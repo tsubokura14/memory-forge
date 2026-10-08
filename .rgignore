@@ -1,0 +1,5 @@
+# Claude Code の Grep（ripgrep）で、リポジトリ全体や docs/ を検索したときに、過去の docs/changes/ の中身を結果に出さない（CLAUDE.md「読むファイル」）
+# .claude/hooks/guard.mjs は、この行があるときだけ、docs/changes/ を含むフォルダの検索を通す
+# 人間が rg で docs/changes/ も検索したいときは --no-ignore を付ける
+/docs/changes/*
+!/docs/changes/_template.md
