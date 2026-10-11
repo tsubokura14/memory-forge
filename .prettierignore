@@ -1,0 +1,10 @@
+# 文書は人が書くので整形しない
+*.md
+docs/
+.claude/
+.github/ISSUE_TEMPLATE/
+
+# 生成されるもの
+package-lock.json
+.next/
+next-env.d.ts
