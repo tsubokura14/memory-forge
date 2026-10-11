@@ -101,6 +101,7 @@
 | 整形・Lint | Prettier、ESLint（`eslint-config-next`） | Next.js の公式のルールと、Tailwind のクラスを調べるルールが使える | Biome：速いが、Next.js の公式のルールの一部が使えない |
 | 見た目 | Tailwind CSS 4 | トークンを Tailwind の値として登録し、部品にそのまま書ける。トークンにない値を Lint で見つけやすい | CSS Modules：トークンにない値を見つけるのに Stylelint が別に要り、ファイルが増える |
 | デプロイ先 | Vercel（Neon の Vercel 連携） | GitHub につなぐだけで、main は本番に、PR は確かめ用の URL に自動で公開され、URL が PR に出る | Cloudflare：Next.js を動かすのに変換の道具が要り、使えない機能がある。Firebase Hosting：PR ごとの公開を自分で CI に組み込む必要があり、サーバーの処理に有料のプランが要る |
+| Next.js の Cache Components | 有効（create-next-app 16.4 の既定） | Next.js のこれからの既定で、公式のドキュメントもこの前提になる。データを読む部分を Suspense で囲む決まりが、`docs/ui.md` の「読み込み中」の見せ方とそのまま対応する | 無効：情報が多く決まりが少ないが、これからの既定から外れ、あとで有効にすると、データを読む画面をまとめて書き直すことになる |
 | パッケージの管理 | npm | `.claude/settings.json` の許可が npm のコマンドで書かれている | — |
 
 ### 全体の構成（仕上げで `docs/design.md` の「全体の構成」に移す）
