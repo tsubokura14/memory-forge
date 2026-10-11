@@ -15,5 +15,6 @@ React で画面を作り、同じプロジェクトにサーバーの処理も�
 - `src/app/page.tsx`：`/` の画面
 - Server Components：`src/app/` の部品は、特に書かなければサーバーで組み立てられる。ブラウザで動かす部品だけ、ファイルの先頭に `"use client"` を書く
 - Cache Components（`next.config.ts` の `cacheComponents: true`）：画面のうち変わらない部分を先に出し、データを読む部分はあとから流し込む。データを読む部分は `<Suspense>` で囲み、囲んだ部品の読み込み中の見た目を `fallback` に書く
+- Partial Prefetching（`next.config.ts` の `partialPrefetching: true`）：リンク先の画面のうち、変わらない部分だけを先に読んでおく。create-next-app が Cache Components と一緒に入れる設定
 - `next.config.ts` の `agentRules: false`：`next dev` が `AGENTS.md` を作らないようにしている
 - 型：`LayoutProps` や `PageProps` は、`next typegen`（`npm run typecheck` の中で動く）が作る型

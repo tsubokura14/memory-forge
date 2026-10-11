@@ -182,6 +182,8 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 | `npm test`／`npm test -- <ファイル>`／`npm test -- -t <名前>` | Vitest のテストを全部／1ファイル／名前で選んで実行する |
 | `npm run lint` | ESLint と Prettier の確かめ（直さない） |
 | `npm run typecheck` | 型チェック |
+| `npm run format` | Prettier で整形する |
+| `npm run build` | 本番用にビルドする |
 | `npm run db:generate`／`npm run db:migrate` | 形の変更のファイルを作る／`dev` と `test` に当てる |
 | `npm run screens:test` | Docker の中で、画面の画像を基準と比べる |
 | `npm run screens:update -- <ファイル>` | Docker の中で、指定した画面を撮り直す |
