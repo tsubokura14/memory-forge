@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+
+# 同じ PR の古い実行を止める。Neon の ci ブランチを、同じ PR の2つの実行が同時に使わないようにするため
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: test・lint・typecheck
+    runs-on: ubuntu-latest
+    outputs:
+      playwright-version: ${{ steps.playwright.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - name: 形の変更を ci のデータベースに当てる
+        run: node node_modules/drizzle-kit/bin.cjs migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - run: npm test
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      # screens のジョブのイメージの版を、入れた @playwright/test の版に合わせる
+      - id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+  screens:
+    name: screens
+    # 形の変更を当てたあとに動かす。ci のデータベースを2つのジョブで同時に使わないため
+    needs: check
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v${{ needs.check.outputs.playwright-version }}-noble
+      options: --ipc=host
+    steps:
+      - uses: actions/checkout@v7
+      - run: npm ci
+      # 基準の画像は、CI では作らない・更新しない
+      - run: npx playwright test --update-snapshots=none
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: 失敗したら、基準・今回・差分の画像のレポートを残す
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
