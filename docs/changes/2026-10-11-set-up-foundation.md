@@ -76,6 +76,10 @@
 - [x] 画面を撮る環境（Docker Desktop）はある？ → ある（起動している）
 - [x] 複数のタスクを別のフォルダで同時に進める？ → 進めない。1つのフォルダで順に進める
 - [x] main のブランチ保護で CI を必須にできる？ → 無料のプランだが、リポジトリを公開してよいので、公開して設定する
+- [x] `tokens.css` は書体を名前（`"Geist"` など）で書いているが、`next/font` は読み込んだ書体に別の名前を付けるのでつながらない。どうつなぐ？ → AIのおすすめどおり、`tokens.css` の `--font-*` を `next/font` の CSS 変数を指す形に変える（タスク4）
+- [x] `tokens.css` に余白の値がない。Tailwind の既定の余白（`p-4` など）をトークンとみなす？ → AIのおすすめどおり、みなす
+- [x] 仮の画面のアプリ名は？ → AIのおすすめどおり、「memory-forge」を mono で出す
+- [x] `tokens.css` の先頭のコメントがプロトタイプ向けの文のまま（写す向きが逆に読める）。どうする？ → AIのおすすめどおり、本番向けの文に直す（タスク4）
 
 ## 調べたこと
 
@@ -154,7 +158,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
   - CI：ジョブの `container:` に同じイメージを指定する
 - Playwright の `webServer` で `next build` と `next start` をして、`.env.test` の接続先を渡す。手元でもコンテナの中なので、別のフォルダのサーバーを撮ることはない
 - 基準の画像は `snapshotPathTemplate` で `docs/specs/screens/{arg}{ext}` にする（OS 名を入れない）
-- 撮るたびに変わるもの：日時は Playwright の `page.clock` で固定する。アニメーションは `toHaveScreenshot` の既定で止まる。書体は `next/font` でアプリから配り、イメージに入っている書体に頼らない
+- 撮るたびに変わるもの：日時は Playwright の `page.clock` で固定する。アニメーションは `toHaveScreenshot` の既定で止まる。書体は `next/font` でアプリから配り、イメージに入っている書体に頼らない。`next/font` は書体に別の名前を付けるので、`tokens.css` の `--font-*` は書体名ではなく `next/font` の CSS 変数を指す形に変える（あわせて、`tokens.css` の先頭のコメントを本番向けの文に直す）
 - 状態の作り方：この作りは、サーバー側で画面を組み立てる。状態（0件など）は、テストの前に `test` のデータベースに決まったデータを入れて作る（`docs/process/screenshots.md`）
 - 撮り直すコマンドは `npm run screens:update -- <画面のテストのファイル>` のように、撮る画面を絞って指定する
 
