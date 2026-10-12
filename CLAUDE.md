@@ -84,6 +84,8 @@
 | `npm run format` | Prettier で整形する |
 | `npm run typecheck` | 型チェック |
 | `npm run build` | 本番用にビルドする |
+| `npm run screens:test` | Docker の中で、画面の画像を基準（`docs/specs/screens/`）と比べる。Docker Desktop が要る |
+| `npm run screens:update -- <画面のテストのファイル>` | Docker の中で、指定した画面だけを撮り直す（例：`npm run screens:update -- e2e/home.spec.ts`） |
 | `npm run db:generate` | 表の定義（`src/server/db/schema.ts`）から、形の変更のファイルを `drizzle/` に作る |
 | `npm run db:migrate` | 形の変更を、`dev`（`.env.local`）と `test`（`.env.test`）のデータベースに当てる |
 
