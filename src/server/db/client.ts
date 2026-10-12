@@ -5,7 +5,7 @@ import * as schema from "./schema";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-// Vercel では、使い終わった接続がプールから片付くまで関数を生かしておく
+// Vercel（本番と確かめ用の公開）だけで付ける。関数が使い回されて、開いた接続が残るのは Vercel の上だけなので、手元と CI では要らない
 if (process.env.VERCEL) {
   attachDatabasePool(pool);
 }
