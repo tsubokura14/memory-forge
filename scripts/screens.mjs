@@ -2,7 +2,7 @@
 //   node scripts/screens.mjs test [Playwright の引数...]
 //   node scripts/screens.mjs update <画面のテストのファイル...>
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 
 const [mode, ...args] = process.argv.slice(2);
 
@@ -44,7 +44,6 @@ const dockerArgs = [
   "memory-forge-next:/work/.next",
   "-w",
   "/work",
-  ...(existsSync(".env.test") ? ["--env-file", ".env.test"] : []),
   image,
   "sh",
   "-c",
