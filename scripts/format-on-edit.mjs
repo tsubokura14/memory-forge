@@ -9,7 +9,7 @@ const lintTargets = new Set([".ts", ".tsx", ".js", ".mjs"]);
 try {
   const chunks = [];
   for await (const chunk of process.stdin) chunks.push(chunk);
-  // Windows の PowerShell から渡すと先頭に BOM が付くことがあるので外す
+  // 手で試すときに PowerShell のパイプで渡すと、先頭に BOM が付くので外す（Claude Code からの入力には付かない）
   const input = JSON.parse(
     Buffer.concat(chunks)
       .toString("utf8")
