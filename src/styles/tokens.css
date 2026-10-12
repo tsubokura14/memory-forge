@@ -1,6 +1,6 @@
 /*
   トークン。色・余白・文字・角の丸み・影は、ここにある値だけを使う。
-  本番のトークンファイルができたら、本番からここへ上書きでコピーする（ここから本番へはコピーしない）。
+  これは本番のトークンファイル。プロトタイプの tokens.css は、ここから上書きでコピーする（プロトタイプからここへはコピーしない）。
   @theme はライトモードの値。ダークモードは下の [data-theme="dark"] で同じ名前の値を上書きする。
 */
 @theme {
@@ -37,11 +37,14 @@
   --color-code-decorator: #b0522c;
   --color-code-comment: #8b8678;
 
-  /* 英字は Geist / Geist Mono。日本語の文字はないので、Noto Sans JP で表示する */
-  --font-sans: "Geist", "Noto Sans JP", sans-serif;
-  --font-mono: "Geist Mono", "Noto Sans JP", monospace;
+  /*
+    英字は Geist / Geist Mono。日本語の文字はないので、Noto Sans JP で表示する
+    書体は next/font が配り、別の名前を付けるので、書体名ではなく src/app/layout.tsx で作る CSS 変数を指す
+  */
+  --font-sans: var(--font-geist), var(--font-noto-sans-jp), sans-serif;
+  --font-mono: var(--font-geist-mono), var(--font-noto-sans-jp), monospace;
   /* 連続日数の数字だけに使う。数字しか出さないので、日本語の書体は要らない */
-  --font-display: "Unbounded", "Geist", sans-serif;
+  --font-display: var(--font-unbounded), var(--font-geist), sans-serif;
 
   --text-xs: 0.75rem;
   --text-xs--line-height: 1rem;
