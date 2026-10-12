@@ -16,7 +16,7 @@
   - `eslint-config-next/typescript`：TypeScript のルール（`any` を使わないなど）
   - `eslint-config-prettier/flat`：Prettier とぶつかる、書式についてのルールを止める
   - `eslint-plugin-better-tailwindcss`：Tailwind のクラスを調べる（https://github.com/schoero/eslint-plugin-better-tailwindcss）。`src/styles/globals.css` を読んで、使えるクラスを知る。使っているのは2つのルールだけ
-    - `no-unknown-classes`：Tailwind にないクラス（トークンにない色や文字の大きさも）を止める
-    - `no-restricted-classes`：`[` を含むクラス（`p-[13px]` のような書いた値）を止める
+    - `no-unknown-classes`：Tailwind にないクラスを止める
+    - `no-restricted-classes`：指定した形（正規表現）のクラスを止める
 - `npm run lint` で、ESLint と Prettier の確かめをまとめて動かす
 - Next.js 16 から `next lint` はなくなり、ESLint を直接動かす

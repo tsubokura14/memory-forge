@@ -12,7 +12,7 @@
 ## このプロジェクトで使っている部分
 
 - 4 から、設定は JavaScript のファイルではなく CSS の `@theme` に書く。`@theme` に書いた `--color-bg` から `bg-bg`・`text-bg` などのクラスができる
-- `src/styles/tokens.css`：トークン。最初に `--color-*: initial` などで Tailwind の既定の色・文字などを消しているので、ここにある値のクラスしか作られない（余白の `p-4` などは Tailwind の既定のまま）
+- `src/styles/tokens.css`：トークン。`--color-*: initial` のように書くと、Tailwind の既定の値（色など）が消え、`@theme` に書いた値のクラスだけが作られる
 - `src/styles/globals.css`：Tailwind とトークンを読み込む。`src/app/layout.tsx` で読み込む
 - `postcss.config.mjs`：Next.js のビルドで Tailwind を動かす（`@tailwindcss/postcss`）
 - ダークモードは、`tokens.css` の `[data-theme="dark"]` で同じ名前の値を上書きする

@@ -14,10 +14,9 @@ const eslintConfig = defineConfig([
     settings: {
       "better-tailwindcss": { entryPoint: "src/styles/globals.css" },
     },
+    // トークンにない値を止める（理由と前提は docs/design.md の「トークンにない値は、ESLint で止める」）
     rules: {
-      // tokens.css で既定の色・文字などを消しているので、トークンにない色や文字の大きさは「知らないクラス」になる
       "better-tailwindcss/no-unknown-classes": "error",
-      // `p-[13px]` のような書いた値は Tailwind では正しいクラスなので、no-unknown-classes では止まらない。`[` を含むクラスをまとめて止める
       "better-tailwindcss/no-restricted-classes": [
         "error",
         {

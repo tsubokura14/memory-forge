@@ -37,3 +37,9 @@
 - 理由：Cache Components を有効にしている（`next.config.ts`）。画面のうち変わらない部分を先に出し、データを読む部分はあとから流し込むので、囲まないとビルドが失敗する。囲んだ `fallback` が、`docs/ui.md` の「読み込み中」の見た目になる
 - 前提（崩れたら見直す）：Cache Components をやめたら、この決まりは要らなくなる
 - 当てはまる場所：`src/app/` と `src/components/` の、データを読むすべての部品
+
+### トークンにない値は、ESLint で止める
+
+- 理由：`docs/ui.md` の「トークンにない値を使わない」を、人の目に頼らずに守るため。`src/styles/tokens.css` の先頭で Tailwind の既定の色・文字などを `initial` で消しているので、トークンにない色や文字の大きさのクラスは `no-unknown-classes` で止まる。`p-[13px]` のような書いた値は Tailwind では正しいクラスなので、`[` を含むクラスを `no-restricted-classes` で止める（`eslint.config.mjs`）
+- 前提（崩れたら見直す）：`tokens.css` の先頭の `--color-*: initial` などの行がある。プロトタイプから写し直してこの行が消えると、Lint は何も言わずに止めなくなる。止めるのは `className` の中だけで、`style` や CSS ファイルに書いた値は止まらない
+- 当てはまる場所：`src/` のすべての `.ts`・`.tsx`
