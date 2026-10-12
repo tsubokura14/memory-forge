@@ -15,6 +15,8 @@ next-env.d.ts
 .vercel
 *.pem
 npm-debug.log*
+test-results/
+playwright-report/
 
 # OS・エディタ
 .DS_Store

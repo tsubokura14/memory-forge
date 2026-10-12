@@ -224,7 +224,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 - [x] 1. ひな形：Next.js・Vitest・ESLint・Prettier・型チェックが入り、`npm run dev`・`npm test`・`npm run lint`・`npm run typecheck` が動き、`docs/overview.md` の「技術」と `CLAUDE.md` の「技術」「よく使うコマンド」が書けたら完了
 - [x] 2. トークンと仮の画面：人間が写した `tokens.css` を Tailwind に登録し、`/` にアプリ名だけの仮の画面を出し、トークンにない値が Lint で止まり、`docs/ui.md` にトークンの場所が書けたら完了
 - [x] 3. データベース：Drizzle と `pg` でつなぐ設定と形の変更のコマンドができ、`dev` と `test` に `npm run db:migrate` が通ったら完了（表は作らない）
-- [ ] 4. 画面を撮る仕組み：Docker の中で `/` を撮って `docs/specs/screens/home-default.png` に入り、比べるテストが通り、コマンドが `CLAUDE.md` に書けたら完了
+- [x] 4. 画面を撮る仕組み：Docker の中で `/` を撮って `docs/specs/screens/home-default.png` に入り、比べるテストが通り、コマンドが `CLAUDE.md` に書けたら完了
 - [ ] 5. CI：PR でテスト・Lint・型チェック・画像の比べが走り、失敗したら画像のレポートが残り、人間にブランチ保護の設定を伝えたら完了
 - [ ] 6. デプロイ：main へのマージで本番に、PR で確かめ用の URL に公開され、それぞれのビルドで形の変更が当たったら完了
 - [ ] 7. 編集したあとのフックと、`.claude/rules/testing.md` の `paths:` ができ、Windows で動いたら完了
