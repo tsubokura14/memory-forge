@@ -14,7 +14,7 @@
 ## 主な機能
 
 - **問題の取り込み**：Claude Code に作らせた問題のファイル（JSON か CSV）を、画面から取り込む。誤りがあれば、どの問題のどこが誤りかを出し、何も取り込まない。取り込む前に、増える・置き換わる問題を見せる
-- **解く**：Subject（例：AWS SAA、Python）と Topic を選び、問題数と出題の順番（正答率が低い順など）を選んで解く。1つを選ぶ問題と、当てはまるものをすべて選ぶ問題がある
+- **解く**：Subject（例：AWS SAA、Python）の中の Topic を1つ、または全部を選び、問題数と出題の順番（正答率が低い順など）を選んで解く。1つを選ぶ問題と、当てはまるものをすべて選ぶ問題がある
 - **答え合わせ**：1問ごとに正解・不正解と解説を出す。解き終わったら、正答率と Topic ごとの結果を出す
 - **記録**：問題ごとの正答率、Subject と Topic ごとの身についている具合、毎日続けている日数（連続日数）を出す
 - **不備の印**：誤りのありそうな問題に印を付け、その問題を書き出して直し、取り込み直す
@@ -53,7 +53,7 @@ cd memory-forge
 npm install
 cp .env.example .env.local   # DATABASE_URL に、Neon の dev ブランチの接続先を入れる
 cp .env.example .env.test    # DATABASE_URL に、Neon の test ブランチの接続先を入れる
-npm run db:migrate           # dev と test のデータベースに、表の形を当てる
+npm run db:migrate           # dev と test のデータベースに、形の変更（マイグレーション）を当てる
 npm run dev                  # http://localhost:3000 で開く
 ```
 
