@@ -84,6 +84,8 @@
 | `npm run format` | Prettier で整形する |
 | `npm run typecheck` | 型チェック |
 | `npm run build` | 本番用にビルドする |
+| `npm run db:generate` | 表の定義（`src/server/db/schema.ts`）から、形の変更のファイルを `drizzle/` に作る |
+| `npm run db:migrate` | 形の変更を、`dev`（`.env.local`）と `test`（`.env.test`）のデータベースに当てる |
 
 ## うまくいかなかったことから追加したルール
 
