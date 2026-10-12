@@ -7,7 +7,7 @@ if (existsSync(".env.test")) {
   process.loadEnvFile(".env.test");
 }
 
-// Playwright 公式の Docker イメージの中で動かす（scripts/screens.mjs、CI）。手元の OS で直接動かすと、文字の描き方が違って基準の画像と一致しない
+// Playwright 公式の Docker イメージの中で動かす（docs/design.md の「画面の画像を撮る・比べる仕組み」）
 export default defineConfig({
   testDir: "./e2e",
   // CI では、失敗したときに基準・今回・差分の画像を開けるように、HTML のレポートも作る

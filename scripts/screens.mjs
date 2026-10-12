@@ -18,7 +18,7 @@ if (mode === "update" && args.length === 0) {
   process.exit(1);
 }
 
-// イメージの版は、入れた @playwright/test の版に合わせる（違うと、イメージの中のブラウザと合わない）
+// イメージの版は、入れた @playwright/test の版に合わせる（docs/design.md の「画面の画像を撮る・比べる仕組み」）
 const { version } = JSON.parse(
   readFileSync("node_modules/@playwright/test/package.json", "utf8"),
 );

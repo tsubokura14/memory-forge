@@ -14,7 +14,61 @@
 
 ## 全体の構成
 
-<!-- フォルダ構成、層の分け方、どの層に何を書くかと、その理由・前提。立ち上げの手順4（docs/process/foundation.md）で書く -->
+```
+src/
+  app/          画面とルート（App Router）。データを取ってきて部品に渡すだけにする
+  components/   画面の部品（docs/ui.md の部品）
+  server/       サーバーだけで動く処理
+    db/         接続（client.ts）と表の定義（schema.ts）
+    <機能>/     機能ごとの読み書きと決まり（例：server/import/）。計算は、データベースを使わない関数に分ける
+  styles/
+    tokens.css  トークン（色・余白・文字の値はここにだけ書く）
+    globals.css Tailwind の読み込みと、トークンの登録
+  **/*.test.ts  Vitest のテスト。確かめるファイルの横に置く
+drizzle/        形の変更（マイグレーション）のファイル。drizzle-kit が作る
+e2e/            Playwright のテスト（*.spec.ts）。画像を比べるテストもここ
+docs/specs/screens/  基準の画像（<画面>-<状態>.png）
+scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリプト
+```
+
+- 決まり（入力の確かめ、出し分け、計算）は `src/server/` に置き、画面（`src/app/`、`src/components/`）には書かない
+  - 理由：1つの決まりを、いちばん中心の層で1回だけ Vitest で確かめるため（`docs/process/testing.md`）。画面のテストは、結果がどの文言で出るかだけにできる
+  - 前提（崩れたら見直す）：決まりを使うのはこのアプリの画面だけ。あとで作る「問題を取り出す API」も `src/server/` を呼ぶ
+- データベースに触るのは `src/server/` だけ。画面の部品から直接 `db` を読まない
+
+## データベースのつながり方
+
+| 使う場所 | Neon のブランチ | 接続先の置き場所 |
+| --- | --- | --- |
+| 本番（Vercel の Production） | main（Neon のいちばん上のブランチ） | Neon の Vercel 連携が入れる |
+| 確かめ用の公開（Vercel の Preview） | `preview/<Git のブランチ名>`（Vercel 連携が公開ごとに作る） | Vercel 連携がその公開だけに入れる |
+| 手元の開発（`npm run dev`） | `dev` | `.env.local` |
+| 手元のテスト（Vitest、Playwright、画面を撮る） | `test` | `.env.test` |
+| CI | `ci` | GitHub の Secret `DATABASE_URL` |
+
+- `dev`・`test`・`ci` は、Neon の画面で main から作ったブランチ。テストは自分で入れたデータだけを使い、始める前に表を空にする（main から写した本番のデータを当てにしない）
+- 接続は `pg` の接続プールと `drizzle-orm/node-postgres`（`src/server/db/client.ts`）
+  - 理由：取り込みで、途中で読んで判断するトランザクションを使うため。手元・CI・本番が同じ書き方になる
+- 形の変更を当てる場所
+  - 手元：`npm run db:generate` でファイルを作り、`npm run db:migrate` で `dev`・`test` に当てる
+  - CI：テストの前に `ci` に当てる（`.github/workflows/ci.yml`）
+  - 本番と確かめ用の公開：Vercel のビルドの最初に当てる（`vercel.json` の `buildCommand`）。接続プールを通さない `DATABASE_URL_UNPOOLED` を使う（`drizzle.config.ts`）。当て方の決まりは「どこでも守る決まり」の「データベースの形の変更は「足す」ものにする」
+- 秘密の値は `.env.local`・`.env.test`（Git に入らない）、GitHub の Secret、Vercel にだけ置く。`.env.example` に名前だけを書く
+
+## 画面の画像を撮る・比べる仕組み
+
+- 撮る・比べるは、Playwright 公式の Docker イメージ（`mcr.microsoft.com/playwright:v<入れた @playwright/test の版>-noble`）の中で、アプリのビルドと立ち上げも含めて行う。同じイメージにする理由は `docs/process/screenshots.md`
+  - 手元：`npm run screens:test`・`npm run screens:update -- <画面のテストのファイル>`（`scripts/screens.mjs` が `docker run` する）
+  - CI：`screens` のジョブの `container:` に同じイメージを指定する
+  - 前提（崩れたら見直す）：イメージの版は、入れた `@playwright/test` の版から決めている（`scripts/screens.mjs` と `ci.yml`）。違うと、イメージの中のブラウザと合わない
+- Playwright の `webServer` で `next build` と `next start` をし、`test`（CI では `ci`）のデータベースにつなぐ（`playwright.config.ts`）
+- 基準の画像は `docs/specs/screens/<画面>-<状態>.png`（OS 名を入れない）
+- 撮るたびに変わるものを止める
+  - 日時：ブラウザの日時を `page.clock` で固定する（`e2e/fixtures.ts`）。画像を撮るテストは、ここの `test` を使う
+  - 書体：`next/font` でアプリから配り（`src/app/layout.tsx`）、イメージに入っている書体に頼らない
+  - アニメーション：`toHaveScreenshot` の既定で止まる
+  - 前提（崩れたら見直す）：サーバー側の日時は固定していない。サーバーで日付を使う画面（連続日数など）を撮るときは、固定する方法を足す
+- 状態（0件など）は、テストの前に `test` のデータベースに決まったデータを入れて作る（`docs/process/screenshots.md`）
 
 ## データ
 

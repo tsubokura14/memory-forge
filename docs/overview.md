@@ -73,6 +73,8 @@
 | 言語・フレームワーク | Next.js（App Router、TypeScript） | 画面とサーバーの処理を1つに書け、情報が多く、Vercel と相性が良い |
 | データベース | Neon（PostgreSQL）と Drizzle ORM | 記録の集計・並べ替え・ページ分けを SQL で素直に書け、取り込みを1つのトランザクションにできる |
 | テスト | Vitest、Playwright | Vitest で中の決まりを速く確かめ、Playwright で画面を通したテストと画像の比べをする |
+| 見た目 | Tailwind CSS 4 | トークンを Tailwind の値として登録して部品にそのまま書け、トークンにない値を Lint で見つけやすい |
+| 整形・Lint | Prettier、ESLint（`eslint-config-next`） | Next.js の公式のルールと、Tailwind のクラスを調べるルールが使える |
 | デプロイ先 | Vercel | main は本番に、PR は確かめ用の URL に自動で公開される |
 
 <!--
