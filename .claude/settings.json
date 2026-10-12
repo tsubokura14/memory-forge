@@ -148,6 +148,20 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/scripts/format-on-edit.mjs"
+            ]
+          }
+        ]
+      }
     ]
   }
 }
