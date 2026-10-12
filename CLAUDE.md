@@ -67,11 +67,23 @@
 
 ## 技術
 
-<!-- 立ち上げで決めたら書く。詳しくは docs/overview.md -->
+- Next.js 16（App Router、TypeScript、Cache Components を有効）、React 19
+- Vitest（テスト）、ESLint（`eslint-config-next`）と Prettier（整形）
+- パッケージの管理は npm
+- 選んだ理由は `docs/overview.md` の「技術」
 
 ## よく使うコマンド
 
-<!-- 起動、テスト、Lint、型チェック、本番の画面を撮り直す、画像を比べるテスト -->
+| コマンド | すること |
+| --- | --- |
+| `npm run dev` | 手元でアプリを立ち上げる（http://localhost:3000） |
+| `npm test` | Vitest のテストを全部実行する |
+| `npm test -- <ファイル>` | 1つのファイルのテストだけを実行する |
+| `npm test -- -t <名前>` | 名前で選んだテストだけを実行する |
+| `npm run lint` | ESLint と Prettier の確かめ（直さない） |
+| `npm run format` | Prettier で整形する |
+| `npm run typecheck` | 型チェック |
+| `npm run build` | 本番用にビルドする |
 
 ## うまくいかなかったことから追加したルール
 

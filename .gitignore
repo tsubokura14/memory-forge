@@ -8,6 +8,13 @@ node_modules/
 dist/
 build/
 coverage/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+*.pem
+npm-debug.log*
 
 # OS・エディタ
 .DS_Store

@@ -101,6 +101,7 @@
 | 整形・Lint | Prettier、ESLint（`eslint-config-next`） | Next.js の公式のルールと、Tailwind のクラスを調べるルールが使える | Biome：速いが、Next.js の公式のルールの一部が使えない |
 | 見た目 | Tailwind CSS 4 | トークンを Tailwind の値として登録し、部品にそのまま書ける。トークンにない値を Lint で見つけやすい | CSS Modules：トークンにない値を見つけるのに Stylelint が別に要り、ファイルが増える |
 | デプロイ先 | Vercel（Neon の Vercel 連携） | GitHub につなぐだけで、main は本番に、PR は確かめ用の URL に自動で公開され、URL が PR に出る | Cloudflare：Next.js を動かすのに変換の道具が要り、使えない機能がある。Firebase Hosting：PR ごとの公開を自分で CI に組み込む必要があり、サーバーの処理に有料のプランが要る |
+| Next.js の Cache Components | 有効（create-next-app 16.4 の既定） | Next.js のこれからの既定で、公式のドキュメントもこの前提になる。データを読む部分を Suspense で囲む決まりが、`docs/ui.md` の「読み込み中」の見せ方とそのまま対応する | 無効：情報が多く決まりが少ないが、これからの既定から外れ、あとで有効にすると、データを読む画面をまとめて書き直すことになる |
 | パッケージの管理 | npm | `.claude/settings.json` の許可が npm のコマンドで書かれている | — |
 
 ### 全体の構成（仕上げで `docs/design.md` の「全体の構成」に移す）
@@ -181,6 +182,8 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 | `npm test`／`npm test -- <ファイル>`／`npm test -- -t <名前>` | Vitest のテストを全部／1ファイル／名前で選んで実行する |
 | `npm run lint` | ESLint と Prettier の確かめ（直さない） |
 | `npm run typecheck` | 型チェック |
+| `npm run format` | Prettier で整形する |
+| `npm run build` | 本番用にビルドする |
 | `npm run db:generate`／`npm run db:migrate` | 形の変更のファイルを作る／`dev` と `test` に当てる |
 | `npm run screens:test` | Docker の中で、画面の画像を基準と比べる |
 | `npm run screens:update -- <ファイル>` | Docker の中で、指定した画面を撮り直す |
@@ -214,7 +217,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 
 ## タスク
 
-- [ ] 1. ひな形：Next.js・Vitest・ESLint・Prettier・型チェックが入り、`npm run dev`・`npm test`・`npm run lint`・`npm run typecheck` が動き、`docs/overview.md` の「技術」と `CLAUDE.md` の「技術」「よく使うコマンド」が書けたら完了
+- [x] 1. ひな形：Next.js・Vitest・ESLint・Prettier・型チェックが入り、`npm run dev`・`npm test`・`npm run lint`・`npm run typecheck` が動き、`docs/overview.md` の「技術」と `CLAUDE.md` の「技術」「よく使うコマンド」が書けたら完了
 - [ ] 2. トークンと仮の画面：人間が写した `tokens.css` を Tailwind に登録し、`/` にアプリ名だけの仮の画面を出し、トークンにない値が Lint で止まり、`docs/ui.md` にトークンの場所が書けたら完了
 - [ ] 3. データベース：Drizzle と `pg` でつなぐ設定と形の変更のコマンドができ、`dev` と `test` に `npm run db:migrate` が通ったら完了（表は作らない）
 - [ ] 4. 画面を撮る仕組み：Docker の中で `/` を撮って `docs/specs/screens/home-default.png` に入り、比べるテストが通り、コマンドが `CLAUDE.md` に書けたら完了
