@@ -68,7 +68,11 @@
 ## 技術
 
 - Next.js 16（App Router、TypeScript、Cache Components を有効）、React 19
-- Vitest（テスト）、ESLint（`eslint-config-next`）と Prettier（整形）
+- Tailwind CSS 4（トークンは `src/styles/tokens.css`）
+- Neon（PostgreSQL）と Drizzle ORM（drizzle-kit で形の変更を管理）
+- Vitest（中の決まりのテスト）、Playwright（画面を通したテストと、Docker の中での画像の比べ）
+- ESLint（`eslint-config-next`、`eslint-plugin-better-tailwindcss`）と Prettier（整形）
+- GitHub Actions（PR ごとの CI）、Vercel（公開）
 - パッケージの管理は npm
 - 選んだ理由は `docs/overview.md` の「技術」
 

@@ -1,6 +1,6 @@
 import { test as base } from "@playwright/test";
 
-// 画面のテストは、ここの test を使う。撮るたびに画像が変わらないように、ブラウザの日時を固定する
+// docs/design.md の「画面の画像を撮る・比べる仕組み」
 export const test = base.extend({
   // 2つめの引数をふつうの名前の use にすると、ESLint が React の use と取り違えて止めるので、名前を変えている
   page: async ({ page }, runTest) => {
