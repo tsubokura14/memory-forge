@@ -227,5 +227,5 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 - [x] 4. 画面を撮る仕組み：Docker の中で `/` を撮って `docs/specs/screens/home-default.png` に入り、比べるテストが通り、コマンドが `CLAUDE.md` に書けたら完了
 - [x] 5. CI：PR でテスト・Lint・型チェック・画像の比べが走り、失敗したら画像のレポートが残り、人間にブランチ保護の設定を伝えたら完了
 - [x] 6. デプロイ：main へのマージで本番に、PR で確かめ用の URL に公開され、それぞれのビルドで形の変更が当たったら完了
-- [ ] 7. 編集したあとのフックと、`.claude/rules/testing.md` の `paths:` ができ、Windows で動いたら完了
+- [x] 7. 編集したあとのフックと、`.claude/rules/testing.md` の `paths:` ができ、Windows で動いたら完了
 - [ ] 8. `README.md` が、GitHub で見た人向けに書けたら完了
