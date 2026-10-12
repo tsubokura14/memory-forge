@@ -1,7 +1,7 @@
 export default function Home() {
   return (
     <main>
-      <div>Hello world!</div>
+      <h1 className="font-mono text-lg">memory-forge</h1>
     </main>
   );
 }

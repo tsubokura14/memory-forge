@@ -1,0 +1,100 @@
+/*
+  トークン。色・余白・文字・角の丸み・影は、ここにある値だけを使う。
+  本番のトークンファイルができたら、本番からここへ上書きでコピーする（ここから本番へはコピーしない）。
+  @theme はライトモードの値。ダークモードは下の [data-theme="dark"] で同じ名前の値を上書きする。
+*/
+@theme {
+  --color-*: initial;
+  --font-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+
+  --color-bg: #f7f5f0;
+  --color-surface: #ffffff;
+  --color-surface-raised: #f1eee6;
+  --color-border: #e4e0d6;
+  --color-text: #2b2a27;
+  --color-muted: #6f6b62;
+  --color-primary: #2f4f7f;
+  --color-primary-soft: #e8eef7;
+  --color-on-primary: #ffffff;
+  --color-success: #2f7a4f;
+  --color-success-soft: #e6f2ea;
+  --color-danger: #b3412e;
+  --color-danger-soft: #f8e7e3;
+  --color-warning: #9a6210;
+  --color-warning-soft: #fbf0dc;
+  --color-flame: #e8590c;
+
+  --color-code-bg: #f1eee6;
+  --color-code-text: #2b2a27;
+  --color-code-line: #a9a395;
+  --color-code-keyword: #8a3b8f;
+  --color-code-string: #3f7a3a;
+  --color-code-function: #2f5fa0;
+  --color-code-builtin: #9a5b12;
+  --color-code-decorator: #b0522c;
+  --color-code-comment: #8b8678;
+
+  /* 英字は Geist / Geist Mono。日本語の文字はないので、Noto Sans JP で表示する */
+  --font-sans: "Geist", "Noto Sans JP", sans-serif;
+  --font-mono: "Geist Mono", "Noto Sans JP", monospace;
+  /* 連続日数の数字だけに使う。数字しか出さないので、日本語の書体は要らない */
+  --font-display: "Unbounded", "Geist", sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 0.9375rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.625rem;
+  --text-display: 2.5rem;
+  --text-display--line-height: 1;
+
+  --container-*: initial;
+  --container-sm: 24rem;
+  --container-md: 28rem;
+  --container-page: 72rem;
+
+  --radius-sm: 3px;
+  --radius-md: 4px;
+
+  /* 浮かせて重ねるもの（プルダウンの中身、ダイアログ）だけに使う */
+  --shadow-popover: 0 8px 24px rgb(43 42 39 / 0.12);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-bg: #0f1115;
+  --color-surface: #161a21;
+  --color-surface-raised: #1d222b;
+  --color-border: #2a303b;
+  --color-text: #e6e9ef;
+  --color-muted: #8a93a3;
+  --color-primary: #82aaff;
+  --color-primary-soft: #1a2640;
+  --color-on-primary: #0f1115;
+  --color-success: #4fd1a5;
+  --color-success-soft: #12312a;
+  --color-danger: #f2777a;
+  --color-danger-soft: #3a1c1f;
+  --color-warning: #f0b75a;
+  --color-warning-soft: #3a2d14;
+  --color-flame: #ff8a3d;
+
+  --color-code-bg: #0b0d11;
+  --color-code-text: #d6deeb;
+  --color-code-line: #4a5263;
+  --color-code-keyword: #c792ea;
+  --color-code-string: #c3e88d;
+  --color-code-function: #82aaff;
+  --color-code-builtin: #ffcb6b;
+  --color-code-decorator: #f78c6c;
+  --color-code-comment: #637083;
+
+  --shadow-popover: 0 8px 24px rgb(0 0 0 / 0.5);
+}

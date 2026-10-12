@@ -12,7 +12,7 @@
 
 ## トークン
 
-- トークンファイル：<!-- 例：src/styles/tokens.css。立ち上げの手順4で決める -->
+- トークンファイル：`src/styles/tokens.css`（Tailwind には `src/styles/globals.css` で登録する）
 - コードでもプロトタイプでも、トークンにない値（`p-[13px]`、`#3366ff` など）を使わない
 
 ## 雰囲気
