@@ -86,7 +86,7 @@
 - 2026-10 時点の最新版：next 16.4.0、react 19.3.0、drizzle-orm 0.45.4、drizzle-kit 0.31.11、pg 8.23.1、vitest 5.0.3、@playwright/test 1.64.0、tailwindcss 4.3.3、eslint 10.12.0、eslint-config-next 16.4.0、prettier 3.9.10。手元は Node.js 24.13.0、npm 11.12.1、Docker 28.4.0。入れるときの版は、各タスクで入れた版を正とする
 - Next.js 16 では `next lint` がなくなり、ESLint の CLI と `eslint.config.mjs`（flat config）で動かす。Prettier と組むときは `eslint-config-prettier/flat` を足す。`eslint-config-next` は ESLint 9 と 10 に対応するが、中の一部のプラグインが 10 を peer に書いておらず、警告が出ることがある（https://nextjs.org/docs/app/api-reference/config/eslint）
 - Neon は、Vercel の Fluid compute では `pg`（TCP）の接続プールと `@vercel/functions` の `attachDatabasePool` を勧めている。Drizzle では `drizzle-orm/node-postgres` で使う（https://neon.com/docs/guides/vercel-connection-methods）。HTTP のドライバー（`@neondatabase/serverless`）は、途中で読んで判断するトランザクションに向かない
-- Neon の Vercel 連携は、Vercel の確かめ用の公開（Preview）ごとに `preview/<Git のブランチ名>` の Neon のブランチを作り、その公開だけに `DATABASE_URL`（プール経由）と `DATABASE_URL_UNPOOLED`（直接）を渡す。ブランチは Vercel の公開が消えるときに消える（既定の保存期間は6か月）（https://neon.com/docs/guides/vercel-managed-integration）
+- Neon の Vercel 連携は、Vercel の確かめ用の公開（Preview）ごとに `preview/<Git のブランチ名>` の Neon のブランチを作り、その公開だけに `DATABASE_URL`（プール経由）と `DATABASE_URL_UNPOOLED`（直接）を渡す。ブランチは Vercel の公開が消えるときに消える（既定の保存期間は6か月）（https://neon.com/docs/guides/vercel-managed-integration）。実際には Neon の画面からつないだ（「人間がすること」）。`preview/<Git のブランチ名>` ができることは確かめたが、ブランチが自動で消えるかは確かめていない
 - Playwright は `snapshotPathTemplate`（`{arg}`、`{ext}`、`{platform}` など）で基準の画像の場所と名前を変えられる。`webServer` でテストの前にサーバーを立ち上げる。`toHaveScreenshot` はアニメーションを既定で止める（https://playwright.dev/docs/api/class-testconfig）
 - Tailwind のクラスを ESLint で調べるプラグイン `eslint-plugin-better-tailwindcss` は Tailwind 4 と flat config に対応し、`no-unknown-classes`・`no-restricted-classes` を持つ。トークンにない値（`p-[13px]`）を止められるかは、トークンのタスクで確かめる
 
@@ -197,7 +197,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 - プロトタイプの `tokens.css` を `src/styles/tokens.css` に写す（トークンのタスク）
 - Neon のプロジェクトを作り、`dev`・`test`・`ci` のブランチを作って、接続先を `.env.local`・`.env.test`・GitHub の Secret に入れる（データベースのタスク、CI のタスク）
 - リポジトリを公開し、main のブランチ保護で CI のジョブを必須にする（CI のタスクのあと）
-- Vercel のプロジェクトを GitHub のリポジトリにつなぎ、Vercel の Marketplace から Neon を連携し、Preview でブランチを作る設定を入れる（デプロイのタスク）
+- Vercel のプロジェクトを GitHub のリポジトリにつなぎ、Neon の画面の Integrations から、今の Neon のプロジェクト（`dev`・`test`・`ci` のブランチがあるもの）を Vercel につなぎ、Preview でブランチを作る設定を入れる（デプロイのタスク）。Vercel の Marketplace から新しく Neon を作ると、別の Neon のプロジェクトになるため、こちらにした
 
 ## 確かめ方
 
@@ -226,6 +226,6 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 - [x] 3. データベース：Drizzle と `pg` でつなぐ設定と形の変更のコマンドができ、`dev` と `test` に `npm run db:migrate` が通ったら完了（表は作らない）
 - [x] 4. 画面を撮る仕組み：Docker の中で `/` を撮って `docs/specs/screens/home-default.png` に入り、比べるテストが通り、コマンドが `CLAUDE.md` に書けたら完了
 - [x] 5. CI：PR でテスト・Lint・型チェック・画像の比べが走り、失敗したら画像のレポートが残り、人間にブランチ保護の設定を伝えたら完了
-- [ ] 6. デプロイ：main へのマージで本番に、PR で確かめ用の URL に公開され、それぞれのビルドで形の変更が当たったら完了
+- [x] 6. デプロイ：main へのマージで本番に、PR で確かめ用の URL に公開され、それぞれのビルドで形の変更が当たったら完了
 - [ ] 7. 編集したあとのフックと、`.claude/rules/testing.md` の `paths:` ができ、Windows で動いたら完了
 - [ ] 8. `README.md` が、GitHub で見た人向けに書けたら完了
