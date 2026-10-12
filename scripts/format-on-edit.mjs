@@ -11,7 +11,9 @@ try {
   for await (const chunk of process.stdin) chunks.push(chunk);
   // Windows の PowerShell から渡すと先頭に BOM が付くことがあるので外す
   const input = JSON.parse(
-    Buffer.concat(chunks).toString("utf8").replace(/^﻿/, ""),
+    Buffer.concat(chunks)
+      .toString("utf8")
+      .replace(/^\uFEFF/, ""),
   );
   const filePath = input?.tool_input?.file_path;
   const projectDir =
