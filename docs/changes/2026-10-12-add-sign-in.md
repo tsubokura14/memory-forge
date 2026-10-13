@@ -21,11 +21,11 @@ PC とスマホで同じ問題と記録を使い、公開しても他人に問�
 
 - ログインしていない人が、Login 以外のどの画面を開いても、Login が出る。sign in すると、開こうとしていた画面に移る（Login を直接開いたときは Home）
 - Login で、登録されたメールアドレスと正しいパスワードを入れて sign in を押すと、Home（または開こうとしていた画面）に移る
-- メールアドレスかパスワードが違うと、Login のまま、danger の帯で「incorrect email or password」を出す。どちらが違ったかは出さない。入れたメールアドレスは残し、パスワードは空にする
-- 5回続けて間違えると、そこから15分は、正しいメールアドレスとパスワードでも入れず、danger の帯で「too many attempts. try again in 15 minutes」を出す。15分たてば、また入れる。入れたら、間違えた回数は0に戻る
+- メールアドレスかパスワードが違うと、Login のまま、danger の帯で「Incorrect email or password.」を出す。どちらが違ったかは出さない。入れたメールアドレスとパスワードは残し、パスワードの枠を danger にする
+- 5回続けて間違えると、そこから15分は、正しいメールアドレスとパスワードでも入れず、danger の帯で「Too many attempts. Try again in 15 minutes.」を出す。15分たてば、また入れる。入れたら、間違えた回数は0に戻る
 - メールアドレスかパスワードが空のまま sign in を押すと、ブラウザの「入力してください」が出て、送らない
-- 送っている間は、ボタンを「signing in…」にして押せなくする
-- つながらないなど、サーバーのエラーのときは、Login のまま、danger の帯で「couldn't sign in. please try again」を出す
+- 送っている間は、ボタンを「signing in…」にして、ボタンと入力を押せなく（打てなく）する
+- つながらないなど、サーバーのエラーのときは、Login のまま、danger の帯で「Couldn't sign in. Please try again.」を出す
 - Login に forgot password? のリンクを置く。パスワードの再設定（#4）ができるまでは、押しても何も起きない
 - Login に、新しく登録する手段はない
 - ログインしている人が Login を開くと、Home に移る
@@ -37,21 +37,26 @@ PC とスマホで同じ問題と記録を使い、公開しても他人に問�
 
 ### Login
 
-`docs/ui.md` の「中身の幅」のとおり、sm の幅のカードにする。上のバーは出さず、カードの上にロゴとアプリ名を出す。カードの中は、上から email の入力、password の入力、sign in のボタン、forgot password? のリンク。
+`docs/ui.md` の「中身の幅」のとおり、sm の幅のカードにする。上のバーは出さず、カードの上にロゴとアプリ名を出す。カードの中は、上から帯（エラーのとき）、email の入力、password の入力、sign in のボタン。forgot password? のリンクは、カードの下の外に置く。
+
+- 帯の文言は、大文字で始め、ピリオドで終える文の形にする（小文字で短くするのは、ボタンとラベルだけ）
+- スクリーンショットには、Google でログインするボタン（「or」と「sign in with google」）が写っているが、この変更では作らない（#14 で作る）
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 通常 | ロゴとアプリ名、email・password の入力、sign in のボタン（primary）、forgot password? のリンク | |
-| 送っている間 | ボタンが「signing in…」になり、押せない | |
-| 違う | 入力の上に danger の帯で「incorrect email or password」。email は残り、password は空 | |
-| 止めている | 入力の上に danger の帯で「too many attempts. try again in 15 minutes」 | |
-| サーバーのエラー | 入力の上に danger の帯で「couldn't sign in. please try again」。retry のボタンは出さない（sign in をもう一度押せば済むため） | |
+| 通常 | ロゴとアプリ名、email・password の入力、sign in のボタン（primary）、forgot password? のリンク | ![](2026-10-12-add-sign-in/login-default.png) |
+| 送っている間 | ボタンが「signing in…」になって薄くなり、ボタンと入力が押せない | ![](2026-10-12-add-sign-in/login-loading.png) |
+| 違う | 入力の上に danger の帯で「Incorrect email or password.」。email と password は残り、password の枠が danger | ![](2026-10-12-add-sign-in/login-error.png) |
+| 止めている | 入力の上に danger の帯で「Too many attempts. Try again in 15 minutes.」。見た目は「違う」の帯と同じ | なし（プロトタイプにない状態） |
+| サーバーのエラー | 入力の上に danger の帯で「Couldn't sign in. Please try again.」。retry のボタンは出さない（sign in をもう一度押せば済むため）。見た目は「違う」の帯と同じ | なし（プロトタイプにない状態） |
 
 ### 上のバー
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 通常 | 左にロゴとアプリ名（Home へ）、右に sign out | |
+| 通常 | 左にロゴとアプリ名（Home へ）、右に sign out | ![](2026-10-12-add-sign-in/home-default.png) |
+
+- スクリーンショットは Home のものなので、上のバーの部分だけを見る。上のバーより下（連続日数、menu、subjects）は、この変更では作らない（Home の中身は今の仮の画面のまま）
 
 ## やらないこと
 
@@ -69,12 +74,17 @@ PC とスマホで同じ問題と記録を使い、公開しても他人に問�
 - [x] ログインしていない人が、Home 以外の画面を開いて Login に戻されたとき、sign in のあとは Home に行くか、開こうとしていた画面に行くか → 開こうとしていた画面に行く（スマホのブックマークから開いたときなどに不便なため）
 - [x] ログインしたままでいられる長さは？ → 最後に使ってから30日（スマホのすきま時間に毎回入り直さないため）
 - [x] パスワードを何度も間違えたとき、しばらく入れなくする？ → 5回続けて間違えたら、15分は入れない（公開していて、通るアカウントは1つだけなので、総当たりを防ぐため）
-- [x] エラーの帯の文言は？ → 違うとき「incorrect email or password」、止めているとき「too many attempts. try again in 15 minutes」
-- [x] つながらないなど、サーバーのエラーのときの表示は？ → danger の帯で「couldn't sign in. please try again」。retry のボタンは出さない
+- [x] エラーの帯の文言は？ → 違うとき「Incorrect email or password.」、止めているとき「Too many attempts. Try again in 15 minutes.」（プロトタイプで、帯は文の形にすると決めた）
+- [x] つながらないなど、サーバーのエラーのときの表示は？ → danger の帯で「Couldn't sign in. Please try again.」。retry のボタンは出さない
 - [x] メールアドレスやパスワードが空のまま sign in を押したら？ → ブラウザに組み込みの「入力してください」を出して、送らない
 - [x] 送っている間は、ボタンを押せなくして文言を変える？ → 「signing in…」にして押せなくする
 - [x] Login の画面に、アプリ名やロゴは出す？ 上のバーは出す？ → 上のバーは出さない（sign out が意味を持たないため）。カードの上にロゴとアプリ名を出す
 - [x] 入力欄のラベルの文言は？ → email、password
+- [x] 帯の文言は、小文字か文の形か → 文の形（大文字で始め、ピリオドで終える）。小文字にするのはボタンとラベルだけ
+- [x] 間違えたとき、パスワードは空にする？ → 合意済みのプロトタイプに合わせて、残す（枠を danger にする）
+- [x] 止めているときとサーバーのエラーは、プロトタイプにない。どうするか → 文で仕様に残し、スクリーンショットは付けない（見た目は「違う」の帯と同じ）
+- [x] Login の Google のボタン（#14）がスクリーンショットに写っている。どうするか → プロトタイプのまま撮る。写っていても、この変更では作らない
+- [x] 上のバーのスクリーンショットは？ → Home のスクリーンショットの、上のバーの部分だけを見る
 - [x] 上のバーは、どの仕様ファイルに書くか → 新しく `docs/specs/app-bar.md` を作る（以後のすべての画面が使うため）
 
 ## 調べたこと
