@@ -42,19 +42,19 @@ PC とスマホで同じ問題と記録を使い、公開しても他人に問�
 - 帯の文言は、大文字で始め、ピリオドで終える文の形にする（小文字で短くするのは、ボタンとラベルだけ）
 - スクリーンショットには、Google でログインするボタン（「or」と「sign in with google」）が写っているが、この変更では作らない（#14 で作る）
 
-| 状態 | 表示 | スクリーンショット |
+| 状態 | 表示 | スクリーンショット（PC・スマホの幅） |
 | --- | --- | --- |
-| 通常 | ロゴとアプリ名、email・password の入力、sign in のボタン（primary）、forgot password? のリンク | ![](2026-10-12-add-sign-in/login-default.png) |
-| 送っている間 | ボタンが「signing in…」になって薄くなり、ボタンと入力が押せない | ![](2026-10-12-add-sign-in/login-loading.png) |
-| 違う | 入力の上に danger の帯で「Incorrect email or password.」。email と password は残り、password の枠が danger | ![](2026-10-12-add-sign-in/login-error.png) |
+| 通常 | ロゴとアプリ名、email・password の入力、sign in のボタン（primary）、forgot password? のリンク | ![](2026-10-12-add-sign-in/login-default.png) ![](2026-10-12-add-sign-in/login-default-mobile.png) |
+| 送っている間 | ボタンが「signing in…」になって薄くなり、ボタンと入力が押せない | ![](2026-10-12-add-sign-in/login-loading.png) ![](2026-10-12-add-sign-in/login-loading-mobile.png) |
+| 違う | 入力の上に danger の帯で「Incorrect email or password.」。email と password は残り、password の枠が danger | ![](2026-10-12-add-sign-in/login-error.png) ![](2026-10-12-add-sign-in/login-error-mobile.png) |
 | 止めている | 入力の上に danger の帯で「Too many attempts. Try again in 15 minutes.」。見た目は「違う」の帯と同じ | なし（プロトタイプにない状態） |
 | サーバーのエラー | 入力の上に danger の帯で「Couldn't sign in. Please try again.」。retry のボタンは出さない（sign in をもう一度押せば済むため）。見た目は「違う」の帯と同じ | なし（プロトタイプにない状態） |
 
 ### 上のバー
 
-| 状態 | 表示 | スクリーンショット |
+| 状態 | 表示 | スクリーンショット（PC・スマホの幅） |
 | --- | --- | --- |
-| 通常 | 左にロゴとアプリ名（Home へ）、右に sign out | ![](2026-10-12-add-sign-in/home-default.png) |
+| 通常 | 左にロゴとアプリ名（Home へ）、右に sign out | ![](2026-10-12-add-sign-in/home-default.png) ![](2026-10-12-add-sign-in/home-default-mobile.png) |
 
 - スクリーンショットは Home のものなので、上のバーの部分だけを見る。上のバーより下（連続日数、menu、subjects）は、この変更では作らない（Home の中身は今の仮の画面のまま）
 
