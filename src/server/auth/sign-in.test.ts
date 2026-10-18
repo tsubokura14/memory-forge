@@ -25,7 +25,8 @@ beforeEach(async () => {
   await createUser(db, { email: EMAIL, password: PASSWORD });
 });
 
-describe("signIn", () => {
+// パスワードを確かめるたびに scrypt のハッシュを作り、CI では1回1秒近くかかる。何度も間違えるテストが既定の5秒に収まらないため延ばす
+describe("signIn", { timeout: 30_000 }, () => {
   test("正しいメールアドレスとパスワードなら ok", async () => {
     expect(await signIn({ email: EMAIL, password: PASSWORD }, start)).toBe(
       "ok",
