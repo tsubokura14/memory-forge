@@ -216,7 +216,7 @@ PC とスマホで同じ問題と記録を使い、公開しても他人に問�
 
 ## タスク
 
-- [ ] 1. ログインの決まりと表：Better Auth を入れて表を作り、`npm run user:create` で自分のアカウントを作れて、sign in の関数が「違う・止めている・入れた」を受け入れ条件どおりに返せたら完了
+- [x] 1. ログインの決まりと表：Better Auth を入れて表を作り、`npm run user:create` で自分のアカウントを作れて、sign in の関数が「違う・止めている・入れた」を受け入れ条件どおりに返せたら完了
   - `src/server/auth/`（`auth.ts`・`sign-in.ts`・`lockout.ts`・`next-path.ts`・`session.ts`）、`schema.ts` と `drizzle/`、`scripts/create-user.ts`、`.env.example`、`ci.yml`、Vitest のテスト
   - `docs/libraries/better-auth.md` の下書き。`docs/design.md` に「Better Auth の HTTP の入口を置かない」と、秘密の値の追記
   - 画面は変えない（画面からはまだ使わない）
