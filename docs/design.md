@@ -54,7 +54,9 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
   - CI：テストの前に `ci` に当てる（`.github/workflows/ci.yml`）
   - 本番と確かめ用の公開：Vercel のビルドの最初に当てる（`vercel.json` の `buildCommand`）。接続プールを通さない `DATABASE_URL_UNPOOLED` を使う（`drizzle.config.ts`）。当て方の決まりは「どこでも守る決まり」の「データベースの形の変更は「足す」ものにする」
 - 秘密の値は `.env.local`・`.env.test`（Git に入らない）、GitHub の Secret、Vercel にだけ置く。`.env.example` に名前だけを書く
-  - データベースの接続先（`DATABASE_URL`）のほかに、ログインの cookie の署名に使う `BETTER_AUTH_SECRET` と、アプリの URL の `BETTER_AUTH_URL` を置く（GitHub の Secret は `BETTER_AUTH_SECRET` だけ。CI の URL は `ci.yml` に書く）
+  - データベースの接続先（`DATABASE_URL`）のほかに、ログインの cookie の署名に使う `BETTER_AUTH_SECRET` と、アプリの URL の `BETTER_AUTH_URL` を置く（GitHub の Secret は `BETTER_AUTH_SECRET` だけ。CI の URL は `ci.yml` に書く）。`BETTER_AUTH_SECRET` は置く場所ごとに別の値にする
+  - Vercel の Preview には `BETTER_AUTH_URL` を置かない。公開のたびに URL が変わるため。置かないと Better Auth はアクセスされた URL を使う
+  - 前提（崩れたら見直す）：Better Auth が URL を使う場面（HTTP の入口、Google でのログインの戻り先）がない。#14 で Google を足すときに決め直す
 
 ## 画面の画像を撮る・比べる仕組み
 
