@@ -33,6 +33,7 @@ jobs:
       - run: npm test
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
       # screens のジョブのイメージの版を、入れた @playwright/test の版に合わせる
       - id: playwright
         run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
@@ -52,6 +53,8 @@ jobs:
       - run: npx playwright test --update-snapshots=none
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          BETTER_AUTH_URL: http://localhost:3000
       - name: 失敗したら、基準・今回・差分の画像のレポートを残す
         if: failure()
         uses: actions/upload-artifact@v7

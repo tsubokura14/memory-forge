@@ -12,7 +12,7 @@ TypeScript で表を定義し、SQL に近い書き方でデータベースを�
 
 ## このプロジェクトで使っている部分
 
-- `src/server/db/schema.ts`：表の定義（まだ表はない）
+- `src/server/db/schema.ts`：表の定義
 - `src/server/db/client.ts`：`drizzle-orm/node-postgres` で、`pg` の接続プールから `db` を作る
 - `drizzle.config.ts`：drizzle-kit の設定。形の変更のファイルは `drizzle/` に作られる
 - `npm run db:generate`（`drizzle-kit generate`）：表の定義と前回のファイルを比べ、形の変更の SQL を `drizzle/` に作る

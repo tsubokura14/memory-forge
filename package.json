@@ -13,10 +13,12 @@
     "screens:test": "node scripts/screens.mjs test",
     "screens:update": "node scripts/screens.mjs update",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs migrate && node --env-file=.env.test node_modules/drizzle-kit/bin.cjs migrate"
+    "db:migrate": "node --env-file=.env.local node_modules/drizzle-kit/bin.cjs migrate && node --env-file=.env.test node_modules/drizzle-kit/bin.cjs migrate",
+    "user:create": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/create-user.ts"
   },
   "dependencies": {
     "@vercel/functions": "^3.9.11",
+    "better-auth": "^1.7.10",
     "drizzle-orm": "^0.45.4",
     "next": "16.4.0",
     "pg": "^8.23.1",
