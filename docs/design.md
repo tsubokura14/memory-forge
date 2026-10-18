@@ -54,6 +54,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
   - CI：テストの前に `ci` に当てる（`.github/workflows/ci.yml`）
   - 本番と確かめ用の公開：Vercel のビルドの最初に当てる（`vercel.json` の `buildCommand`）。接続プールを通さない `DATABASE_URL_UNPOOLED` を使う（`drizzle.config.ts`）。当て方の決まりは「どこでも守る決まり」の「データベースの形の変更は「足す」ものにする」
 - 秘密の値は `.env.local`・`.env.test`（Git に入らない）、GitHub の Secret、Vercel にだけ置く。`.env.example` に名前だけを書く
+  - データベースの接続先（`DATABASE_URL`）のほかに、ログインの cookie の署名に使う `BETTER_AUTH_SECRET` と、アプリの URL の `BETTER_AUTH_URL` を置く（GitHub の Secret は `BETTER_AUTH_SECRET` だけ。CI の URL は `ci.yml` に書く）
 
 ## 画面の画像を撮る・比べる仕組み
 
@@ -97,6 +98,12 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 - 理由：本番と確かめ用の公開では、Vercel のビルドの最初に形の変更を当てる（`vercel.json` の `buildCommand`）。本番では、形を変えたあと、公開が切り替わるまで前の版のコードが動く。前の版のコードが読む列や表を消したり名前を変えたりすると、その間に前の版が壊れる
 - 前提（崩れたら見直す）：形の変更を、ビルドの中（公開の前）で当てている。消すとき・名前を変えるときは、使わなくするPRと消すPRの2回に分ける
 - 当てはまる場所：`src/server/db/schema.ts` と `drizzle/` のすべての変更
+
+### Better Auth の HTTP の入口を置かない
+
+- 理由：sign in・sign out は、サーバーの中（`src/server/auth/`）から `auth.api` を呼ぶ。`/api/auth/[...all]` を置くと、`/sign-in/email` を直接呼んで、続けて間違えた回数の決まり（`src/server/auth/sign-in.ts`）を通らずにパスワードを試せてしまう
+- 前提（崩れたら見直す）：Better Auth の機能を、ブラウザから直接呼ばずに済んでいる。Google でのログイン（#14）などで入口を置くときは、`/sign-in/email` と `/sign-up/email` を `disabledPaths` に入れる
+- 当てはまる場所：`src/server/auth/auth.ts` と、`src/app/` のルート
 
 ### トークンにない値は、ESLint で止める
 
