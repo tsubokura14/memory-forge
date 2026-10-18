@@ -193,7 +193,8 @@ PC とスマホで同じ問題と記録を使い、公開しても他人に問�
 
 ### 人間がすること
 
-- タスク1のあと：Vercel（Production と Preview）に `BETTER_AUTH_SECRET`・`BETTER_AUTH_URL`、GitHub の Secret に `BETTER_AUTH_SECRET` を入れる（値は AI に渡さない）
+- タスク1のあと：Vercel の Production に `BETTER_AUTH_SECRET`・`BETTER_AUTH_URL`、Preview に `BETTER_AUTH_SECRET`、GitHub の Secret に `BETTER_AUTH_SECRET` を入れる。`BETTER_AUTH_SECRET` は場所ごとに別の値にする（値は AI に渡さない）
+  - Preview に `BETTER_AUTH_URL` を入れないのは、公開のたびに URL が変わり、1つの値に決められないため。入れないと Better Auth はアクセスされた URL を使い、HTTP の入口も Google の戻り先もない今の作りでは困らない。Google でのログイン（#14）で決め直す
 - タスク1が本番に出たあと：本番の接続先で `npm run user:create` を実行し、自分のアカウントを作る（タスク2が本番に出る前に）
 
 ## 確かめ方
