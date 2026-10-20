@@ -97,6 +97,10 @@ async function main() {
 if (import.meta.main) {
   main().catch((error: unknown) => {
     console.error(error instanceof Error ? error.message : error);
+    // Drizzle は SQL の文だけを message にし、データベースが返した理由（同じメールアドレスがある、表がないなど）は cause に入れる
+    if (error instanceof Error && error.cause instanceof Error) {
+      console.error(`理由：${error.cause.message}`);
+    }
     process.exitCode = 1;
   });
 }
