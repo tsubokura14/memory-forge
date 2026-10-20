@@ -50,7 +50,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 | 手元のテスト（Vitest、Playwright、画面を撮る） | `test` | `.env.test` |
 | CI | `ci` | GitHub の Secret `DATABASE_URL` |
 
-- すべてのブランチは、自分の Neon のアカウントの同じ1つのプロジェクトにある。Vercel とは、Vercel の Marketplace から入れた「Neon が管理する Vercel 連携」でつなぐ（Vercel が Neon の組織を作る形ではない）
+- すべてのブランチは、自分の Neon のアカウントの同じ1つのプロジェクトにある。Vercel とは、Vercel の Marketplace から入れた「Neon が管理する Vercel 連携」でつなぐ
 - `dev`・`test`・`ci` は、Neon の画面で main から作ったブランチ。テストは自分で入れたデータだけを使い、始める前に表を空にする（main から写した本番のデータを当てにしない）
 - Preview のブランチは、Git のブランチが消えたあと、次の Preview の公開のときに連携が消す（連携の「Automatically delete obsolete Neon branches」）。Git のブランチは、PR をマージすると GitHub が消す（リポジトリの「Automatically delete head branches」）
 - 前提（崩れたら見直す）：無料のプランのブランチの上限は、1つのプロジェクトに10本。main・`dev`・`test`・`ci` の4本を除いて、同時に置ける Preview は6本。1タスク = 1PR で順に進めるので超えない
