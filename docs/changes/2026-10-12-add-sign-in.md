@@ -221,7 +221,7 @@ PC とスマホで同じ問題と記録を使い、公開しても他人に問�
   - `src/server/auth/`（`auth.ts`・`sign-in.ts`・`lockout.ts`・`next-path.ts`・`session.ts`）、`schema.ts` と `drizzle/`、`scripts/create-user.ts`、`.env.example`、`ci.yml`、Vitest のテスト
   - `docs/libraries/better-auth.md` の下書き。`docs/design.md` に「Better Auth の HTTP の入口を置かない」と、秘密の値の追記
   - 画面は変えない（画面からはまだ使わない）
-- [ ] 2. Login：ログインしていない人が Login に移され、sign in すると開こうとしていた画面に移れたら完了
+- [x] 2. Login：ログインしていない人が Login に移され、sign in すると開こうとしていた画面に移れたら完了
   - `src/proxy.ts`、`src/app/login/`、`src/components/`（`logo`・`card`・`text-field`・`button`・`banner`）、Material Symbols の書体の読み込み、`e2e/global-setup.ts`、`e2e/login.spec.ts`、`e2e/home.spec.ts` をログインした状態で撮るように直す
   - `docs/design.md` に「ログインの確かめ」と、「画面の画像を撮る・比べる仕組み」のログインの追記
   - 合わせるスクリーンショット：`login-default.png`・`login-default-mobile.png`・`login-loading.png`・`login-loading-mobile.png`・`login-error.png`・`login-error-mobile.png`（Google のボタンは作らない）
