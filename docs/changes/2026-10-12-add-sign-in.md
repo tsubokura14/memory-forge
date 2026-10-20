@@ -228,7 +228,7 @@ PC とスマホで同じ問題と記録を使い、公開しても他人に問�
   - `docs/design.md` に「ログインの確かめ」と、「画面の画像を撮る・比べる仕組み」のログインの追記
   - 合わせるスクリーンショット：`login-default.png`・`login-default-mobile.png`・`login-loading.png`・`login-loading-mobile.png`・`login-error.png`・`login-error-mobile.png`（Google のボタンは作らない）
   - 撮り直す画面：Login（新規）。Home は、ログインして撮っても見た目が変わらないこと（比べるテストが通ること）を確かめ、撮り直さない
-- [ ] 3. 上のバーと sign out：Home に上のバーが出て、sign out すると Login に移り、戻っても中身が見えなくなったら完了
+- [x] 3. 上のバーと sign out：Home に上のバーが出て、sign out すると Login に移り、戻っても中身が見えなくなったら完了
   - `src/app/(app)/`（`layout.tsx`・`page.tsx` を移す・`actions.ts`）、`src/components/app-bar.tsx`、`e2e/home.spec.ts` に sign out のテスト
   - 合わせるスクリーンショット：`home-default.png`・`home-default-mobile.png` の上のバーの部分だけ（その下は今の仮の画面のまま）
   - 撮り直す画面：Home
