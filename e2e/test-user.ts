@@ -1,5 +1,4 @@
-// 画面のテストで使うユーザー。test（CI では ci）のデータベースにだけ入る決まった値
-// （docs/design.md の「画面の画像を撮る・比べる仕組み」）
+// 画面のテストで使うユーザー（docs/design.md の「画面の画像を撮る・比べる仕組み」）
 export const TEST_USER = {
   email: "me@example.com",
   password: "correct-horse-battery",

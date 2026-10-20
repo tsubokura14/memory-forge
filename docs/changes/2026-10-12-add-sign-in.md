@@ -153,7 +153,8 @@ PC とスマホで同じ問題と記録を使い、公開しても他人に問�
 | `src/components/text-field.tsx`（新規） | ラベル付きの入力。誤りのときに枠を danger にする |
 | `src/components/banner.tsx`（新規） | 帯。この変更では danger だけを使う |
 | `src/components/card.tsx`（新規） | 中身の幅のカード（sm） |
-| `e2e/global-setup.ts`（新規）・`playwright.config.ts` | テストの前に `test` のデータベースの表を空にし、テスト用のユーザーを `create-user` と同じ関数で作る。ログインした状態を `storageState` に保存して、ログインが要る画面のテストで使う |
+| `scripts/insert-user.ts`（新規） | `create-user.ts` からアカウントの行を入れる関数を分ける。Playwright は `import.meta` を使う `create-user.ts` を読み込めないため（タスク2で分けた） |
+| `e2e/global-setup.ts`（新規）・`playwright.config.ts` | テストの前に `test` のデータベースの表を空にし、テスト用のユーザーを `create-user` と同じ関数（`insert-user.ts`）で作る。ログインした状態を `storageState` に保存して、ログインが要る画面のテストで使う |
 | `e2e/login.spec.ts`（新規）・`e2e/home.spec.ts` | 画面を通したテストと、画面の画像（`home.spec.ts` はログインした状態で撮る） |
 
 - forgot password? は、リンクの見た目の `button type="button"` にし、押しても何もしない。#4 で `Link` に置き換える
@@ -195,6 +196,7 @@ PC とスマホで同じ問題と記録を使い、公開しても他人に問�
 
 - タスク1のあと：Vercel の Production に `BETTER_AUTH_SECRET`・`BETTER_AUTH_URL`、Preview に `BETTER_AUTH_SECRET`、GitHub の Secret に `BETTER_AUTH_SECRET` を入れる。`BETTER_AUTH_SECRET` は場所ごとに別の値にする（値は AI に渡さない）
   - Preview に `BETTER_AUTH_URL` を入れないのは、公開のたびに URL が変わり、1つの値に決められないため。入れないと Better Auth はアクセスされた URL を使い、HTTP の入口も Google の戻り先もない今の作りでは困らない。Google でのログイン（#14）で決め直す
+- タスク2の前に：手元の `.env.test` と `.env.local` に、`BETTER_AUTH_SECRET`（それぞれ別の値）と `BETTER_AUTH_URL`（`http://localhost:3000`）を入れる。画面のテストと `npm run dev` で、アプリが Better Auth を使うようになるため
 - タスク1が本番に出たあと：本番の接続先で `npm run user:create` を実行し、自分のアカウントを作る（タスク2が本番に出る前に）
 
 ## 確かめ方
