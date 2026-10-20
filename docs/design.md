@@ -44,13 +44,17 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 
 | 使う場所 | Neon のブランチ | 接続先の置き場所 |
 | --- | --- | --- |
-| 本番（Vercel の Production） | main（Neon のいちばん上のブランチ） | Neon の Vercel 連携が入れる |
-| 確かめ用の公開（Vercel の Preview） | `preview/<Git のブランチ名>`（Vercel 連携が公開ごとに作る） | Vercel 連携がその公開だけに入れる |
+| 本番（Vercel の Production） | main（Neon のいちばん上のブランチ） | Neon が管理する Vercel 連携が入れる |
+| 確かめ用の公開（Vercel の Preview） | `preview/<Git のブランチ名>`（連携が公開ごとに作る） | 連携がその公開だけに入れる |
 | 手元の開発（`npm run dev`） | `dev` | `.env.local` |
 | 手元のテスト（Vitest、Playwright、画面を撮る） | `test` | `.env.test` |
 | CI | `ci` | GitHub の Secret `DATABASE_URL` |
 
+- すべてのブランチは、自分の Neon のアカウントの同じ1つのプロジェクトにある。Vercel とは、Vercel の Marketplace から入れた「Neon が管理する Vercel 連携」でつなぐ（Vercel が Neon の組織を作る形ではない）
 - `dev`・`test`・`ci` は、Neon の画面で main から作ったブランチ。テストは自分で入れたデータだけを使い、始める前に表を空にする（main から写した本番のデータを当てにしない）
+- Preview のブランチは、Git のブランチが消えたあと、次の Preview の公開のときに連携が消す（連携の「Automatically delete obsolete Neon branches」）。Git のブランチは、PR をマージすると GitHub が消す（リポジトリの「Automatically delete head branches」）
+- 前提（崩れたら見直す）：無料のプランのブランチの上限は、1つのプロジェクトに10本。main・`dev`・`test`・`ci` の4本を除いて、同時に置ける Preview は6本。1タスク = 1PR で順に進めるので超えない
+  - Vercel の Development 用のブランチ（連携の「Create a branch for your development environment」で作る `vercel-dev`）は作らない。手元は `.env.local` の `dev` を使い、作ると上限の1本を使うため
 - 接続は `pg` の接続プールと `drizzle-orm/node-postgres`（`src/server/db/client.ts`）
   - 理由：取り込みで、途中で読んで判断するトランザクションを使うため。手元・CI・本番が同じ書き方になる
 - 形の変更を当てる場所
