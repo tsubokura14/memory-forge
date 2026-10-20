@@ -76,10 +76,56 @@ Neon の公式ドキュメント（2026-10-21 に確かめた）
 
 ## 設計
 
+コードは変えない。今のコードが読む接続先の名前（`DATABASE_URL`・`DATABASE_URL_UNPOOLED`）は、新しい連携が入れる名前と同じため（「調べたこと」）。変えるのは、Vercel・Neon・GitHub の設定と `docs/design.md` だけ。
+
+### 変えるファイル
+
+- `docs/design.md` の「データベースのつながり方」
+  - 表の本番・Preview の行：Vercel が作った組織ではなく、自分の Neon のアカウントの、`dev`・`test`・`ci` と同じプロジェクトにあること。接続先は「Neon が管理する Vercel 連携」が入れること
+  - Preview のブランチは、Git のブランチが消えたあと、次の Preview の公開のときに Neon が消す。Git のブランチは、マージすると GitHub が消す
+  - 前提（崩れたら見直す）：無料のプランのブランチの上限は1つのプロジェクトに10本。main・`dev`・`test`・`ci` の4本を除いて、同時に置ける Preview は6本。1タスク = 1PR で順に進めるので、超えない。Vercel の Development 用のブランチ（`vercel-dev`）は作らない（手元は `.env.local` の `dev` を使うため。作ると上限の1本を使う）
+- `drizzle.config.ts`・`.env.example` のコメント（「Vercel では Neon の連携が入れる」）は、新しい連携でもそのまま正しいので変えない
+
+### 切り替えの手順（人間が画面で行う）
+
+順番が大事なので、タスク1の PR を出す前に、この順で行う。秘密の値は AI に渡さない。
+
+1. GitHub のリポジトリの Settings → General で「Automatically delete head branches」を入れる
+2. 自分の Neon のプロジェクトの main に、表が入っていないか見る（Tables）。入っていたら消す
+3. Vercel のプロジェクトから、今の Neon（Vercel が作った組織）を外す。Storage でつながりを外すだけにし、データベースは消さない。Settings → Environment Variables から、`DATABASE_URL` などの Neon の値が消えたことを確かめる
+   - 理由：新しい連携は、同じ名前の値が Vercel にあると入れられない（「調べたこと」の連携のページ）
+4. Vercel の Marketplace から Neon を、自分の Neon のアカウントをつなぐ形で入れる。Vercel のプロジェクト memory-forge と、自分の Neon のプロジェクト・データベース・ロールを選ぶ
+   - 「Automatically delete obsolete Neon branches」は入れる
+   - 「Create a branch for your development environment」は入れない
+5. Vercel で本番をもう一度公開する（Deployments → いちばん新しい本番 → Redeploy）。ビルドの最初に、形の変更が main に当たる（`vercel.json`）
+6. Neon の main に表ができたことを見る。本番がどのブランチを使うかはドキュメントに書かれていないので、ここで main だと確かめる
+7. main の接続先を書いた一時の `.env` のファイルを手元に作り、`npm run user:create -- --env-file=<そのファイル>` でアカウントを作る。作ったらファイルを消す
+   - ファイル名は `.env.` で始める（`.gitignore` で Git に入らない）
+8. 本番の URL で sign in して、Home が出ることを確かめる
+
+うまくいかなかったときの戻し方：新しい連携を外し、手順3で外した Vercel が作った組織をつなぎ直して、本番をもう一度公開する。古い組織は、本番で動くことを確かめるまで消さない。
+
+### 古い組織を消す
+
+本番で動くこと（手順8）と、Preview で動くこと（タスク1の PR）を確かめてから、`/dev-finish` の「触って確かめる」で、人間が Vercel の Marketplace から Vercel が作った Neon の組織を消す。消すと戻せない。古い組織の Preview のブランチも一緒に消える。
+
+### 選ばなかったやり方
+
+- 連携を使わず、本番の接続先を Vercel に手で置き、Preview のブランチは GitHub Actions で作って消す：仕組みを自分で持つことになり、Preview の公開ごとの接続先を入れる手間が増える。連携で同じことができるので選ばない
+- 今の本番のデータを新しいほうへ写す：アカウント1つだけで、作り直すほうが早く、確かめることも少ない（「やらないこと」）
+
 ## 確かめ方
 
--
+- 本番・Preview・手元・CI のデータベースが、すべて自分の Neon のアカウントの同じプロジェクトにある：触って確かめる（Neon のプロジェクトの Branches に、main・`dev`・`test`・`ci`・`preview/...` が並ぶ。Vercel の Storage に、Vercel が作った組織が出ない）
+- 本番の URL で、作り直したアカウントで sign in でき、Home が出る：触って確かめる（手順8）
+- PR を出すと Preview が公開され、Login が出て、本番と同じアカウントで sign in できる：触って確かめる（タスク1の PR の Preview）
+- PR をマージすると、その Git のブランチが自動で消える：触って確かめる（タスク1の PR をマージしたあと、GitHub のブランチの一覧に `35-...` が残っていない）
+- Git のブランチを消すと、その Preview の分のブランチが、次の Preview の公開のときに消える：触って確かめる（`/dev-finish` の PR の Preview が公開されたあと、Neon にタスク1の `preview/...` が残っていない）
+- 本番の main に、作り直したアカウントのほかのデータが入っていない：触って確かめる（手順2）
+- Neon のブランチは、main・`dev`・`test`・`ci` と Preview の分だけ：触って確かめる（Neon の Branches に `vercel-dev` がない）
+- 手元の開発・手元のテスト・CI は、移す前と同じように動く：テスト（今あるテストと CI がそのまま通る。接続先を変えないので、新しいテストは書かない）
+- Vercel が作った Neon の組織が消えている：触って確かめる（`/dev-finish` で消したあと、Vercel の Storage と Neon の組織の一覧に出ない）
 
 ## タスク
 
-- [ ]
+- [ ] 本番を自分の Neon につなぎ替え、`docs/design.md` の「データベースのつながり方」を直す（「切り替えの手順」の1〜8を人間が行ってから PR を出し、その Preview で sign in できたら完了）
