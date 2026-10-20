@@ -3,48 +3,19 @@
 // メールアドレスとパスワードは引数ではなく入力で聞く（シェルの履歴に残さないため）。パスワードは画面に出さない。
 //
 // node が型を外して直接動かすので、ここから読み込むプロジェクトのファイルは、拡張子付きで書き、
-// `@/` の別名を使わないもの（schema.ts）だけにする
-import { randomUUID } from "node:crypto";
+// `@/` の別名を使わないもの（schema.ts・insert-user.ts）だけにする
 import { stdin, stdout } from "node:process";
 import { createInterface } from "node:readline/promises";
 import { Writable } from "node:stream";
 import { parseArgs } from "node:util";
-import { hashPassword } from "better-auth/crypto";
-import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as schema from "../src/server/db/schema.ts";
+import { createUser } from "./insert-user.ts";
 
 // Better Auth の既定の長さの決まりに合わせる
 const MIN_PASSWORD_LENGTH = 8;
 const MAX_PASSWORD_LENGTH = 128;
-
-// Better Auth の sign up と同じ形で、user と、パスワードのハッシュを持つ account（credential）の行を入れる。
-// e2e のテスト用のユーザーも、この関数で作る
-export async function createUser(
-  db: NodePgDatabase<typeof schema>,
-  input: { email: string; password: string },
-) {
-  const email = input.email.trim().toLowerCase();
-  const password = await hashPassword(input.password);
-  await db.transaction(async (tx) => {
-    const userId = randomUUID();
-    await tx.insert(schema.user).values({
-      id: userId,
-      name: "",
-      email,
-      emailVerified: false,
-      updatedAt: new Date(),
-    });
-    await tx.insert(schema.account).values({
-      id: randomUUID(),
-      accountId: userId,
-      providerId: "credential",
-      userId,
-      password,
-      updatedAt: new Date(),
-    });
-  });
-}
 
 async function askHidden(question: string): Promise<string> {
   stdout.write(question);
@@ -93,14 +64,11 @@ async function main() {
   console.log(`作った：${email.toLowerCase()}`);
 }
 
-// node で直接動かしたときだけ実行する（テストから createUser を読み込んだときは動かさない）
-if (import.meta.main) {
-  main().catch((error: unknown) => {
-    console.error(error instanceof Error ? error.message : error);
-    // Drizzle は SQL の文だけを message にし、データベースが返した理由（同じメールアドレスがある、表がないなど）は cause に入れる
-    if (error instanceof Error && error.cause instanceof Error) {
-      console.error(`理由：${error.cause.message}`);
-    }
-    process.exitCode = 1;
-  });
-}
+main().catch((error: unknown) => {
+  console.error(error instanceof Error ? error.message : error);
+  // Drizzle は SQL の文だけを message にし、データベースが返した理由（同じメールアドレスがある、表がないなど）は cause に入れる
+  if (error instanceof Error && error.cause instanceof Error) {
+    console.error(`理由：${error.cause.message}`);
+  }
+  process.exitCode = 1;
+});
