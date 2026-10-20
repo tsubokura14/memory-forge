@@ -70,6 +70,7 @@
 - Next.js 16（App Router、TypeScript、Cache Components を有効）、React 19
 - Tailwind CSS 4（トークンは `src/styles/tokens.css`）
 - Neon（PostgreSQL）と Drizzle ORM（drizzle-kit で形の変更を管理）
+- Better Auth（メールアドレスとパスワードでのログイン。`src/server/auth/`）
 - Vitest（中の決まりのテスト）、Playwright（画面を通したテストと、Docker の中での画像の比べ）
 - ESLint（`eslint-config-next`、`eslint-plugin-better-tailwindcss`）と Prettier（整形）
 - GitHub Actions（PR ごとの CI）、Vercel（公開）
@@ -92,6 +93,7 @@
 | `npm run screens:update -- <画面のテストのファイル>` | Docker の中で、指定した画面だけを撮り直す（例：`npm run screens:update -- e2e/home.spec.ts`） |
 | `npm run db:generate` | 表の定義（`src/server/db/schema.ts`）から、形の変更のファイルを `drizzle/` に作る |
 | `npm run db:migrate` | 形の変更を、`dev`（`.env.local`）と `test`（`.env.test`）のデータベースに当てる |
+| `npm run user:create -- --env-file=<接続先の .env のファイル>` | 自分のアカウントを作る（メールアドレスとパスワードは入力で聞く） |
 
 ## うまくいかなかったことから追加したルール
 

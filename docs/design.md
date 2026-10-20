@@ -17,9 +17,13 @@
 ```
 src/
   app/          画面とルート（App Router）。データを取ってきて部品に渡すだけにする
+    (app)/      上のバーの付く画面（Login と解く画面以外）。layout.tsx が上のバーを付ける
+    login/      Login（上のバーの付かない画面）
   components/   画面の部品（docs/ui.md の部品）
+  proxy.ts      すべての画面の前で、ログインしているかを確かめる（下の「ログインの確かめ」）
   server/       サーバーだけで動く処理
     db/         接続（client.ts）と表の定義（schema.ts）
+    auth/       ログインの設定（Better Auth）と決まり（続けて間違えた回数、移る先）
     <機能>/     機能ごとの読み書きと決まり（例：server/import/）。計算は、データベースを使わない関数に分ける
   styles/
     tokens.css  トークン（色・余白・文字の値はここにだけ書く）
@@ -90,6 +94,12 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 ## データ
 
 <!-- 保存するものの持ち方（テーブルなど）と、その理由・前提 -->
+
+- ログイン
+  - `user`・`session`・`account`・`verification`：Better Auth の表。形は Better Auth が決める（`src/server/db/schema.ts`）。`session` は、ログインしている端末ごとの行で、期限を持つ。`account` にパスワードのハッシュが入る
+  - アカウントの行は、`scripts/insert-user.ts` で入れる。`npm run user:create` と、画面のテストの global setup の両方がこれを使う
+    - 前提（崩れたら見直す）：Better Auth の sign up と同じ形の行を、手で入れている（ハッシュは `better-auth/crypto` の `hashPassword`）。Better Auth の版を上げて行の形が変わったら、ここを直す。sign in の画面のテストが、global setup で作ったアカウントで通ることで気づける
+  - `sign_in_attempts`：入れたメールアドレスごとの、続けて間違えた回数と止める期限
 
 ## どこでも守る決まり
 
