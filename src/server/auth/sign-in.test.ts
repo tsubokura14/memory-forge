@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from "vitest";
-import { createUser } from "../../../scripts/create-user";
+import { createUser } from "../../../scripts/insert-user";
 import { db } from "@/server/db/client";
 import { signInAttempts, user } from "@/server/db/schema";
 import { signIn } from "./sign-in";

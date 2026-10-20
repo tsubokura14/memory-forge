@@ -17,6 +17,7 @@ next-env.d.ts
 npm-debug.log*
 test-results/
 playwright-report/
+e2e/.auth/
 
 # OS・エディタ
 .DS_Store
