@@ -58,6 +58,16 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
   - Vercel の Preview には `BETTER_AUTH_URL` を置かない。公開のたびに URL が変わるため。置かないと Better Auth はアクセスされた URL を使う
   - 前提（崩れたら見直す）：Better Auth が URL を使う場面（HTTP の入口、Google でのログインの戻り先）がない。#14 で Google を足すときに決め直す
 
+## ログインの確かめ
+
+- ログインしているかは、`src/proxy.ts` で、すべての画面の前に DB まで確かめる。ログインしていなければ `/login?next=<開こうとしていたパス>` に移す
+  - 理由：期限切れも含めて1か所で確かめ、開こうとしていた画面を各画面から渡さずに済ませるため
+  - ログインしていなくても開ける画面は `/login` だけ。足すときは、`src/proxy.ts` の一覧に足す
+  - Next.js が配るファイル（`/_next/`）には動かさない
+- あとで作る、データを読み書きする `src/server/` の関数とサーバーアクションは、proxy に頼らず、自分でもセッションを確かめる
+  - 理由：proxy の対象から外れたパスや、画面を移したサーバーアクションは、proxy を通らずに呼べるため
+- 前提（崩れたら見直す）：Next.js の proxy が Node.js で動き、DB につなげる。使う人がひとりなので、画面を開くたびに DB を1回読んでも重くならない
+
 ## 画面の画像を撮る・比べる仕組み
 
 - 撮る・比べるは、Playwright 公式の Docker イメージ（`mcr.microsoft.com/playwright:v<入れた @playwright/test の版>-noble`）の中で、アプリのビルドと立ち上げも含めて行う。同じイメージにする理由は `docs/process/screenshots.md`
@@ -72,6 +82,10 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
   - アニメーション：`toHaveScreenshot` の既定で止まる
   - 前提（崩れたら見直す）：サーバー側の日時は固定していない。サーバーで日付を使う画面（連続日数など）を撮るときは、固定する方法を足す
 - 状態（0件など）は、テストの前に `test` のデータベースに決まったデータを入れて作る（`docs/process/screenshots.md`）
+- ログインが要る画面は、テスト用のユーザーでログインした状態で撮る
+  - global setup（`e2e/global-setup.ts`）が、`test`（CI では `ci`）のデータベースの表を空にし、テスト用のユーザーを `scripts/insert-user.ts` で作り、Login から sign in した cookie を `e2e/.auth/` に保存する。ログインが要るテストは、それを `storageState` で使う
+  - テスト用のユーザーのメールアドレスとパスワードは、`e2e/test-user.ts` に書いた決まった値（`test`・`ci` のデータベースにだけ入る）
+  - 前提（崩れたら見直す）：Vitest と Playwright を同じ `test` のデータベースで同時に動かさない。どちらも始める前に表を空にするので、ぶつかる
 
 ## データ
 

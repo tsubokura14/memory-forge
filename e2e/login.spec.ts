@@ -8,6 +8,11 @@ async function signIn(page: Page, email: string, password: string) {
   await page.getByRole("button", { name: "sign in" }).click();
 }
 
+// 帯。Next.js が画面の移動を読み上げるために置く role="alert" の部品は、main の外にあるので含めない
+function banner(page: Page) {
+  return page.getByRole("main").getByRole("alert");
+}
+
 // サーバーアクションの通信（next-action の付いた POST）だけを選ぶ
 function isServerAction(request: { method(): string; headers(): object }) {
   return request.method() === "POST" && "next-action" in request.headers();
@@ -58,9 +63,7 @@ test("違うと帯が出て、入れた値が残る", async ({ page }) => {
   await page.goto("/login");
   await signIn(page, TEST_USER.email, "wrong-password");
 
-  await expect(page.getByRole("alert")).toHaveText(
-    "Incorrect email or password.",
-  );
+  await expect(banner(page)).toHaveText("Incorrect email or password.");
   await expect(page.getByLabel("email")).toHaveValue(TEST_USER.email);
   await expect(page.getByLabel("password")).toHaveValue("wrong-password");
   await expect(page).toHaveScreenshot("login-error.png", { fullPage: true });
@@ -71,13 +74,11 @@ test("5回続けて間違えると、止めている帯が出る", async ({ page
   // 登録されていないメールアドレスで試す（テスト用のユーザーを止めないため）
   for (let i = 1; i <= 4; i++) {
     await signIn(page, "stranger@example.com", `guess-${i}`);
-    await expect(page.getByRole("alert")).toHaveText(
-      "Incorrect email or password.",
-    );
+    await expect(banner(page)).toHaveText("Incorrect email or password.");
   }
   await signIn(page, "stranger@example.com", "guess-5");
 
-  await expect(page.getByRole("alert")).toHaveText(
+  await expect(banner(page)).toHaveText(
     "Too many attempts. Try again in 15 minutes.",
   );
   await expect(page).toHaveScreenshot("login-locked.png", { fullPage: true });
@@ -92,9 +93,7 @@ test("サーバーにつながらないと、エラーの帯が出る", async ({
   await page.goto("/login");
   await signIn(page, TEST_USER.email, TEST_USER.password);
 
-  await expect(page.getByRole("alert")).toHaveText(
-    "Couldn't sign in. Please try again.",
-  );
+  await expect(banner(page)).toHaveText("Couldn't sign in. Please try again.");
   await expect(page).toHaveScreenshot("login-server-error.png", {
     fullPage: true,
   });
