@@ -3,13 +3,14 @@
 // メールアドレスとパスワードは引数ではなく入力で聞く（シェルの履歴に残さないため）。パスワードは画面に出さない。
 //
 // node が型を外して直接動かすので、ここから読み込むプロジェクトのファイルは、拡張子付きで書き、
-// `@/` の別名を使わないもの（schema.ts・insert-user.ts）だけにする
+// `@/` の別名を使わないもの（schema.ts・connection-url.ts・insert-user.ts）だけにする
 import { stdin, stdout } from "node:process";
 import { createInterface } from "node:readline/promises";
 import { Writable } from "node:stream";
 import { parseArgs } from "node:util";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
+import { withVerifyFull } from "../src/server/db/connection-url.ts";
 import * as schema from "../src/server/db/schema.ts";
 import { createUser } from "./insert-user.ts";
 
@@ -55,7 +56,9 @@ async function main() {
     );
   }
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new Pool({
+    connectionString: withVerifyFull(process.env.DATABASE_URL),
+  });
   try {
     await createUser(drizzle({ client: pool, schema }), { email, password });
   } finally {
