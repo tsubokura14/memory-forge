@@ -94,4 +94,4 @@
 
 ## タスク
 
-- [ ] 接続先の URL の `sslmode` を `verify-full` にする関数を作り、つなぐ4か所で通し、`docs/design.md` の「データベースのつながり方」に決まりを足す（CI と Preview のログに警告が出ず、Preview で sign in できたら完了）
+- [x] 接続先の URL の `sslmode` を `verify-full` にする関数を作り、つなぐ4か所で通し、`docs/design.md` の「データベースのつながり方」に決まりを足す（CI と Preview のログに警告が出ず、Preview で sign in できたら完了）
