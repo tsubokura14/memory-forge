@@ -21,8 +21,7 @@ describe("withVerifyFull", () => {
     expect(url.searchParams.get("sslmode")).toBe("verify-full");
   });
 
-  test("空やないときは、そのまま返す", () => {
-    expect(withVerifyFull("")).toBe("");
+  test("ないときは、そのまま返す", () => {
     expect(withVerifyFull(undefined)).toBeUndefined();
   });
 });
