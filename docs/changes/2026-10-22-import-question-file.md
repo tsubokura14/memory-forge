@@ -76,32 +76,39 @@ Claude Code に作らせた問題を、アプリで解けるようにするた�
 
 ## 画面
 
-<!-- 合意したプロトタイプのスクリーンショットと、文言の細かいところは /dev-proto で足す -->
+スクリーンショットは、印と記録（#9・#12）と、問題の作り方の説明へのリンク（#15）を隠して撮った。
 
 ### Import
 
-| 状態 | 表示 |
-| --- | --- |
-| ファイルを選ぶ | ファイルを落とす場所と choose file、上に戻るリンク（manage） |
-| 確かめ中 | 確かめていることがわかる表示。ファイルを選べない |
-| 誤り | danger の帯（誤りの数と、何も取り込んでいないこと）、誤りの一覧（問題・項目・内容）、choose another file |
-| 取り込む前の確認 | ファイル名 → Subject の名前（まだなければ new subject）、増える・置き換わる・変わらない数、置き換わる問題の前と後、import all と cancel |
-| 取り込み中 | import all が押せない表示 |
-| 取り込んだ | success の帯や枠で知らせ、open in manage |
-| サーバーのエラー | danger の帯 |
+- 上に、戻るリンク（manage）、パンくず（manage / import）、見出し「Import」を置く
+- 置き換わる問題は、1問ずつ開閉する行にする。行には ID と問題文の1行目を出し、開くと、変わった項目ごとに、前（danger の枠）と後（success の枠）を横に並べる（スマホの幅では縦）。最初の1問だけを開いておく
+- 増える・置き換わる・変わらない数は、3つの枠に横に並べ、増えるは success、置き換わるは warning（0なら muted）、変わらないは muted の数字にする
+
+| 状態 | 表示 | スクリーンショット |
+| --- | --- | --- |
+| ファイルを選ぶ | 点線の枠の中に「Drop a question file here」「.json」と choose file | ![](2026-10-22-import-question-file/import-select.png) |
+| 確かめ中 | 点線の枠の中に、ファイル名と、点滅する「checking…」。choose file は出さない | ![](2026-10-22-import-question-file/import-checking.png) |
+| 誤り | danger の帯「4 problems found in python-decorators.json. Nothing was imported.」、誤りの一覧（ID・項目・内容）、choose another file | ![](2026-10-22-import-question-file/import-errors.png) |
+| 取り込む前の確認 | 「python-decorators.json → Python」、new・replaced・unchanged の数、「replaced」の見出しと置き換わる問題、cancel と import all | ![](2026-10-22-import-question-file/import-preview.png) |
+| 取り込む前の確認（まだない Subject） | Subject の名前の右に、success の枠の「new subject」。置き換わる問題の一覧は出さない | ![](2026-10-22-import-question-file/import-preview-new.png) |
+| 取り込み中 | import all を押せない表示にし、ボタンの文字を「importing…」にする。cancel も押せない（スクリーンショットなし） | |
+| 取り込んだ | success の枠に「imported into Python」と、数（12 new · 3 replaced · 33 unchanged）、open in manage | ![](2026-10-22-import-question-file/import-done.png) |
+| サーバーのエラー | danger の帯「Import failed. Nothing was imported.」と retry。その下にファイルを選ぶところ | ![](2026-10-22-import-question-file/import-error.png) |
 
 ### Manage
 
 | 状態 | 表示 |
 | --- | --- |
-| 通常 | import への入り口だけ（中身は #11） |
+| 通常 | 上に戻るリンク（home）、見出し「Manage」と「Import, export and delete questions.」、右に primary の import のボタン（中身は #11。スクリーンショットなし） |
 
 ### Home
 
+スクリーンショットはなし（ほかの Issue の部分が多く写るため）。
+
 | 状態 | 表示 |
 | --- | --- |
-| Subject が0件 | 点線の枠の中に、短い説明と import |
-| 通常 | menu に manage |
+| Subject が0件 | 「subjects」の見出しの下、点線の枠の中に「No subjects yet.」「Import a question file to get started.」と primary の import |
+| 通常 | 「menu」の見出しの下に、枠の行「manage」と「Import, export, delete, flagged」 |
 
 ## やらないこと
 
