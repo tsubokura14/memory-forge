@@ -130,14 +130,11 @@ export const questions = pgTable(
     subjectId: integer("subject_id")
       .notNull()
       .references(() => subjects.id, { onDelete: "cascade" }),
-    // ファイルに書かれた ID。Subject の中だけで重ならない
     questionId: text("question_id").notNull(),
     topic: text("topic").notNull(),
     type: text("type").$type<"single" | "multiple">().notNull(),
     text: text("text").notNull(),
-    // 選択肢の文の並び。並び順が記号（A〜H）になる
     choices: jsonb("choices").$type<string[]>().notNull(),
-    // 正解の記号（A〜H）の並び
     correct: jsonb("correct").$type<string[]>().notNull(),
     explanation: text("explanation").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
