@@ -4,9 +4,11 @@ import {
   boolean,
   index,
   integer,
+  jsonb,
   pgTable,
   text,
   timestamp,
+  unique,
 } from "drizzle-orm/pg-core";
 
 // ここから verification まで（relations も）は、Better Auth の表。Better Auth の CLI（npx auth generate）が作った定義をそのまま貼っている。
@@ -110,3 +112,43 @@ export const signInAttempts = pgTable("sign_in_attempts", {
   failedCount: integer("failed_count").notNull(),
   lockedUntil: timestamp("locked_until", { withTimezone: true }),
 });
+
+// 問題のまとまりのいちばん上。名前で見分け、取り込むファイルの subject と同じ名前の行に入れる
+export const subjects = pgTable("subjects", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  name: text("name").notNull().unique(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+// 取り込んだ問題。Topic・種類・選択肢・正解の決まりは、取り込むときに確かめる（src/server/import/）
+export const questions = pgTable(
+  "questions",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    subjectId: integer("subject_id")
+      .notNull()
+      .references(() => subjects.id, { onDelete: "cascade" }),
+    questionId: text("question_id").notNull(),
+    topic: text("topic").notNull(),
+    type: text("type").$type<"single" | "multiple">().notNull(),
+    text: text("text").notNull(),
+    choices: jsonb("choices").$type<string[]>().notNull(),
+    correct: jsonb("correct").$type<string[]>().notNull(),
+    explanation: text("explanation").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("questions_subject_question_id_unique").on(
+      table.subjectId,
+      table.questionId,
+    ),
+  ],
+);
