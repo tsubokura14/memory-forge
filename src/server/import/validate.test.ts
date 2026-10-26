@@ -80,7 +80,8 @@ describe("validateQuestionFile", () => {
   });
 
   test("項目がない・空白だけ・文字でないと誤りになる", () => {
-    const { explanation: _, ...noExplanation } = question();
+    const noExplanation: Record<string, unknown> = question();
+    delete noExplanation.explanation;
     expect(errorsOf(file([noExplanation]))).toEqual([
       { id: "k3f9a2", item: "explanation", message: "Missing." },
     ]);
@@ -107,12 +108,13 @@ describe("validateQuestionFile", () => {
   test("選択肢は2〜8つまで通り、外れると誤りになる", () => {
     const choices = (n: number) =>
       Array.from({ length: n }, (_, i) => `choice ${i}`);
-    expect(
-      validateQuestionFile(file([question({ choices: choices(2) })])).ok,
-    ).toBe(true);
-    expect(
-      validateQuestionFile(file([question({ choices: choices(8) })])).ok,
-    ).toBe(true);
+    for (const n of [2, 8]) {
+      expect(
+        validateQuestionFile(
+          file([question({ choices: choices(n), correct: ["A"] })]),
+        ).ok,
+      ).toBe(true);
+    }
     for (const n of [1, 9]) {
       expect(
         errorsOf(file([question({ choices: choices(n), correct: ["A"] })])),
