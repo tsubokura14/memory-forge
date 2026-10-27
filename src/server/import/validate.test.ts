@@ -55,11 +55,11 @@ describe("validateQuestionFile", () => {
     const many = (n: number) =>
       Array.from({ length: n }, (_, i) => question({ id: `q${i}` }));
     expect(validateQuestionFile(file(many(1000))).ok).toBe(true);
-    expect(errorsOf(file(many(1200)))).toEqual([
+    expect(errorsOf(file(many(1001)))).toEqual([
       {
         id: "—",
         item: "questions",
-        message: "Too many questions (1,200). Up to 1,000.",
+        message: "Too many questions (1,001). Up to 1,000.",
       },
     ]);
   });
@@ -122,6 +122,18 @@ describe("validateQuestionFile", () => {
         { id: "k3f9a2", item: "choices", message: "Needs 2 to 8 choices." },
       ]);
     }
+  });
+
+  test("選択肢が空の並びだと、ないのと同じ誤りになる", () => {
+    expect(errorsOf(file([question({ choices: [] })]))).toEqual([
+      { id: "k3f9a2", item: "choices", message: "Missing." },
+    ]);
+  });
+
+  test("正解に同じ記号が2回あると、形の誤りになる", () => {
+    expect(
+      errorsOf(file([question({ type: "multiple", correct: ["A", "A"] })])),
+    ).toEqual([{ id: "k3f9a2", item: "correct", message: "Wrong format." }]);
   });
 
   test("空の選択肢は、その記号で示す", () => {

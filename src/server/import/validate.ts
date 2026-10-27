@@ -125,7 +125,6 @@ export function validateQuestionFile(content: string): ValidateResult {
     const choices = readChoices(raw.choices, add);
     const correct = readCorrect(raw.correct, type, choices, add);
     const explanation = readText(raw.explanation, "explanation", add, true);
-    // 決まった項目のほかに書かれた項目は、見ずに捨てる
 
     if (id !== undefined) {
       positionsById.set(id, [...(positionsById.get(id) ?? []), index]);
@@ -202,7 +201,7 @@ function readType(value: unknown, add: Add): QuestionType | undefined {
 }
 
 function readChoices(value: unknown, add: Add): string[] | undefined {
-  if (value === undefined) {
+  if (value === undefined || (Array.isArray(value) && value.length === 0)) {
     add("choices", MISSING);
     return undefined;
   }
