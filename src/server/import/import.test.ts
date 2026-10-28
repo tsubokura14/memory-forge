@@ -120,23 +120,30 @@ describe("applyImport", () => {
 
   test("増える問題を足し、置き換わる問題を新しくし、ファイルにない問題は残す", async () => {
     await applyImport(file(first));
+    // 置き換わる問題は、すべての項目を変え、どれも新しい中身になることを確かめる
+    const replaced = question({
+      id: "a1",
+      topic: "Iterators",
+      type: "multiple",
+      text: "新しい問題文",
+      choices: ["x", "y", "z", "w"],
+      correct: ["A", "D"],
+      explanation: "新しい解説",
+    });
+    const added = question({ id: "d4", topic: "Generators" });
     const result = await applyImport(
-      file([
-        question({ id: "a1", topic: "Generators" }),
-        question({ id: "b2", topic: "Generators" }),
-        question({ id: "d4", topic: "Generators" }),
-      ]),
+      file([replaced, question({ id: "b2", topic: "Generators" }), added]),
     );
     expect(result).toEqual({
       ok: true,
       subject: "Python",
       counts: { added: 1, replaced: 1, unchanged: 1 },
     });
-    expect((await storedQuestions()).map((q) => [q.id, q.topic])).toEqual([
-      ["a1", "Generators"],
-      ["b2", "Generators"],
-      ["c3", "Decorators"],
-      ["d4", "Generators"],
+    expect(await storedQuestions()).toEqual([
+      { subject: "Python", ...replaced },
+      { subject: "Python", ...first[1] },
+      { subject: "Python", ...first[2] },
+      { subject: "Python", ...added },
     ]);
   });
 
