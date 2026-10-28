@@ -34,7 +34,7 @@ export function choiceLetter(index: number): string {
   return String.fromCharCode("A".charCodeAt(0) + index);
 }
 
-// 前後の空白だけのものは空とみなす。返す値は、書かれたまま（コードの字下げを崩さないため）
+// 前後の空白だけのものは空とみなす（docs/design.md の「データ」の「問題」）
 function isBlank(value: string): boolean {
   return value.trim() === "";
 }
