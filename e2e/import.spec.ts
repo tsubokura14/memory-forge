@@ -118,7 +118,7 @@ test("取り込む前の確認で、数と置き換わる問題の前と後を�
   await openImport(page);
   await chooseFile(page, "python-decorators.json", json(next));
 
-  await expect(page.getByText("python-decorators.json")).toBeVisible();
+  await expect(page.getByRole("button", { name: "import all" })).toBeVisible();
   await expect(page).toHaveScreenshot("import-preview.png", { fullPage: true });
 
   await page.getByRole("button", { name: "cancel" }).click();
@@ -133,6 +133,7 @@ test("まだない Subject のときは new subject と出す", async ({ page })
     json([testQuestion("r1"), testQuestion("r2")], "Rust"),
   );
 
+  await expect(page.getByRole("button", { name: "import all" })).toBeVisible();
   await expect(page.getByText("new subject")).toBeVisible();
   await expect(page).toHaveScreenshot("import-preview-new.png", {
     fullPage: true,

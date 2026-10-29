@@ -1,7 +1,9 @@
-// ボタン。primary は画面の主な操作（1画面に1つ）、outline はほかの操作（docs/ui.md の「ボタン」）
+// ボタン。primary は画面の主な操作（1画面に1つ）、outline はほかの操作（docs/ui.md の「ボタン」）。
+// danger は、danger の帯の中に置く操作（retry）
 const VARIANTS = {
   primary: "bg-primary text-on-primary",
   outline: "border border-border bg-surface text-text",
+  danger: "border border-danger text-danger",
 };
 
 export function Button({

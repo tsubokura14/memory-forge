@@ -30,6 +30,13 @@ const WRONG_FORMAT = "Wrong format.";
 const UNCLOSED_CODE = "Code block is not closed (```).";
 const FILE_ID = "—";
 
+// 画面が、大きすぎるファイルを送らずに止めるときにも使う
+export const TOO_LARGE: FileError = {
+  id: FILE_ID,
+  item: "file",
+  message: "Too large. Up to 4 MB.",
+};
+
 export function choiceLetter(index: number): string {
   return String.fromCharCode("A".charCodeAt(0) + index);
 }
@@ -52,9 +59,7 @@ function formatCount(n: number): string {
 export function validateQuestionFile(content: string): ValidateResult {
   // 大きさは UTF-8 のバイト数で数える。画面でも、送る前に同じ上限で止める
   if (new TextEncoder().encode(content).length > MAX_FILE_BYTES) {
-    return fail([
-      { id: FILE_ID, item: "file", message: "Too large. Up to 4 MB." },
-    ]);
+    return fail([TOO_LARGE]);
   }
 
   let parsed: unknown;
