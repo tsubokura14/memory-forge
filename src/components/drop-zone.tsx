@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Button } from "./button";
 
 // ファイルを落とすか選ぶ、点線の枠（docs/ui.md の「0件」と同じ点線の枠）。busy の間は、選ぶボタンを出さず、落としても受け取らない
@@ -18,22 +18,17 @@ export function DropZone({
   children?: React.ReactNode;
 }) {
   const input = useRef<HTMLInputElement>(null);
-  const [over, setOver] = useState(false);
 
   return (
     <div
-      onDragOver={(event) => {
-        event.preventDefault();
-        if (!busy) setOver(true);
-      }}
-      onDragLeave={() => setOver(false)}
+      // ブラウザがファイルを開いてしまわないよう、重ねたときの既定の動きを止める
+      onDragOver={(event) => event.preventDefault()}
       onDrop={(event) => {
         event.preventDefault();
-        setOver(false);
         const file = event.dataTransfer.files[0];
         if (!busy && file) onFile(file);
       }}
-      className={`flex flex-col items-center gap-1 rounded-md border border-dashed bg-surface px-4 py-10 text-center ${over ? "border-primary" : "border-border"}`}
+      className={`flex flex-col items-center gap-1 rounded-md border border-dashed bg-surface border-border px-4 py-10 text-center`}
     >
       {children ?? (
         <>

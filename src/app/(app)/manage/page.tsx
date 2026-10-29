@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { buttonClass } from "@/components/button";
 import { PageHeader } from "@/components/page-header";
 
 // Manage。今は Import への入り口だけ（問題の一覧・書き出し・削除は #11）
@@ -11,10 +12,7 @@ export default function ManagePage() {
             Import, export and delete questions.
           </p>
         </PageHeader>
-        <Link
-          href="/manage/import"
-          className="rounded-md bg-primary px-4 py-2 font-mono text-sm text-on-primary"
-        >
+        <Link href="/manage/import" className={buttonClass()}>
           import
         </Link>
       </div>

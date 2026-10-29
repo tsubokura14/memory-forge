@@ -58,7 +58,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 - 接続は `pg` の接続プールと `drizzle-orm/node-postgres`（`src/server/db/client.ts`）
   - 理由：取り込みで、途中で読んで判断するトランザクションを使うため。手元・CI・本番が同じ書き方になる
 - つなぐときは、どこでも接続先の URL を `withVerifyFull`（`src/server/db/connection-url.ts`）に通し、`sslmode` を `verify-full` にする。サーバーの証明書と接続先の名前を確かめるため
-  - 通している場所：`src/server/db/client.ts`・`drizzle.config.ts`・`scripts/create-user.ts`・`e2e/global-setup.ts`。新しくつなぐ場所（`new Pool()` など）を作るときも通す
+  - 通している場所：`src/server/db/client.ts`・`drizzle.config.ts`・`scripts/create-user.ts`・`e2e/global-setup.ts`・`e2e/questions.ts`。新しくつなぐ場所（`new Pool()` など）を作るときも通す
   - 理由：本番と Preview の接続先は連携が入れ、Preview は公開のたびに作られるので、人間が URL を書き換えられない。アプリの側で置き換えれば、どこでも同じ確かめ方になる
   - 前提（崩れたら見直す）：`pg` は、URL の `sslmode` を `ssl` の設定より優先する。`pg` の大きな版を上げるときは、`verify-full` の意味が変わっていないか確かめる
 - 形の変更を当てる場所

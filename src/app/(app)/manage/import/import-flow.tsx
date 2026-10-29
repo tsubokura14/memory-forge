@@ -4,7 +4,7 @@ import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
 import { useState } from "react";
 import { Banner } from "@/components/banner";
-import { Button } from "@/components/button";
+import { Button, buttonClass } from "@/components/button";
 import { ChangeRow } from "@/components/change-row";
 import { CountBox } from "@/components/count-box";
 import { DropZone } from "@/components/drop-zone";
@@ -239,10 +239,7 @@ export function ImportFlow() {
             {phase.counts.added} new · {phase.counts.replaced} replaced ·{" "}
             {phase.counts.unchanged} unchanged
           </p>
-          <Link
-            href="/manage"
-            className="mt-2 rounded-md bg-primary px-4 py-2 font-mono text-sm text-on-primary"
-          >
+          <Link href="/manage" className={`mt-2 ${buttonClass()}`}>
             open in manage
           </Link>
         </div>

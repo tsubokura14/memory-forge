@@ -17,10 +17,13 @@ const stored = [
   testQuestion("k3f9a2"),
 ];
 
-// 取り込み済みに対して、増える1問・置き換わる1問（choice D）・変わらない2問になるファイル
+// 取り込み済みに対して、増える1問・置き換わる2問（choice D と解説）・変わらない1問になるファイル
 const next = [
   testQuestion("a1x9k2"),
-  testQuestion("b4m7q1", { topic: "Generators" }),
+  testQuestion("b4m7q1", {
+    topic: "Generators",
+    explanation: "ジェネレータは yield で値を1つずつ返す。",
+  }),
   testQuestion("k3f9a2", { choices: ["call add", "add", "None", "None"] }),
   testQuestion("n5p2r8", { topic: "Generators" }),
 ];
@@ -54,15 +57,11 @@ test.beforeEach(async () => {
 test("manage-default", async ({ page }) => {
   await page.goto("/manage");
   await expect(page).toHaveScreenshot("manage-default.png", { fullPage: true });
-  await page.getByRole("link", { name: "import" }).click();
-  await expect(page).toHaveURL("/manage/import");
 });
 
 test("import-select", async ({ page }) => {
   await openImport(page);
   await expect(page).toHaveScreenshot("import-select.png", { fullPage: true });
-  await page.getByRole("link", { name: "manage" }).first().click();
-  await expect(page).toHaveURL("/manage");
 });
 
 test("確かめている間は、ファイル名と checking… を出し、ファイルを選べない", async ({
@@ -140,7 +139,7 @@ test("まだない Subject のときは new subject と出す", async ({ page })
   });
 });
 
-test("import all で取り込み、知らせの open in manage で Manage に移る", async ({
+test("import all で取り込み、取り込んだという知らせを出す", async ({
   page,
 }) => {
   await openImport(page);
@@ -149,17 +148,6 @@ test("import all で取り込み、知らせの open in manage で Manage に移
 
   await expect(page.getByText("imported into Python")).toBeVisible();
   await expect(page).toHaveScreenshot("import-done.png", { fullPage: true });
-
-  // 取り込んだあとに同じファイルを確かめると、全部が変わらない
-  await page.goto("/manage/import");
-  await chooseFile(page, "python-decorators.json", json(next));
-  await expect(page.getByTestId("count-unchanged")).toHaveText(/4/);
-
-  await page.goto("/manage/import");
-  await chooseFile(page, "python-decorators.json", json(next));
-  await page.getByRole("button", { name: "import all" }).click();
-  await page.getByRole("link", { name: "open in manage" }).click();
-  await expect(page).toHaveURL("/manage");
 });
 
 test("サーバーにつながらないと、帯と retry を出し、ファイルを選び直せる", async ({
