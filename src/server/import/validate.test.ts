@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { MAX_FILE_BYTES, validateQuestionFile } from "./validate";
+import {
+  countProblems,
+  MAX_FILE_BYTES,
+  validateQuestionFile,
+} from "./validate";
 
 function question(overrides: Record<string, unknown> = {}) {
   return {
@@ -233,5 +237,12 @@ describe("validateQuestionFile", () => {
       },
       { id: "m2v7c4", item: "explanation", message: "Missing." },
     ]);
+  });
+});
+
+describe("countProblems", () => {
+  test("誤りが1つなら単数、2つ以上なら複数で数える", () => {
+    expect(countProblems(1)).toBe("1 problem");
+    expect(countProblems(2)).toBe("2 problems");
   });
 });
