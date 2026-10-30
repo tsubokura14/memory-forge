@@ -15,7 +15,7 @@ export default function Home() {
         <h2 className="font-mono text-xs text-muted">menu</h2>
         <Link
           href="/manage"
-          className="flex items-center justify-between gap-4 rounded-md border border-border bg-surface px-4 py-3"
+          className="flex items-center justify-between gap-4 rounded-md border border-border bg-surface px-4 py-3 hover:bg-surface-raised"
         >
           <span className="flex flex-col gap-0.5">
             <span className="font-mono text-sm">manage</span>
@@ -53,7 +53,15 @@ async function EmptySubjects() {
   );
 }
 
-// docs/ui.md の「読み込み中」。0件の表示と同じ形の枠を点滅させる
+// docs/ui.md の「読み込み中」。0件の表示と同じ形（見出しと枠）を点滅させる
 function EmptySubjectsSkeleton() {
-  return <div className="h-40 animate-pulse rounded-md bg-surface-raised" />;
+  return (
+    <div
+      data-testid="subjects-loading"
+      className="flex animate-pulse flex-col gap-2"
+    >
+      <div className="h-4 w-16 rounded-sm bg-surface-raised" />
+      <div className="h-44 rounded-md bg-surface-raised" />
+    </div>
+  );
 }

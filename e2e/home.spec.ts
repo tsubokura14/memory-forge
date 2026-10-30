@@ -19,7 +19,8 @@ test.describe("ログインした状態を保存したもので開く", () => {
       { name: "Python", questions: [testQuestion("a1x9k2")] },
     ]);
     await page.goto("/");
-    await expect(page.getByRole("link", { name: /manage/ })).toBeVisible();
+    // 読み込み中の枠が消えて、Subject を読み終えるのを待つ
+    await expect(page.getByTestId("subjects-loading")).toHaveCount(0);
     await expect(page.getByText("subjects", { exact: true })).toHaveCount(0);
     await expect(page).toHaveScreenshot("home-default.png", { fullPage: true });
   });
