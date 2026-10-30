@@ -12,6 +12,7 @@ import { ErrorList } from "@/components/error-list";
 import { PageHeader } from "@/components/page-header";
 import type { ImportCounts, ImportPreview } from "@/server/import/import";
 import {
+  countProblems,
   type FileError,
   MAX_FILE_BYTES,
   TOO_LARGE,
@@ -158,8 +159,7 @@ export function ImportFlow() {
       {phase.kind === "errors" && (
         <>
           <Banner>
-            {phase.errors.length}{" "}
-            {phase.errors.length === 1 ? "problem" : "problems"} found in{" "}
+            {countProblems(phase.errors.length)} found in{" "}
             <span className="font-mono">{phase.fileName}</span>. Nothing was
             imported.
           </Banner>

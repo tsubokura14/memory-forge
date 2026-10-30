@@ -28,7 +28,7 @@ export function DropZone({
         const file = event.dataTransfer.files[0];
         if (!busy && file) onFile(file);
       }}
-      className={`flex flex-col items-center gap-1 rounded-md border border-dashed bg-surface border-border px-4 py-10 text-center`}
+      className="flex flex-col items-center gap-1 rounded-md border border-dashed border-border bg-surface px-4 py-10 text-center"
     >
       {children ?? (
         <>

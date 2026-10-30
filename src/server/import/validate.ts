@@ -269,3 +269,8 @@ function readCorrect(
   }
   return letters;
 }
+
+// 誤りの帯に出す数。1つのときだけ単数にする
+export function countProblems(count: number): string {
+  return `${count} ${count === 1 ? "problem" : "problems"}`;
+}
