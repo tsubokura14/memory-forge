@@ -87,6 +87,8 @@ Claude Code に作らせた問題を、アプリで解けるようにするた�
 
 - 上に、戻るリンク（manage）、パンくず（manage / import）、見出し「Import」を置く
 - 置き換わる問題は、1問ずつ開閉する行にする。行には ID と問題文の1行目を出し、開くと、変わった項目ごとに、前（danger の枠）と後（success の枠）を横に並べる（スマホの幅では縦）。最初の1問だけを開いておく
+- 誤りの帯の数は、1つのときは単数（「1 problem found in …」）、2つ以上は複数（「4 problems found in …」）にする
+- サーバーのエラーの帯の retry は、帯と同じ danger の枠と文字のボタンにする（仕上げで `docs/ui.md` の「ボタン」に足す）
 - 増える・置き換わる・変わらない数は、3つの枠に横に並べ、増えるは success、置き換わるは warning（0なら muted）、変わらないは muted の数字にする
 
 | 状態 | 表示 | スクリーンショット |
@@ -171,6 +173,9 @@ Claude Code に作らせた問題を、アプリで解けるようにするた�
 - [x] 決まった項目のほかに書かれた項目は？（実装で出てきた） → 誤りにせず、取り込まない（あとで項目を足したファイルや、書き足したメモでも取り込めるように）
 - [x] 問題そのものや、ファイル全体がオブジェクトでないときの項目の列は？（実装で出てきた） → 問題は question、ファイル全体は file。内容はどちらも Wrong format.
 - [x] 4MB は、1024 と 1000 のどちらで数える？（実装で出てきた） → 4 × 1024 × 1024 バイト
+- [x] 誤りが1つのときの帯の文は？（画面の実装で出てきた） → 「1 problem found in …」と単数にする
+- [x] retry のボタンの見た目は？（`docs/ui.md` にない。画面の実装で出てきた） → 合意したスクリーンショットのとおり、danger の枠と文字。仕上げで `docs/ui.md` に足す
+- [x] 画面が、送る前に大きさを確かめるため、`src/server/import/validate.ts` の上限と文言を読み込んでよい？（画面の実装で出てきた） → よい。`docs/design.md` に、データベースを使わない決まりは画面からも読み込んでよいと書く
 
 ## 調べたこと
 
@@ -265,7 +270,7 @@ Claude Code に作らせた問題を、アプリで解けるようにするた�
 - import all で取り込む（増える・置き換わる・変わらない、ファイルにない問題が残る、新しい Subject ができる、空になった Topic が消える）：テスト（`src/server/import/import.test.ts`。`test` のデータベースを使う）。知らせは画像を比べるテスト（`import-done`）
 - 全部が入るか、何も入らないか：コードを見て確かめる（`applyImport` が1つのトランザクションの中で書く）と、テスト（確かめ直しで誤りになる中身を `applyImport` に渡すと、何も書かれない）
 - 画面を離れても何も変わらない：コードを見て確かめる（確かめは何も書かず、書くのは `applyImport` の1つのトランザクションだけ）
-- サーバーのエラーで danger の帯と retry、何も変わらない：触って確かめる（データベースにつながらない状態を作りにくいため。見た目は合意したスクリーンショットと見比べる）
+- サーバーのエラーで danger の帯と retry、何も変わらない：画像を比べるテスト（`import-error`。サーバーアクションの通信を Playwright で切って作る）と、画面のテスト（retry で同じ中身を確かめ直す）。何も変わらないことは、コードを見て確かめる（失敗したら書く前に止まる）
 - 取り込み中の表示：触って確かめる
 
 ## タスク
@@ -273,5 +278,5 @@ Claude Code に作らせた問題を、アプリで解けるようにするた�
 - [x] `subjects`・`questions` の表を足し、`docs/design.md` の「データ」に書く（形の変更が `dev`・`test`・CI に当たり、今あるテストが通ったら完了）
 - [x] 問題のファイルを確かめる `validate.ts` を作る（誤りの決まりと文言のテストが通ったら完了）
 - [x] 取り込む前の比べ（`diff.ts`）と、確かめ・取り込み（`import.ts`）を作る（比べと、データベースに入る・入らないのテストが通ったら完了）
-- [ ] Manage と Import の画面を作る（スクリーンショット：`import-select.png`・`import-checking.png`・`import-errors.png`・`import-preview.png`・`import-preview-new.png`・`import-done.png`・`import-error.png`。Manage はスクリーンショットなし。合意した画像と見比べ、画像を比べるテストの基準を撮ったら完了）
+- [x] Manage と Import の画面を作る（スクリーンショット：`import-select.png`・`import-checking.png`・`import-errors.png`・`import-preview.png`・`import-preview-new.png`・`import-done.png`・`import-error.png`。Manage はスクリーンショットなし。合意した画像と見比べ、画像を比べるテストの基準を撮ったら完了）
 - [ ] Home に「subjects」の0件の表示と、「menu」の manage を足す（スクリーンショットなし。「画面」の Home の表に合わせ、Home の基準の画像を撮り直したら完了）

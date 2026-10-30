@@ -14,6 +14,8 @@ export default async function globalSetup(config: FullConfig) {
   });
   try {
     const db = drizzle({ client: pool, schema });
+    // questions は subjects を消すと一緒に消える
+    await db.delete(schema.subjects);
     await db.delete(schema.signInAttempts);
     await db.delete(schema.session);
     await db.delete(schema.account);
