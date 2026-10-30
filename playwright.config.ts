@@ -16,8 +16,7 @@ export default defineConfig({
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
   // 基準の画像は、OS 名を入れずに docs/specs/screens/<画面>-<状態>.png に置く
   snapshotPathTemplate: "docs/specs/screens/{arg}{ext}",
-  // 画面のテストは、テストの前に同じデータベースの Subject と問題を入れ直す（e2e/questions.ts）。
-  // ファイルを並べて動かすと、ほかのファイルが入れたデータで画面が変わるので、1つずつ動かす
+  // docs/design.md の「画面の画像を撮る・比べる仕組み」
   workers: 1,
   use: {
     baseURL: "http://localhost:3000",

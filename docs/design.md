@@ -98,6 +98,8 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
   - アニメーション：`toHaveScreenshot` の既定で止まる
   - 前提（崩れたら見直す）：サーバー側の日時は固定していない。サーバーで日付を使う画面（連続日数など）を撮るときは、固定する方法を足す
 - 状態（0件など）は、テストの前に `test` のデータベースに決まったデータを入れて作る（`docs/process/screenshots.md`）
+  - Subject と問題は、テストごとに `e2e/questions.ts` の `resetQuestions` で入れ直す
+  - 画面のテストは、ファイルを並べずに1つずつ動かす（`playwright.config.ts` の `workers: 1`）。並べると、ほかのファイルのテストが入れ直したデータで、撮っている画面が変わるため
 - ログインが要る画面は、テスト用のユーザーでログインした状態で撮る
   - global setup（`e2e/global-setup.ts`）が、`test`（CI では `ci`）のデータベースの表を空にし、テスト用のユーザーを `scripts/insert-user.ts` で作り、Login から sign in した cookie を `e2e/.auth/` に保存する。ログインが要るテストは、それを `storageState` で使う
   - テスト用のユーザーのメールアドレスとパスワードは、`e2e/test-user.ts` に書いた決まった値（`test`・`ci` のデータベースにだけ入る）
