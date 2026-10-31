@@ -279,4 +279,4 @@ Claude Code に作らせた問題を、アプリで解けるようにするた�
 - [x] 問題のファイルを確かめる `validate.ts` を作る（誤りの決まりと文言のテストが通ったら完了）
 - [x] 取り込む前の比べ（`diff.ts`）と、確かめ・取り込み（`import.ts`）を作る（比べと、データベースに入る・入らないのテストが通ったら完了）
 - [x] Manage と Import の画面を作る（スクリーンショット：`import-select.png`・`import-checking.png`・`import-errors.png`・`import-preview.png`・`import-preview-new.png`・`import-done.png`・`import-error.png`。Manage はスクリーンショットなし。合意した画像と見比べ、画像を比べるテストの基準を撮ったら完了）
-- [ ] Home に「subjects」の0件の表示と、「menu」の manage を足す（スクリーンショットなし。「画面」の Home の表に合わせ、Home の基準の画像を撮り直したら完了）
+- [x] Home に「subjects」の0件の表示と、「menu」の manage を足す（スクリーンショットなし。「画面」の Home の表に合わせ、Home の基準の画像を撮り直したら完了）
