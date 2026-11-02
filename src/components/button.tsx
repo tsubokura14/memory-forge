@@ -9,7 +9,7 @@ const VARIANTS = {
 // lg は、幅いっぱいに大きく置く主な操作（Setup の start、解く画面の下に固定した操作）
 const SIZES = {
   md: "px-4 py-2 text-sm",
-  lg: "w-full px-4 py-3 text-base",
+  lg: "w-full px-4 py-3 text-base font-medium",
 };
 
 // リンク（Next.js の Link）を、ボタンと同じ見た目にするときに使う

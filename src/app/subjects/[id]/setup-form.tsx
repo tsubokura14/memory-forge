@@ -39,7 +39,7 @@ export function SetupForm({ setup }: { setup: Setup }) {
   const scope = topic ?? setup.name;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <Field label="topic">
         <RadioList
           label="topic"
