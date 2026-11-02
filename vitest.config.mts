@@ -13,6 +13,8 @@ export default defineConfig({
   test: {
     include: ["src/**/*.test.{ts,tsx}"],
     environment: "node",
+    // docs/design.md の「データベースのつながり方」
+    fileParallelism: false,
     // テストがまだ1つもない間も、npm test を失敗にしないため
     passWithNoTests: true,
   },

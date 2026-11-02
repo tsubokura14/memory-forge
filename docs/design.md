@@ -55,6 +55,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 
 - すべてのブランチは、自分の Neon のアカウントの同じ1つのプロジェクトにある。Vercel とは、Vercel の Marketplace から入れた「Neon が管理する Vercel 連携」でつなぐ
 - `dev`・`test`・`ci` は、Neon の画面で main から作ったブランチ。テストは自分で入れたデータだけを使い、始める前に表を空にする（main から写した本番のデータを当てにしない）
+  - Vitest は、テストのファイルを並べずに1つずつ動かす（`vitest.config.mts` の `fileParallelism: false`）。データベースを使うファイルどうしが、同じデータベースの表を互いに空にしてぶつかるため
 - Preview のブランチは、Git のブランチが消えたあと、次の Preview の公開のときに連携が消す（連携の「Automatically delete obsolete Neon branches」）。Git のブランチは、PR をマージすると GitHub が消す（リポジトリの「Automatically delete head branches」）
 - 前提（崩れたら見直す）：無料のプランのブランチの上限は、1つのプロジェクトに10本。main・`dev`・`test`・`ci` の4本を除いて、同時に置ける Preview は6本。1タスク = 1PR で順に進めるので超えない
   - Vercel の Development 用のブランチ（連携の「Create a branch for your development environment」で作る `vercel-dev`）は作らない。手元は `.env.local` の `dev` を使い、作ると上限の1本を使うため
@@ -127,6 +128,12 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
     - 前提（崩れたら見直す）：使う人はひとり。複数人で使うときに足す
   - 問題の文字（Subject・Topic・ID・問題文・選択肢・解説）は、ファイルに書かれたまま（前後の空白も含めて）持ち、比べる。前後の空白を除くのは、空かどうかを見るときだけ（`src/server/import/validate.ts`・`diff.ts`・`import.ts`）
     - 理由：問題文・選択肢・解説のコードの字下げを崩さないため
+- 記録
+  - `answers`：答えるたびに（submit とスキップ）1行足す。正解か（スキップは不正解）と答えた日時を持つ。問題を消すと、その記録も消える
+  - 問題ごとの正答率と解いた回数、最後の答え、答えた日は、どれもこの表から数える（数を `questions` の列に持たない）
+    - 理由：正答率が低い順の出題、身についている具合（最後の答え）、連続日数（答えた日）が、同じ記録から数えられるため
+    - 前提（崩れたら見直す）：使う人はひとりで、行は数万ほどにしかならない。数えるのが重くなったら、数をまとめた表を足す
+  - 取り込み直しは同じ問題の行を書き換えるので、`questions.id` は変わらず、記録は残る
 
 ## どこでも守る決まり
 
