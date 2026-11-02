@@ -100,8 +100,8 @@
   - lowest accuracy で、解いた問題がない：warning の文字で「No questions to ask — none in Typing have been answered yet.」。start は薄くして押せない（start · 0）
   - All を選んでいるときは、Topic の名前の代わりに Subject の名前（「Python has only 8 questions to ask.」など）
 - start を押して問題を読めなかった：start の上に、danger の帯「Couldn't load questions.」と retry（プロトタイプにない状態。スクリーンショットは付けない）
-- 読み込み中：Topic の行の形の枠を6つ、点滅させる
-- 読み込めなかった：danger の帯「Couldn't load this subject.」と retry
+- 読み込み中：Topic の行の形の枠を6つ、点滅させる。Subject の名前（見出し）の場所も点滅する枠にする
+- 読み込めなかった：danger の帯「Couldn't load this subject.」と retry。Subject の名前（見出し）は出さない
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
@@ -172,6 +172,8 @@
 - [x] Solve から Setup に戻ったときの選び方は？ → 直前の Topic・順番・問題数のまま。読み込み直したときは最初の選び方（`/dev-plan` で決めた）
 - [x] start を押して問題を読めなかったら？ → Setup のまま、start の上に danger の帯「Couldn't load questions.」と retry（`/dev-plan` で決めた）
 - [x] 問題が足りないときなどの案内で、All を選んでいるときは？ → Topic の名前の代わりに Subject の名前。ない Subject の Setup は、見つからない画面を出す（`/dev-plan` で決めた）
+
+- [x] Setup の読み込み中と読み込めなかったときは、Subject の名前（見出し）をどう出す？（プロトタイプでは名前が出ているが、本番では読み終えるまでわからない） → 読み込み中は名前の場所を点滅する枠に、読み込めなかったときは見出しを出さない（T3 の `/dev-impl` で決めた）
 
 画面に見えるもの（選べる順番と問題数、Home の Subject の行と Setup の Topic の行に出すもの、押せない表示、文言）は、合意済みのプロトタイプ（Home・Setup・Solve は作成済み）に合わせる。`/dev-proto` でプロトタイプから写し、仕様と食い違うところだけを聞く。
 
