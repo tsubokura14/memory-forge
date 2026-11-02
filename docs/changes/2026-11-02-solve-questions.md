@@ -359,7 +359,7 @@ Setup と Solve は、1つの画面（`/subjects/[id]`）の中で切り替え�
 
 ## タスク
 
-- [ ] T1：`answers` の表を足し、答え合わせと記録（`gradeAnswer`・`answerQuestion`・`skipQuestion`）ができたら完了。画面は変えない
+- [x] T1：`answers` の表を足し、答え合わせと記録（`gradeAnswer`・`answerQuestion`・`skipQuestion`）ができたら完了。画面は変えない
 - [ ] T2：Setup の数と出題の決まり（`getSetup`・`pickQuestions`・`startNotice`・`startSession`）ができたら完了。画面は変えない
 - [ ] T3：`/subjects/[id]` に Setup が出て、Topic・順番・問題数を選べたら完了。start はまだ Solve につながない（Home からはまだ入れない）
   - 合わせる画像：setup-default・setup-few・setup-unanswered・setup-many（setup-loading・setup-error は見本）
