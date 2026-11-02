@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Banner } from "@/components/banner";
 import { Button } from "@/components/button";
 import { RadioList } from "@/components/radio-list";
 import { Segmented } from "@/components/segmented";
@@ -25,12 +25,24 @@ const COUNTS: { value: Count; label: string }[] = [
   { value: 20, label: "20" },
 ];
 
-// Topic・順番・問題数を選ぶ。topic の null は All。start は T4 で Solve につなぐ
-export function SetupForm({ setup }: { setup: Setup }) {
-  const [topic, setTopic] = useState<string | null>(null);
-  const [order, setOrder] = useState<Order>("in-order");
-  const [count, setCount] = useState<Count>(10);
+// 選び方。topic の null は All。Solve から戻ったときに残すため、study.tsx が持つ
+export type Choices = { topic: string | null; order: Order; count: Count };
 
+export function SetupForm({
+  setup,
+  choices,
+  onChange,
+  onStart,
+  failed,
+}: {
+  setup: Setup;
+  choices: Choices;
+  onChange: (choices: Choices) => void;
+  onStart: () => void;
+  // 問題を読めなかったとき。retry は start と同じ
+  failed: boolean;
+}) {
+  const { topic, order, count } = choices;
   const start = startNotice(topicStats(setup.topics, topic), order, count);
   // All のときは、Topic の名前の代わりに Subject の名前で案内する
   const scope = topic ?? setup.name;
@@ -45,7 +57,7 @@ export function SetupForm({ setup }: { setup: Setup }) {
             { value: null, label: "All", strong: true },
           ]}
           value={topic}
-          onChange={setTopic}
+          onChange={(value) => onChange({ ...choices, topic: value })}
         />
       </Field>
       <Field label="order">
@@ -53,7 +65,7 @@ export function SetupForm({ setup }: { setup: Setup }) {
           label="order"
           options={ORDERS}
           value={order}
-          onChange={setOrder}
+          onChange={(value) => onChange({ ...choices, order: value })}
         />
       </Field>
       <Field label="questions">
@@ -61,7 +73,7 @@ export function SetupForm({ setup }: { setup: Setup }) {
           label="questions"
           options={COUNTS}
           value={count}
-          onChange={setCount}
+          onChange={(value) => onChange({ ...choices, count: value })}
         />
       </Field>
       <div className="flex flex-col gap-3">
@@ -75,7 +87,18 @@ export function SetupForm({ setup }: { setup: Setup }) {
             No questions to ask — none in {scope} have been answered yet.
           </p>
         )}
-        <Button size="lg" disabled={start.count === 0}>
+        {failed && (
+          <Banner
+            action={
+              <Button variant="danger" onClick={onStart}>
+                retry
+              </Button>
+            }
+          >
+            Couldn&apos;t load questions.
+          </Banner>
+        )}
+        <Button size="lg" disabled={start.count === 0} onClick={onStart}>
           start · {start.count}
         </Button>
       </div>

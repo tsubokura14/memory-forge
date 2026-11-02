@@ -362,6 +362,8 @@ test("最後の問題の skip は、Setup に戻る", async ({ page }) => {
 });
 
 test("solve-many：問題が多いと、37/100 のように出す", async ({ page }) => {
+  // 36問をスキップして進むので、ふつうの上限（30秒）では足りない
+  test.setTimeout(90_000);
   await openSetup(
     page,
     Array.from({ length: 100 }, (_, i) =>
@@ -399,7 +401,9 @@ test("問題を読めなかったら、Setup のまま帯と retry を出し、r
     isServerAction(route.request()) ? route.abort() : route.continue(),
   );
   await start(page).click();
-  await expect(page.getByRole("alert")).toHaveText(/Couldn't load questions\./);
+  await expect(page.getByRole("main").getByRole("alert")).toHaveText(
+    /Couldn't load questions\./,
+  );
 
   await page.unrouteAll();
   await page.getByRole("button", { name: "retry" }).click();

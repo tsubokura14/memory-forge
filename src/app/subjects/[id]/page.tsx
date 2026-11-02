@@ -7,22 +7,15 @@ import { Banner } from "@/components/banner";
 import { PageHeader } from "@/components/page-header";
 import { RetryButton } from "@/components/retry-button";
 import { getSetup, type Setup } from "@/server/solve/setup";
-import { SetupForm } from "./setup-form";
+import { BACK, KICKER, Main } from "./main";
+import { Study } from "./study";
 
-const BACK = { href: "/", label: "back" };
-const KICKER = "study setup";
-
-// Setup（と、T4 からは Solve）。上のバーをここで出す（docs/design.md の「解く画面の状態」）
+// Setup と Solve。上のバーは、Setup と Solve で出し分けるので、ここ（と study.tsx）で出す（docs/design.md の「解く画面の状態」）
 export default function SubjectPage({ params }: PageProps<"/subjects/[id]">) {
   return (
-    <>
-      <AppBar signOutAction={signOutAction} />
-      <main className="mx-auto flex max-w-page flex-col gap-6 px-4 pt-6 pb-10">
-        <Suspense fallback={<SetupSkeleton />}>
-          <SetupLoader params={params} />
-        </Suspense>
-      </main>
-    </>
+    <Suspense fallback={<SetupSkeleton />}>
+      <SetupLoader params={params} />
+    </Suspense>
   );
 }
 
@@ -39,45 +32,46 @@ async function SetupLoader({ params }: { params: Promise<{ id: string }> }) {
   } catch {
     return (
       <>
-        <PageHeader back={BACK} kicker={KICKER} />
-        <Banner action={<RetryButton />}>
-          Couldn&apos;t load this subject.
-        </Banner>
+        <AppBar signOutAction={signOutAction} />
+        <Main>
+          <PageHeader back={BACK} kicker={KICKER} />
+          <Banner action={<RetryButton />}>
+            Couldn&apos;t load this subject.
+          </Banner>
+        </Main>
       </>
     );
   }
   if (!setup) notFound();
 
-  return (
-    <>
-      <PageHeader back={BACK} kicker={KICKER} title={setup.name} />
-      <SetupForm setup={setup} />
-    </>
-  );
+  return <Study subjectId={subjectId} setup={setup} />;
 }
 
 // docs/ui.md の「読み込み中」。Subject の名前と、Topic の行の形の枠を6つ点滅させる
 function SetupSkeleton() {
   return (
     <>
-      <PageHeader
-        back={BACK}
-        kicker={KICKER}
-        title={
-          <span className="block h-7 w-32 animate-pulse rounded-sm bg-surface-raised" />
-        }
-      />
-      <div
-        data-testid="setup-loading"
-        className="flex animate-pulse flex-col gap-2"
-      >
-        {Array.from({ length: 6 }, (_, i) => (
-          <div
-            key={i}
-            className="h-14 rounded-md border border-border bg-surface-raised"
-          />
-        ))}
-      </div>
+      <AppBar signOutAction={signOutAction} />
+      <Main>
+        <PageHeader
+          back={BACK}
+          kicker={KICKER}
+          title={
+            <span className="block h-7 w-32 animate-pulse rounded-sm bg-surface-raised" />
+          }
+        />
+        <div
+          data-testid="setup-loading"
+          className="flex animate-pulse flex-col gap-2"
+        >
+          {Array.from({ length: 6 }, (_, i) => (
+            <div
+              key={i}
+              className="h-14 rounded-md border border-border bg-surface-raised"
+            />
+          ))}
+        </div>
+      </Main>
     </>
   );
 }
