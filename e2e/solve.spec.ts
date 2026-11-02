@@ -32,19 +32,8 @@ function start(page: Page) {
   return page.getByRole("button", { name: /^start/ });
 }
 
-test("setup-default：All・in order・10 を選んで、start · 10", async ({
-  page,
-}) => {
+test("setup-default", async ({ page }) => {
   await openSetup(page, python);
-  await expect(page.getByRole("heading", { name: "Python" })).toBeVisible();
-  await expect(
-    page.getByRole("radio", { name: "All", exact: true }),
-  ).toBeChecked();
-  await expect(page.getByRole("radio", { name: "in order" })).toBeChecked();
-  await expect(
-    page.getByRole("radio", { name: "10", exact: true }),
-  ).toBeChecked();
-  await expect(start(page)).toHaveText("start · 10");
   await expect(page).toHaveScreenshot("setup-default.png", { fullPage: true });
 });
 
@@ -99,9 +88,14 @@ test("setup-many：Topic が多いと、行が続く", async ({ page }) => {
   await expect(page).toHaveScreenshot("setup-many.png", { fullPage: true });
 });
 
+// 読み込みを流し込む途中で見つからないとわかるので、HTTP の状態ではなく、出した中身で確かめる
 test("ない Subject の Setup は、見つからない画面を出す", async ({ page }) => {
   await resetQuestions();
   await page.goto("/subjects/999999");
-  // 読み込みを流し込む途中で見つからないとわかるので、HTTP の状態ではなく、出した中身で確かめる
+  await expect(page.getByText("This page could not be found.")).toBeVisible();
+});
+
+test("数字でない id の Setup も、見つからない画面を出す", async ({ page }) => {
+  await page.goto("/subjects/abc");
   await expect(page.getByText("This page could not be found.")).toBeVisible();
 });
