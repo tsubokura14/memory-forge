@@ -1,15 +1,19 @@
 import Link from "next/link";
 
-// 画面の上の、戻るリンク・パンくず・見出し（docs/ui.md の「上のバー」の、各画面の左上の戻るリンク）
+// 画面の上の、戻るリンク・パンくず・見出し（docs/ui.md の「上のバー」の、各画面の左上の戻るリンク）。
+// kicker は、パンくずの代わりに primary の色で出す画面の種類（Setup の「study setup」）。
+// title がないのは、見出しの中身（Subject の名前など）を読めなかったとき
 export function PageHeader({
   back,
   crumbs,
+  kicker,
   title,
   children,
 }: {
   back: { href: string; label: string };
   crumbs?: string[];
-  title: string;
+  kicker?: string;
+  title?: React.ReactNode;
   children?: React.ReactNode;
 }) {
   return (
@@ -27,7 +31,8 @@ export function PageHeader({
         {crumbs && (
           <p className="font-mono text-xs text-muted">{crumbs.join(" / ")}</p>
         )}
-        <h1 className="text-lg">{title}</h1>
+        {kicker && <p className="font-mono text-xs text-primary">{kicker}</p>}
+        {title && <h1 className="text-lg">{title}</h1>}
         {children}
       </div>
     </div>

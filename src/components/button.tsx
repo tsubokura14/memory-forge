@@ -6,17 +6,33 @@ const VARIANTS = {
   danger: "border border-danger text-danger",
 };
 
+// lg は、幅いっぱいに大きく置く主な操作（Setup の start、解く画面の下に固定した操作）
+const SIZES = {
+  md: "px-4 py-2 text-sm",
+  lg: "w-full px-4 py-3 text-base",
+};
+
 // リンク（Next.js の Link）を、ボタンと同じ見た目にするときに使う
-export function buttonClass(variant: keyof typeof VARIANTS = "primary") {
-  return `rounded-md px-4 py-2 font-mono text-sm disabled:opacity-50 ${VARIANTS[variant]}`;
+export function buttonClass(
+  variant: keyof typeof VARIANTS = "primary",
+  size: keyof typeof SIZES = "md",
+) {
+  return `rounded-md font-mono disabled:opacity-50 ${SIZES[size]} ${VARIANTS[variant]}`;
 }
 
 export function Button({
   variant = "primary",
+  size = "md",
   className = "",
   ...props
-}: React.ComponentProps<"button"> & { variant?: keyof typeof VARIANTS }) {
+}: React.ComponentProps<"button"> & {
+  variant?: keyof typeof VARIANTS;
+  size?: keyof typeof SIZES;
+}) {
   return (
-    <button className={`${buttonClass(variant)} ${className}`} {...props} />
+    <button
+      className={`${buttonClass(variant, size)} ${className}`}
+      {...props}
+    />
   );
 }
