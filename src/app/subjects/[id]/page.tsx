@@ -12,7 +12,7 @@ import { SetupForm } from "./setup-form";
 const BACK = { href: "/", label: "back" };
 const KICKER = "study setup";
 
-// Setup（と、T4 からは Solve）。Solve は上のバーが違うので、上のバーの付く (app) のまとまりの外に置き、ここで出す
+// Setup（と、T4 からは Solve）。上のバーをここで出す（docs/design.md の「解く画面の状態」）
 export default function SubjectPage({ params }: PageProps<"/subjects/[id]">) {
   return (
     <>
@@ -72,7 +72,10 @@ function SetupSkeleton() {
         className="flex animate-pulse flex-col gap-2"
       >
         {Array.from({ length: 6 }, (_, i) => (
-          <div key={i} className="h-14 rounded-md bg-surface-raised" />
+          <div
+            key={i}
+            className="h-14 rounded-md border border-border bg-surface-raised"
+          />
         ))}
       </div>
     </>

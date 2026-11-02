@@ -4,7 +4,12 @@ import { useState } from "react";
 import { Button } from "@/components/button";
 import { RadioList } from "@/components/radio-list";
 import { Segmented } from "@/components/segmented";
-import { type Count, type Order, startNotice } from "@/server/solve/pick";
+import {
+  type Count,
+  type Order,
+  startNotice,
+  topicStats,
+} from "@/server/solve/pick";
 import type { Setup } from "@/server/solve/setup";
 
 const ORDERS: { value: Order; label: string }[] = [
@@ -26,15 +31,7 @@ export function SetupForm({ setup }: { setup: Setup }) {
   const [order, setOrder] = useState<Order>("in-order");
   const [count, setCount] = useState<Count>(10);
 
-  const chosen =
-    topic === null
-      ? setup.topics
-      : setup.topics.filter((t) => t.name === topic);
-  const stats = {
-    total: chosen.reduce((sum, t) => sum + t.total, 0),
-    answered: chosen.reduce((sum, t) => sum + t.answered, 0),
-  };
-  const start = startNotice(stats, order, count);
+  const start = startNotice(topicStats(setup.topics, topic), order, count);
   // All のときは、Topic の名前の代わりに Subject の名前で案内する
   const scope = topic ?? setup.name;
 
