@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { pickQuestions, startNotice } from "./pick";
+import { pickQuestions, startNotice, topicStats } from "./pick";
 
 function candidate(id: number, correctCount = 0, answerCount = 0) {
   return { id, correctCount, answerCount };
@@ -88,5 +88,20 @@ describe("startNotice", () => {
     expect(
       startNotice({ total: 12, answered: 0 }, "lowest-accuracy", "all"),
     ).toEqual({ count: 0, notice: "unanswered" });
+  });
+});
+
+describe("topicStats", () => {
+  const topics = [
+    { name: "Decorators", total: 12, answered: 3 },
+    { name: "Typing", total: 8, answered: 0 },
+  ];
+
+  test("Topic を選ぶと、その Topic の数", () => {
+    expect(topicStats(topics, "Typing")).toEqual({ total: 8, answered: 0 });
+  });
+
+  test("All（null）は、全部の Topic の数を足す", () => {
+    expect(topicStats(topics, null)).toEqual({ total: 20, answered: 3 });
   });
 });

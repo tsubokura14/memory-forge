@@ -81,3 +81,16 @@ export function startNotice(
   }
   return { count: available, notice: "few" };
 }
+
+// 選んだ Topic（null は All で、全部の Topic を足す）の、問題の数と解いた問題の数
+export function topicStats(
+  topics: { name: string; total: number; answered: number }[],
+  topic: string | null,
+): { total: number; answered: number } {
+  const chosen =
+    topic === null ? topics : topics.filter((t) => t.name === topic);
+  return {
+    total: chosen.reduce((sum, t) => sum + t.total, 0),
+    answered: chosen.reduce((sum, t) => sum + t.answered, 0),
+  };
+}

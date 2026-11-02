@@ -36,13 +36,14 @@ export function questionFile(subject: string, questions: TestQuestion[]) {
   return JSON.stringify({ subject, questions }, null, 2);
 }
 
-// Subject を空にし、渡した Subject と問題だけを入れる
+// Subject を空にし、渡した Subject と問題だけを入れる。入れた Subject の id を、渡した順に返す
 export async function resetQuestions(
   subjects: { name: string; questions: TestQuestion[] }[] = [],
-) {
+): Promise<number[]> {
   const pool = new Pool({
     connectionString: withVerifyFull(process.env.DATABASE_URL),
   });
+  const ids: number[] = [];
   try {
     const db = drizzle({ client: pool, schema });
     // questions は subjects を消すと一緒に消える
@@ -52,6 +53,7 @@ export async function resetQuestions(
         .insert(schema.subjects)
         .values({ name: subject.name })
         .returning({ id: schema.subjects.id });
+      ids.push(row.id);
       await db.insert(schema.questions).values(
         subject.questions.map((q) => ({
           subjectId: row.id,
@@ -68,4 +70,5 @@ export async function resetQuestions(
   } finally {
     await pool.end();
   }
+  return ids;
 }
