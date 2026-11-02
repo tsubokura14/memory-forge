@@ -15,6 +15,13 @@
       "when": 1792935862094,
       "tag": "0001_kind_lady_vermin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793582199893,
+      "tag": "0002_absurd_jubilee",
+      "breakpoints": true
     }
   ]
 }

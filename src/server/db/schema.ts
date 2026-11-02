@@ -152,3 +152,19 @@ export const questions = pgTable(
     ),
   ],
 );
+
+// 答えた記録。答えるたびに（submit とスキップ）1行足す（docs/design.md の「データ」）
+export const answers = pgTable(
+  "answers",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    questionId: integer("question_id")
+      .notNull()
+      .references(() => questions.id, { onDelete: "cascade" }),
+    correct: boolean("correct").notNull(),
+    answeredAt: timestamp("answered_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [index("answers_question_id_idx").on(table.questionId)],
+);
