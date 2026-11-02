@@ -163,3 +163,10 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 - 理由：`docs/ui.md` の「トークンにない値を使わない」を、人の目に頼らずに守るため。`src/styles/tokens.css` の先頭で Tailwind の既定の色・文字などを `initial` で消しているので、トークンにない色や文字の大きさのクラスは `no-unknown-classes` で止まる。`p-[13px]` のような書いた値は Tailwind では正しいクラスなので、`[` を含むクラスを `no-restricted-classes` で止める（`eslint.config.mjs`）
 - 前提（崩れたら見直す）：`tokens.css` の先頭の `--color-*: initial` などの行がある。プロトタイプから写し直してこの行が消えると、Lint は何も言わずに止めなくなる。止めるのは `className` の中だけで、`style` や CSS ファイルに書いた値は止まらない
 - 当てはまる場所：`src/` のすべての `.ts`・`.tsx`
+
+### 依存パッケージの中の版を、`overrides` で上書きする
+
+- `zod` を 4.6.7 以上にする（`package.json` の `overrides`）
+- 理由：`@vercel/functions` の中の `@vercel/cli-config` が、脆弱性のある `zod` 4.1.11 を決め打ちで使っていて、`@vercel/functions` の新しい版でも直っていないため（#54）。Better Auth も同じ `zod` を使うので、1つの版にそろう
+- 前提（崩れたら見直す）：`@vercel/cli-config` が `zod` 4 の新しい版でも動く。`@vercel/functions` を上げたときに、中の `zod` が 4.6.6 以上になっていれば、この上書きを消す
+- 当てはまる場所：`package.json`（JSON にはコメントを書けないので、理由はここに書く）
