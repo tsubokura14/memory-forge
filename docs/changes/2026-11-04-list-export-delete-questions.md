@@ -5,62 +5,83 @@
 スクリーンショットは、このファイルと同じ名前のフォルダに置く（例：2026-09-17-add-due-date/list-empty.png）。
 -->
 
-# <機能の名前>（#Issue番号）
+# 問題を一覧で見て、書き出し・削除できる（#11）
 
 ## なぜ
 
-<!-- 今何に困っていて、なぜ作るのか -->
+今の Manage には import しかなく、取り込んだ問題を見られない。問題を直すための元のファイルを取り出す方法も、要らなくなった問題を消す方法もない。
+取り込んだ問題を一覧で確かめ、直すときは Subject ごとに書き出し、要らなくなった問題は Subject・Topic・1問ずつ消せるようにする。
 
 ## 影響する今の仕様
 
-<!-- 変わる docs/specs/ のファイルと節。新しいまとまりなら「新規：docs/specs/xxx.md」 -->
+- `docs/specs/manage.md`：Manage（今は「問題の一覧・書き出し・削除は、まだない」）
+- `docs/specs/import.md`：書き出したファイルを、そのまま取り込み直せること（問題のファイルの形）
+- `docs/specs/home.md`・`docs/specs/solve.md`：消した Subject・Topic・問題が、Home の一覧と Setup から消える
 
 ## 使う場面
 
-<!--
-具体的な人・データ・操作の順で、1〜3つ。言葉の受け取り方のずれを見つけるために書く。
-例：期限が3日後のタスク「請求書を送る」を持つ人が、一覧を開くと、そのタスクの右に「あと3日」と出る
--->
-
-1.
+1. Python（480問、Topic が6つ）を取り込んである人が、Manage を開くと、Subject のプルダウンに Python、Topic に All topics が選ばれ、問題が50問ずつ並ぶ。下には「1–50 of 480」とページの番号が出る。Topic で Decorators を選ぶと、Decorators の問題だけになる
+2. 同じ人が、Python の問題を直したくなり、export Python を押す。Python の全部の問題が1つのファイルとして保存される。直して Import で取り込み直すと、直した問題だけが「置き換わる」に出る
+3. 同じ人が、もう使わない Topic「Typing」を消そうとして、Topic のプルダウンの右の delete を押す。確認のダイアログに、消える問題の数と記録のことと、取り消せないことが出る。delete を押すと Typing が一覧と Setup から消える
 
 ## 受け入れ条件
 
-<!--
-「これができたら完成」を、確かめられるくらい具体的に。技術の話は書かない。
-画面の文言まで書く。エラーのとき、データが空のとき、ログインしていないときも書く。
--->
+### 一覧
 
--
+- Subject のプルダウンで Subject を選び、Topic のプルダウンで All topics か Topic を1つ選ぶと、その問題が一覧に並ぶ
+- プルダウンの一覧の行には、名前と問題数を出す
+- 一覧は50問ずつのページに分ける。「151–200 of 480」と、前後のボタンとページの番号を出す。1ページで収まるときは、前後のボタンと番号を出さない
+- 問題の行には、問題ごとの正答率（75% など）と解いた回数を出す。まだ解いていない問題は「—」
+- Subject が0件のときは、一覧の代わりに、Subject がないことと import を出す
+
+### 書き出し
+
+- export <Subject の名前>（例：export Python）で、選んでいる Subject の全部の問題を、1つのファイルに保存する。Topic で絞っていても、Subject の全部を書き出す
+- 書き出したファイルは、そのまま Import で取り込み直せる。取り込み直すと、全部「変わらない」になる
+
+### 削除
+
+- Subject のプルダウンの右の delete で、その Subject を消す。Topic のプルダウンの右の delete で、その Topic を消す（All topics のときは、ボタンを出さない）。問題の行から、その1問を消す
+- 消す前に、確認のダイアログで、消えるもの（問題の数と記録）と、取り消せないことを出す。cancel と Esc ではそのまま、delete で消える
+- 消した問題の記録も一緒に消える
+- 消したものは、一覧・Home・Setup から消える。問題が1つもなくなった Topic と Subject も消える
 
 ## 画面
 
-<!--
-画面が変わるときだけ書く。変わる画面ごとに、起こる状態（0件、大量、読み込み中、エラー、権限なし）の表示を書く。
-docs/ui.md にない見た目の決まりができたら、ここに書く（仕上げのときに docs/ui.md へ移す）。
-例：
+- Manage：Subject と Topic のプルダウン、問題の一覧、ページ、export、delete のボタンと確認のダイアログ
+- 状態：通常、Subject が0件、Topic が多い（プルダウンの中をスクロール）、問題が多い（ページ）、スマホの幅（ページの「4 / 10」）、読み込み中、読み込めない、書き出し・削除の失敗
 
-### 一覧（list）
-
-| 状態 | 表示 | スクリーンショット |
-| --- | --- | --- |
-| 通常 | 期限が近い順に並ぶ。期限が過ぎたものは赤字 | ![](2026-09-17-add-due-date/list-default.png) |
-| 0件 | 「タスクはありません」と作成ボタン | ![](2026-09-17-add-due-date/list-empty.png) |
--->
+状態ごとの表示とスクリーンショットは、`/dev-proto` で合わせて足す。
 
 ## やらないこと
 
--
+- アプリの画面で問題を書き換えない（`docs/overview.md` の「やらないこと」）
+- 不備の印の一覧（flagged）・unflag・export flagged、プルダウンの印の数は作らない（#12）
+- Topic で絞って、その Topic だけを書き出すことはしない（書き出しは Subject 単位）
+- 消したものを元に戻すことはしない
+- 一覧の中を文字で検索したり、並べ替えたりしない
 
 ## 決まっていないこと
 
-<!-- 答えは人間が書く。答えも消さずに残す。例：- [x] 完了したタスクも赤字にする？ → しない -->
-
-- [ ]
+- [ ] Manage を開いたときに選んでいる Subject は？ 案：Home と同じ並び（取り込んだ順）の最初の Subject
+- [ ] 問題の行に出すものは？ 案：ID、Topic、問題文の1行目（長いときは「…」で切る）、種類（single / multi）、正答率と解いた回数。並びは取り込んだ順（Setup の in order と同じ）
+- [ ] 行を押すと、問題の中身（選択肢・正解・解説）を見られる？ 案：見られない（確かめは書き出したファイルで）
+- [ ] 1問ずつの delete のボタンは、行のどこに、どんな形で出す？（`docs/ui.md` には Subject と Topic の delete しかない）
+- [ ] Subject を変えたとき、Topic とページはどうなる？ 案：All topics と1ページ目に戻る
+- [ ] 読み込み直したときや、Setup などから戻ったとき、選んでいた Subject・Topic・ページは残る？
+- [ ] 書き出すファイルの名前は？ 案：Subject の名前を小文字にしたもの（python.json）。Subject の名前に空白や記号があるときは？
+- [ ] 書き出すファイルに記録（正答率など）は入れない？（案：入れない。取り込むファイルと同じ形だけ）
+- [ ] 確認のダイアログの文言は？ 案：
+  - Subject：「Delete Python?」「480 questions and their records will be deleted. This can't be undone.」
+  - Topic：「Delete Typing?」「12 questions and their records will be deleted. This can't be undone.」
+  - 1問：「Delete k3f9a2?」「This question and its records will be deleted. This can't be undone.」
+- [ ] 消したあとの表示は？ 案：Subject を消したら次の Subject（なければ0件の表示）、Topic を消したら All topics、1問を消して今のページが空になったら前のページ。消したことの知らせは出す？
+- [ ] 消して Subject の問題が0問になったら（最後の Topic・最後の1問を消したら）、Subject も消える、でよい？
+- [ ] 書き出し・削除・読み込みに失敗したときの文言は？ 案：danger の帯「Couldn't load questions.」と retry／「Couldn't export Python.」／ダイアログの中に「Couldn't delete.」
+- [ ] Subject が0件のときの文言は？ 案：Home と同じ点線の枠「No subjects yet.」「Import a question file to get started.」と import
+- [ ] Home の menu の説明「Import, export, delete, flagged」と Manage の説明「Import, export and delete questions.」は今のまま？
 
 ## 調べたこと
-
-<!-- 作り方がわからず先に調べたときだけ書く -->
 
 ---
 
