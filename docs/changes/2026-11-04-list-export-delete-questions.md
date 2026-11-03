@@ -31,20 +31,33 @@
 - Subject のプルダウンで Subject を選び、Topic のプルダウンで All topics か Topic を1つ選ぶと、その問題が一覧に並ぶ
 - プルダウンの一覧の行には、名前と問題数を出す
 - 一覧は50問ずつのページに分ける。「151–200 of 480」と、前後のボタンとページの番号を出す。1ページで収まるときは、前後のボタンと番号を出さない
-- 問題の行には、問題ごとの正答率（75% など）と解いた回数を出す。まだ解いていない問題は「—」
-- Subject が0件のときは、一覧の代わりに、Subject がないことと import を出す
+- 開いたときは、取り込んだ順で最初の Subject と All topics、1ページ目を選んでいる
+- Subject を変えると、All topics と1ページ目に戻る
+- 読み込み直したときや、ほかの画面から戻ったときは、選んでいた Subject・Topic・ページのまま
+- 問題は取り込んだ順に並べる。行には、ID、Topic、問題文の1行目（長いときは「…」で切る）、種類（single / multi）、問題ごとの正答率（75% など）と解いた回数を出す。まだ解いていない問題は「—」
+- 行を押しても、問題の中身は開かない
+- Subject が0件のときは、点線の枠で「No subjects yet.」「Import a question file to get started.」と import を出す。import で Import に移る
+- 読み込めなかったときは、danger の帯「Couldn't load questions.」と retry を出す
 
 ### 書き出し
 
 - export <Subject の名前>（例：export Python）で、選んでいる Subject の全部の問題を、1つのファイルに保存する。Topic で絞っていても、Subject の全部を書き出す
+- ファイルの名前は、Subject の名前を小文字にし、空白とファイル名に使えない記号を「-」にしたもの（Python → python.json、Web API → web-api.json）
+- ファイルには、取り込むファイルと同じ項目だけを入れる（記録は入れない）。問題は取り込んだ順
 - 書き出したファイルは、そのまま Import で取り込み直せる。取り込み直すと、全部「変わらない」になる
+- 書き出せなかったときは、danger の帯「Couldn't export Python.」を出す
 
 ### 削除
 
 - Subject のプルダウンの右の delete で、その Subject を消す。Topic のプルダウンの右の delete で、その Topic を消す（All topics のときは、ボタンを出さない）。問題の行から、その1問を消す
-- 消す前に、確認のダイアログで、消えるもの（問題の数と記録）と、取り消せないことを出す。cancel と Esc ではそのまま、delete で消える
+- 消す前に、確認のダイアログを出す。cancel と Esc ではそのまま、delete で消える
+  - Subject：「Delete Python?」「480 questions and their records will be deleted. This can't be undone.」
+  - Topic：「Delete Typing?」「12 questions and their records will be deleted. This can't be undone.」
+  - 1問：「Delete k3f9a2?」「This question and its records will be deleted. This can't be undone.」
 - 消した問題の記録も一緒に消える
 - 消したものは、一覧・Home・Setup から消える。問題が1つもなくなった Topic と Subject も消える
+- 消したあと：Subject を消したら次の Subject（なければ0件の表示）、Topic を消したら All topics、1問を消して今のページが空になったら前のページを出す。消したことの知らせは出さない
+- 消せなかったときは、ダイアログの中に「Couldn't delete.」を出し、何も消さない
 
 ## 画面
 
@@ -63,23 +76,23 @@
 
 ## 決まっていないこと
 
-- [ ] Manage を開いたときに選んでいる Subject は？ 案：Home と同じ並び（取り込んだ順）の最初の Subject
-- [ ] 問題の行に出すものは？ 案：ID、Topic、問題文の1行目（長いときは「…」で切る）、種類（single / multi）、正答率と解いた回数。並びは取り込んだ順（Setup の in order と同じ）
-- [ ] 行を押すと、問題の中身（選択肢・正解・解説）を見られる？ 案：見られない（確かめは書き出したファイルで）
-- [ ] 1問ずつの delete のボタンは、行のどこに、どんな形で出す？（`docs/ui.md` には Subject と Topic の delete しかない）
-- [ ] Subject を変えたとき、Topic とページはどうなる？ 案：All topics と1ページ目に戻る
-- [ ] 読み込み直したときや、Setup などから戻ったとき、選んでいた Subject・Topic・ページは残る？
-- [ ] 書き出すファイルの名前は？ 案：Subject の名前を小文字にしたもの（python.json）。Subject の名前に空白や記号があるときは？
-- [ ] 書き出すファイルに記録（正答率など）は入れない？（案：入れない。取り込むファイルと同じ形だけ）
-- [ ] 確認のダイアログの文言は？ 案：
+- [x] Manage を開いたときに選んでいる Subject は？ 案：Home と同じ並び（取り込んだ順）の最初の Subject → 案のまま
+- [x] 問題の行に出すものは？ 案：ID、Topic、問題文の1行目（長いときは「…」で切る）、種類（single / multi）、正答率と解いた回数。並びは取り込んだ順（Setup の in order と同じ） → 案のまま
+- [x] 行を押すと、問題の中身（選択肢・正解・解説）を見られる？ 案：見られない（確かめは書き出したファイルで） → 案のまま
+- [x] 1問ずつの delete のボタンは、行のどこに、どんな形で出す？（`docs/ui.md` には Subject と Topic の delete しかない） → 合意済みのプロトタイプに合わせる（`/dev-proto` で撮って書く）
+- [x] Subject を変えたとき、Topic とページはどうなる？ 案：All topics と1ページ目に戻る → 案のまま
+- [x] 読み込み直したときや、Setup などから戻ったとき、選んでいた Subject・Topic・ページは残る？ → 残す
+- [x] 書き出すファイルの名前は？ 案：Subject の名前を小文字にしたもの（python.json）。Subject の名前に空白や記号があるときは？ → 小文字にし、空白とファイル名に使えない記号は「-」にする（「Web API」→ web-api.json）
+- [x] 書き出すファイルに記録（正答率など）は入れない？（案：入れない。取り込むファイルと同じ形だけ） → 案のまま
+- [x] 確認のダイアログの文言は？ 案：（下） → 案のまま
   - Subject：「Delete Python?」「480 questions and their records will be deleted. This can't be undone.」
   - Topic：「Delete Typing?」「12 questions and their records will be deleted. This can't be undone.」
   - 1問：「Delete k3f9a2?」「This question and its records will be deleted. This can't be undone.」
-- [ ] 消したあとの表示は？ 案：Subject を消したら次の Subject（なければ0件の表示）、Topic を消したら All topics、1問を消して今のページが空になったら前のページ。消したことの知らせは出す？
-- [ ] 消して Subject の問題が0問になったら（最後の Topic・最後の1問を消したら）、Subject も消える、でよい？
-- [ ] 書き出し・削除・読み込みに失敗したときの文言は？ 案：danger の帯「Couldn't load questions.」と retry／「Couldn't export Python.」／ダイアログの中に「Couldn't delete.」
-- [ ] Subject が0件のときの文言は？ 案：Home と同じ点線の枠「No subjects yet.」「Import a question file to get started.」と import
-- [ ] Home の menu の説明「Import, export, delete, flagged」と Manage の説明「Import, export and delete questions.」は今のまま？
+- [x] 消したあとの表示は？ 案：Subject を消したら次の Subject（なければ0件の表示）、Topic を消したら All topics、1問を消して今のページが空になったら前のページ。消したことの知らせは出す？ → 案のまま。知らせは出さない
+- [x] 消して Subject の問題が0問になったら（最後の Topic・最後の1問を消したら）、Subject も消える、でよい？ → 消える
+- [x] 書き出し・削除・読み込みに失敗したときの文言は？ 案：danger の帯「Couldn't load questions.」と retry／「Couldn't export Python.」／ダイアログの中に「Couldn't delete.」 → 案のまま
+- [x] Subject が0件のときの文言は？ 案：Home と同じ点線の枠「No subjects yet.」「Import a question file to get started.」と import → 案のまま
+- [x] Home の menu の説明「Import, export, delete, flagged」と Manage の説明「Import, export and delete questions.」は今のまま？ → 今のまま
 
 ## 調べたこと
 
