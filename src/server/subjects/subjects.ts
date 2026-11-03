@@ -1,8 +1,10 @@
 import { db } from "@/server/db/client";
 import { subjects } from "@/server/db/schema";
 
-// Subject が1つでもあるか（Home の0件の表示に使う）
-export async function hasSubjects(): Promise<boolean> {
-  const rows = await db.select({ id: subjects.id }).from(subjects).limit(1);
-  return rows.length > 0;
+// Home の一覧。取り込んだ順（subjects.id の順）に返す
+export async function listSubjects(): Promise<{ id: number; name: string }[]> {
+  return db
+    .select({ id: subjects.id, name: subjects.name })
+    .from(subjects)
+    .orderBy(subjects.id);
 }
