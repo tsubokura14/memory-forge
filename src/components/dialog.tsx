@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 
-// 確かめのダイアログ（docs/ui.md の「浮かせて重ねるもの」）。ブラウザの <dialog> を showModal で開き、後ろの画面を押せなくする。
-// Esc は onCancel（閉じる側のボタンと同じ）。外側を押しても閉じない
+// 確かめのダイアログ（docs/ui.md の「ダイアログ」）。ブラウザの <dialog> を showModal で開き、後ろの画面を押せなくする
 export function Dialog({
   open,
   title,
@@ -18,6 +17,7 @@ export function Dialog({
   onCancel: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
 
   useEffect(() => {
     const dialog = ref.current;
@@ -29,7 +29,7 @@ export function Dialog({
   return (
     <dialog
       ref={ref}
-      aria-labelledby="dialog-title"
+      aria-labelledby={titleId}
       onCancel={(event) => {
         // ブラウザに閉じさせず、open を持つ側に閉じさせる
         event.preventDefault();
@@ -37,7 +37,7 @@ export function Dialog({
       }}
       className="m-auto w-full max-w-sm rounded-md border border-border bg-surface p-5 text-text shadow-popover backdrop:bg-backdrop"
     >
-      <h2 id="dialog-title" className="text-lg">
+      <h2 id={titleId} className="text-lg">
         {title}
       </h2>
       <p className="mt-2 text-sm text-muted">{description}</p>

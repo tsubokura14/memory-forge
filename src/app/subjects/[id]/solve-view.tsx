@@ -63,7 +63,7 @@ export function SolveView({
     );
   }
 
-  // 保存できなかったときは、数を進めずに帯を出す（答え合わせはサーバーで記録と一緒にするので、正解・不正解も出さない）
+  // 保存できなかったときは、数を進めずに帯を出す
   async function submit(answer = selected) {
     setBusy(true);
     try {
