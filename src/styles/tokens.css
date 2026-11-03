@@ -26,6 +26,7 @@
   --color-warning: #9a6210;
   --color-warning-soft: #fbf0dc;
   --color-flame: #e8590c;
+  --color-backdrop: rgb(43 42 39 / 0.4);
 
   --color-code-bg: #f1eee6;
   --color-code-text: #2b2a27;
@@ -88,6 +89,7 @@
   --color-warning: #f0b75a;
   --color-warning-soft: #3a2d14;
   --color-flame: #ff8a3d;
+  --color-backdrop: rgb(0 0 0 / 0.6);
 
   --color-code-bg: #0b0d11;
   --color-code-text: #d6deeb;

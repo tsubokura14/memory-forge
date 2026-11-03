@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Banner } from "@/components/banner";
 import { Button } from "@/components/button";
 import { Choice, type ChoiceMark } from "@/components/choice";
+import { Dialog } from "@/components/dialog";
 import { RichText } from "@/components/rich-text";
 import { SolveBar } from "@/components/solve-bar";
 import { choiceLetter } from "@/server/import/validate";
@@ -12,7 +13,10 @@ import type { AnswerResult } from "@/server/solve/answer";
 import type { SolveQuestion } from "@/server/solve/start";
 import { answerAction, skipAction } from "./actions";
 
-// 1問ずつ解く。最後の問題の results と skip で onFinish（Setup に戻る。Result の画面は #8）
+// 保存できなかった操作。retry は同じ中身で送り直す
+type Failed = { kind: "submit"; selected: string[] } | { kind: "skip" };
+
+// 1問ずつ解く。最後の問題の results と skip、quit のダイアログの quit で onFinish（Setup に戻る。Result の画面は #8）
 export function SolveView({
   questions,
   onFinish,
@@ -28,6 +32,9 @@ export function SolveView({
   const [view, setView] = useState<"question" | "explanation">("question");
   // 答えを送っている間は、下のボタンを押せない（二重に記録しないため）
   const [busy, setBusy] = useState(false);
+  // 帯を出している間も、選び直し・submit・skip はできる。どれかが通れば消す
+  const [failed, setFailed] = useState<Failed | null>(null);
+  const [quitting, setQuitting] = useState(false);
 
   const question = questions[index];
   const multiple = question.type === "multiple";
@@ -56,11 +63,13 @@ export function SolveView({
     );
   }
 
-  // 保存できなかったときの帯と retry は T5 で足す
-  async function submit() {
+  // 保存できなかったときは、数を進めずに帯を出す
+  async function submit(answer = selected) {
     setBusy(true);
     try {
-      const answered = await answerAction(question.id, selected);
+      const answered = await answerAction(question.id, answer);
+      setSelected(answer);
+      setFailed(null);
       setResult(answered);
       setCounts((c) =>
         answered.correct
@@ -69,6 +78,7 @@ export function SolveView({
       );
     } catch (error) {
       unstable_rethrow(error);
+      setFailed({ kind: "submit", selected: answer });
     } finally {
       setBusy(false);
     }
@@ -78,13 +88,20 @@ export function SolveView({
     setBusy(true);
     try {
       await skipAction(question.id);
+      setFailed(null);
       setCounts((c) => ({ ...c, wrong: c.wrong + 1 }));
       advance();
     } catch (error) {
       unstable_rethrow(error);
+      setFailed({ kind: "skip" });
     } finally {
       setBusy(false);
     }
+  }
+
+  function retry() {
+    if (failed?.kind === "submit") submit(failed.selected);
+    else skip();
   }
 
   function markOf(letter: string): ChoiceMark | undefined {
@@ -102,6 +119,7 @@ export function SolveView({
         wrong={counts.wrong}
         current={index + 1}
         total={questions.length}
+        onQuit={() => setQuitting(true)}
       />
       <main className="mx-auto flex w-full max-w-page flex-1 flex-col gap-4 px-4 pt-5 pb-8">
         <div className="flex items-center gap-2 font-mono text-xs text-muted">
@@ -145,6 +163,17 @@ export function SolveView({
                 );
               })}
             </div>
+            {failed && (
+              <Banner
+                action={
+                  <Button variant="danger" disabled={busy} onClick={retry}>
+                    retry
+                  </Button>
+                }
+              >
+                Couldn&apos;t save your answer.
+              </Banner>
+            )}
           </>
         )}
       </main>
@@ -197,7 +226,7 @@ export function SolveView({
                   <Button
                     size="lg"
                     disabled={selected.length === 0 || busy}
-                    onClick={submit}
+                    onClick={() => submit()}
                   >
                     submit
                   </Button>
@@ -207,6 +236,20 @@ export function SolveView({
           )}
         </div>
       </div>
+      <Dialog
+        open={quitting}
+        title="Quit this session?"
+        description="Answers so far are kept."
+        onCancel={() => setQuitting(false)}
+        actions={
+          <>
+            <Button variant="outline" onClick={() => setQuitting(false)}>
+              continue
+            </Button>
+            <Button onClick={onFinish}>quit</Button>
+          </>
+        }
+      />
     </div>
   );
 }

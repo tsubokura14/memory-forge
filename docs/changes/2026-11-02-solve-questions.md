@@ -179,6 +179,10 @@
 - [x] T4 の quit は？ → 出すだけで、確かめのダイアログとあわせて T5 でつなぐ（T4 の `/dev-impl` で決めた）
 - [x] 選択肢の文字の書体は？（プロトタイプは mono、`docs/ui.md` には書いていない） → mono にし、`docs/ui.md` の「文字」に足す（T4 の `/dev-impl` で決めた）
 - [x] 下に固定した操作の skip と explanation / question の文字は？（プロトタイプは小さく薄い） → 主な操作より小さい muted の文字にし、`docs/ui.md` の「ボタン」に足す（T4 の `/dev-impl` で決めた）
+- [x] 答えを保存できなかったときの retry と、帯を出している間の操作は？ → retry は、失敗した操作（submit か skip）を同じ中身で送り直す。帯の間も、選び直し・submit・skip はでき、どれかが通れば帯は消える。skip で失敗したときも同じ帯「Couldn't save your answer.」（T5 の `/dev-impl` で決めた）
+- [x] quit のダイアログは、どうすれば閉じる？ → continue と quit のほか、Esc も continue と同じ。外側を押しても閉じない（T5 の `/dev-impl` で決めた）
+- [x] 問題を読み込んでいる間の quit は？ → 薄くして押せない（T5 の `/dev-impl` で決めた）
+- [x] ダイアログの後ろは？ → トークン backdrop で暗くし、`docs/ui.md` に足す（T5 の `/dev-impl` で決めた）
 
 画面に見えるもの（選べる順番と問題数、Home の Subject の行と Setup の Topic の行に出すもの、押せない表示、文言）は、合意済みのプロトタイプ（Home・Setup・Solve は作成済み）に合わせる。`/dev-proto` でプロトタイプから写し、仕様と食い違うところだけを聞く。
 
@@ -372,7 +376,7 @@ Setup と Solve は、1つの画面（`/subjects/[id]`）の中で切り替え�
   - 合わせる画像：setup-default・setup-few・setup-unanswered・setup-many（setup-loading・setup-error は見本）
 - [x] T4：start で Solve が始まり、答える・解説を見る・next・skip・results で Setup に戻るまでができたら完了。start で読めなかったときの帯も
   - 合わせる画像：solve-question・solve-answered・solve-explanation・solve-multiple・solve-answered-multiple・solve-code-choices・solve-answered-code-choices・solve-last・solve-many・solve-loading
-- [ ] T5：保存できなかったときの帯と retry、quit のダイアログができたら完了
-  - 合わせる画像：solve-error・solve-quit
+- [x] T5：保存できなかったときの帯と retry、quit のダイアログができたら完了
+  - 合わせる画像：solve-error・solve-quit。読み込み中の quit を薄くするので、solve-loading も撮り直す
 - [ ] T6：Home の menu と subjects を入れ替え、Subject の一覧から Setup に入れたら完了
   - 合わせる画像：home-default・home-many・home-empty（home-loading・home-error は見本）

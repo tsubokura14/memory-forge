@@ -1,5 +1,5 @@
 // 解く画面の上のバー（docs/ui.md の「進み具合」）。左に quit、右にここまでの正解・不正解（スキップを含む）の数と今の問題の番号。
-// 下の端の線は、答えた割合だけ伸びる
+// 下の端の線は、答えた割合だけ伸びる。onQuit がないとき（問題の読み込み中）は、quit を押せない
 export function SolveBar({
   correct,
   wrong,
@@ -20,7 +20,8 @@ export function SolveBar({
         <button
           type="button"
           onClick={onQuit}
-          className="flex items-center gap-1 font-mono text-sm text-muted"
+          disabled={!onQuit}
+          className="flex items-center gap-1 font-mono text-sm text-muted disabled:opacity-50"
         >
           <span aria-hidden className="icon text-base">
             arrow_back
