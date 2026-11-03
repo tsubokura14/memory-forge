@@ -12,17 +12,46 @@ test.describe("ログインした状態を保存したもので開く", () => {
     await expect(page).toHaveScreenshot("home-empty.png", { fullPage: true });
   });
 
-  test("Subject が1つ以上あると、subjects の見出しを出さない", async ({
+  test("home-default：Subject を取り込んだ順に並べ、押すと Setup に移る", async ({
     page,
   }) => {
-    await resetQuestions([
-      { name: "Python", questions: [testQuestion("a1x9k2")] },
-    ]);
+    const names = ["AWS SAA", "Python", "TypeScript", "Linux"];
+    const ids = await resetQuestions(
+      names.map((name, i) => ({ name, questions: [testQuestion(`q${i}`)] })),
+    );
     await page.goto("/");
-    // 読み込み中の枠が消えて、Subject を読み終えるのを待つ
-    await expect(page.getByTestId("subjects-loading")).toHaveCount(0);
-    await expect(page.getByText("subjects", { exact: true })).toHaveCount(0);
+    const subjects = page.getByRole("list", { name: "subjects" });
+    await expect(subjects.getByRole("link")).toHaveText(names);
     await expect(page).toHaveScreenshot("home-default.png", { fullPage: true });
+
+    await subjects.getByRole("link", { name: "Python" }).click();
+    await expect(page).toHaveURL(`/subjects/${ids[1]}`);
+  });
+
+  test("home-many", async ({ page }) => {
+    const base = [
+      "AWS SAA",
+      "AWS DVA",
+      "Python",
+      "TypeScript",
+      "Linux",
+      "Docker",
+      "Kubernetes",
+      "SQL",
+    ];
+    const names = [
+      ...base,
+      ...base.map((name) => `${name} 2`),
+      ...base.map((name) => `${name} 3`),
+    ];
+    await resetQuestions(
+      names.map((name, i) => ({ name, questions: [testQuestion(`q${i}`)] })),
+    );
+    await page.goto("/");
+    await expect(
+      page.getByRole("list", { name: "subjects" }).getByRole("link"),
+    ).toHaveCount(names.length);
+    await expect(page).toHaveScreenshot("home-many.png", { fullPage: true });
   });
 });
 
