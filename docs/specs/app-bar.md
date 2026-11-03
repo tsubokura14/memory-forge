@@ -2,7 +2,7 @@
 
 ## 上のバー
 
-- Login と解く画面以外の、すべての画面のいちばん上に出る（今は Home・Manage・Import）
+- Login と解く画面以外の、すべての画面のいちばん上に出る（今は Home・Manage・Import・Setup）。解く画面（Solve）の上のバーは `docs/specs/solve.md`
 - 左にロゴとアプリ名（memory-forge）。押すと Home に移る
 - 右に sign out。押すとログインが終わり、Login に移る（そのあとの扱いは `docs/specs/sign-in.md`）
 
