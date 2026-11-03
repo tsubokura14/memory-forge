@@ -1,3 +1,5 @@
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { auth } from "./auth";
 
 // ログインしているかを、cookie の token で DB まで確かめる。していなければ session は null。
@@ -10,4 +12,10 @@ export async function getSession(headers: Headers) {
 // セッションを DB から消し、cookie も消す
 export async function endSession(headers: Headers) {
   await auth.api.signOut({ headers });
+}
+
+// サーバーアクションの最初に呼ぶ（docs/design.md の「ログインの確かめ」）。ログインしていなければ Login に移す
+export async function requireSession() {
+  const { session } = await getSession(await headers());
+  if (!session) redirect("/login");
 }
