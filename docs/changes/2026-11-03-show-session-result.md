@@ -166,7 +166,7 @@
 
 ## タスク
 
-- [ ] 1. 結果の数え方：`startSession` が問題に `correctBefore` を添え、`summarizeSession` で得点・%・4つの数・Topic ごとの行を数えられたら完了（画面は変わらない）
+- [x] 1. 結果の数え方：`startSession` が問題に `correctBefore` を添え、`summarizeSession` で得点・%・4つの数・Topic ごとの行を数えられたら完了（画面は変わらない）
 - [ ] 2. Result の画面：最後の問題の results と skip で Result が出て、try again で直前の選び方の Setup に、home で Home に移れたら完了
   - 合わせるスクリーンショット：`2026-11-03-show-session-result/result-default.png`
   - 撮る画面：`result-default.png`（新規）。Solve の画像は変わらないはず

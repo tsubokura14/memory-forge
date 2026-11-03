@@ -12,6 +12,9 @@ export type SolveQuestion = {
   type: QuestionType;
   text: string;
   choices: string[];
+  // start の時点の記録に、一度でも正解があるか（解き終わりの結果で「前は正解したのに今回間違えた」を見分ける）。
+  // 1つの回に同じ問題は2回出ないので、解いている間に足した記録はこの問題の判定に混ざらない
+  correctBefore: boolean;
 };
 
 // topic が null なら、その Subject の全部の Topic（All）
@@ -44,13 +47,14 @@ export async function startSession(
     .groupBy(questions.id);
 
   return pickQuestions(rows, order, count).map(
-    ({ id, questionId, topic, type, text, choices }) => ({
+    ({ id, questionId, topic, type, text, choices, correctCount }) => ({
       id,
       questionId,
       topic,
       type,
       text,
       choices,
+      correctBefore: correctCount > 0,
     }),
   );
 }

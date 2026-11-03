@@ -54,6 +54,7 @@ describe("startSession", () => {
         type: "single",
         text: "a1 の問題文",
         choices: ["A の選択肢", "B の選択肢"],
+        correctBefore: false,
       },
       expect.objectContaining({ questionId: "c3" }),
     ]);
@@ -72,5 +73,24 @@ describe("startSession", () => {
     ]);
     const picked = await startSession(python, null, "lowest-accuracy", "all");
     expect(questionIds(picked)).toEqual(["c3", "a1"]);
+  });
+
+  test("correctBefore は、記録に一度でも正解がある問題だけ true", async () => {
+    await db.insert(answers).values([
+      { questionId: ids.a1, correct: false },
+      { questionId: ids.a1, correct: true },
+      { questionId: ids.b2, correct: false },
+    ]);
+    const picked = await startSession(python, null, "in-order", "all");
+    expect(
+      picked.map(({ questionId, correctBefore }) => [
+        questionId,
+        correctBefore,
+      ]),
+    ).toEqual([
+      ["a1", true],
+      ["b2", false],
+      ["c3", false],
+    ]);
   });
 });
