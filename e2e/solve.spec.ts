@@ -390,7 +390,90 @@ test("solve-loading：問題を受け取るまで、点滅する枠を出す", a
   });
   await start(page).click();
   await expect(page.getByTestId("solve-loading")).toBeVisible();
+  await expect(page.getByRole("button", { name: "quit" })).toBeDisabled();
   await expect(page).toHaveScreenshot("solve-loading.png", { fullPage: true });
+});
+
+// 3問を答えて（2問正解・1問不正解）、4問目で B を選んだところまで進める（solve-error と solve-quit の画像の状態）
+async function toFourth(page: Page) {
+  await startDecorators(page);
+  await answer(page, "A");
+  await next(page);
+  await answer(page, "A");
+  await next(page);
+  await answer(page, "B");
+  await next(page);
+  await choice(page, "B").click();
+}
+
+function failActions(page: Page) {
+  return page.route(/\/subjects\/\d+$/, (route) =>
+    isServerAction(route.request()) ? route.abort() : route.continue(),
+  );
+}
+
+function saveError(page: Page) {
+  return page.getByRole("main").getByRole("alert");
+}
+
+test("solve-error：答えを保存できなかったら、数を進めずに帯と retry を出し、retry で答え合わせする", async ({
+  page,
+}) => {
+  await toFourth(page);
+  await failActions(page);
+  await button(page, "submit").click();
+  await expect(saveError(page)).toHaveText(/Couldn't save your answer\./);
+  await expect(page.getByLabel("correct answers")).toHaveText("2");
+  await expect(page.getByLabel("wrong answers")).toHaveText("1");
+  await expect(choice(page, "B")).toHaveAttribute("aria-pressed", "true");
+  await expect(page).toHaveScreenshot("solve-error.png", { fullPage: true });
+
+  await page.unrouteAll();
+  await button(page, "retry").click();
+  await expect(page.getByText("correct", { exact: true })).toBeVisible();
+  await expect(saveError(page)).toHaveCount(0);
+  await expect(page.getByLabel("correct answers")).toHaveText("3");
+});
+
+test("skip を保存できなかったら、同じ帯を出して進まず、retry で次に進む", async ({
+  page,
+}) => {
+  await startDecorators(page);
+  await failActions(page);
+  await button(page, "skip").click();
+  await expect(saveError(page)).toHaveText(/Couldn't save your answer\./);
+  await expect(page.getByText("1/10", { exact: true })).toBeVisible();
+
+  await page.unrouteAll();
+  await button(page, "retry").click();
+  await expect(page.getByText("2/10", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("wrong answers")).toHaveText("1");
+  await expect(saveError(page)).toHaveCount(0);
+});
+
+test("solve-quit：quit で確かめのダイアログを出す。continue と Esc は続け、quit は選び方を残して Setup に戻る", async ({
+  page,
+}) => {
+  await toFourth(page);
+  const dialog = page.getByRole("dialog");
+  await page.getByRole("button", { name: "quit" }).click();
+  await expect(dialog).toContainText("Quit this session?");
+  await expect(dialog).toContainText("Answers so far are kept.");
+  await expect(page).toHaveScreenshot("solve-quit.png", { fullPage: true });
+
+  await dialog.getByRole("button", { name: "continue" }).click();
+  await expect(dialog).toBeHidden();
+  await expect(page.getByText("4/10", { exact: true })).toBeVisible();
+  await expect(choice(page, "B")).toHaveAttribute("aria-pressed", "true");
+
+  await page.getByRole("button", { name: "quit" }).click();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(page.getByText("4/10", { exact: true })).toBeVisible();
+
+  await page.getByRole("button", { name: "quit" }).click();
+  await dialog.getByRole("button", { name: "quit" }).click();
+  await expect(page.getByRole("radio", { name: "Decorators" })).toBeChecked();
 });
 
 test("問題を読めなかったら、Setup のまま帯と retry を出し、retry で始められる", async ({
