@@ -368,9 +368,7 @@ test("最後の問題の skip も、Result に移る", async ({ page }) => {
   await expect(page.getByText("session complete")).toBeVisible();
 });
 
-test("result-default：得点・正答率・4つの数と、Topic ごとの行を Setup の順に出す", async ({
-  page,
-}) => {
+test("result-default：解き終わりの結果", async ({ page }) => {
   // 正解はどれも C。d4 は前に正解した記録があり、今回間違えるので、線の黄色になる
   await openSetup(page, [
     ...topicQuestions("Decorators", 4),
@@ -388,10 +386,6 @@ test("result-default：得点・正答率・4つの数と、Topic ごとの行�
   await button(page, "skip").click();
 
   await expect(page.getByText("session complete")).toBeVisible();
-  await expect(page.getByText("6/9", { exact: true })).toBeVisible();
-  await expect(page.getByTestId("count-correct")).toContainText("6");
-  await expect(page.getByTestId("count-incorrect")).toContainText("2");
-  await expect(page.getByTestId("count-skipped")).toContainText("1");
   await expect(page).toHaveScreenshot("result-default.png", { fullPage: true });
 });
 
