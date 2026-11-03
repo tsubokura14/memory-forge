@@ -1,6 +1,11 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures";
-import { resetQuestions, type TestQuestion, testQuestion } from "./questions";
+import {
+  insertAnswers,
+  resetQuestions,
+  type TestQuestion,
+  testQuestion,
+} from "./questions";
 import { SIGNED_IN_STATE } from "./test-user";
 
 test.use({ storageState: SIGNED_IN_STATE });
@@ -337,7 +342,7 @@ test("答えるたびに数と番号が進み、正解・不正解の帯と、�
   });
 });
 
-test("skip で次に進み、不正解として数える。最後の問題は results で Setup に戻り、選び方が残る", async ({
+test("skip で次に進み、不正解として数える。最後の問題は results で Result に移り、try again で選び方の残った Setup に戻る", async ({
   page,
 }) => {
   await startDecorators(page);
@@ -351,14 +356,43 @@ test("skip で次に進み、不正解として数える。最後の問題は re
   await expect(page).toHaveScreenshot("solve-last.png", { fullPage: true });
 
   await page.getByRole("button", { name: /^results/ }).click();
+  await expect(page.getByText("session complete")).toBeVisible();
+  await button(page, "try again").click();
   await expect(page.getByRole("radio", { name: "Decorators" })).toBeChecked();
   await expect(start(page)).toHaveText("start · 10");
 });
 
-test("最後の問題の skip は、Setup に戻る", async ({ page }) => {
+test("最後の問題の skip も、Result に移る", async ({ page }) => {
   await startDecorators(page);
   for (let i = 1; i <= 10; i++) await button(page, "skip").click();
-  await expect(page.getByRole("radio", { name: "Decorators" })).toBeChecked();
+  await expect(page.getByText("session complete")).toBeVisible();
+});
+
+test("result-default：得点・正答率・4つの数と、Topic ごとの行を Setup の順に出す", async ({
+  page,
+}) => {
+  // 正解はどれも C。d4 は前に正解した記録があり、今回間違えるので、線の黄色になる
+  await openSetup(page, [
+    ...topicQuestions("Decorators", 4),
+    ...topicQuestions("Generators", 3),
+    ...topicQuestions("Async", 2),
+  ]);
+  await insertAnswers([{ questionId: "dec4", correct: true }]);
+  await start(page).click();
+  await expect(page.getByText("1/9", { exact: true })).toBeVisible();
+  // Decorators 3/4・Generators 2/3・Async 1/2（最後はスキップ）
+  for (const letter of ["C", "C", "C", "A", "C", "C", "A", "C"]) {
+    await answer(page, letter);
+    await next(page);
+  }
+  await button(page, "skip").click();
+
+  await expect(page.getByText("session complete")).toBeVisible();
+  await expect(page.getByText("67%", { exact: true })).toBeVisible();
+  await expect(page.getByTestId("count-correct")).toContainText("6");
+  await expect(page.getByTestId("count-incorrect")).toContainText("2");
+  await expect(page.getByTestId("count-skipped")).toContainText("1");
+  await expect(page).toHaveScreenshot("result-default.png", { fullPage: true });
 });
 
 test("solve-many：問題が多いと、37/100 のように出す", async ({ page }) => {
