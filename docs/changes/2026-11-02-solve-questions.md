@@ -380,5 +380,5 @@ Setup と Solve は、1つの画面（`/subjects/[id]`）の中で切り替え�
   - 合わせる画像：solve-question・solve-answered・solve-explanation・solve-multiple・solve-answered-multiple・solve-code-choices・solve-answered-code-choices・solve-last・solve-many・solve-loading
 - [x] T5：保存できなかったときの帯と retry、quit のダイアログができたら完了
   - 合わせる画像：solve-error・solve-quit。読み込み中の quit を薄くするので、solve-loading も撮り直す
-- [ ] T6：Home の menu と subjects を入れ替え、Subject の一覧から Setup に入れたら完了
+- [x] T6：Home の menu と subjects を入れ替え、Subject の一覧から Setup に入れたら完了
   - 合わせる画像：home-default・home-many・home-empty（home-loading・home-error は見本）
