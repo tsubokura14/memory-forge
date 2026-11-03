@@ -72,3 +72,31 @@ export async function resetQuestions(
   }
   return ids;
 }
+
+// 答えた記録を入れる。questionId はファイルの ID（resetQuestions で入れた問題の中から探す）
+export async function insertAnswers(
+  records: { questionId: string; correct: boolean }[],
+): Promise<void> {
+  const pool = new Pool({
+    connectionString: withVerifyFull(process.env.DATABASE_URL),
+  });
+  try {
+    const db = drizzle({ client: pool, schema });
+    const rows = await db
+      .select({
+        id: schema.questions.id,
+        questionId: schema.questions.questionId,
+      })
+      .from(schema.questions);
+    const idOf = new Map(rows.map((r) => [r.questionId, r.id]));
+    await db.insert(schema.answers).values(
+      records.map((r) => {
+        const id = idOf.get(r.questionId);
+        if (id === undefined) throw new Error(`No question ${r.questionId}.`);
+        return { questionId: id, correct: r.correct };
+      }),
+    );
+  } finally {
+    await pool.end();
+  }
+}
