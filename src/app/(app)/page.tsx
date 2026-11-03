@@ -49,7 +49,7 @@ async function Subjects() {
 
   if (subjects.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-1 rounded-md border border-dashed border-border bg-surface px-4 py-10 text-center">
+      <div className="flex flex-col items-center gap-1 rounded-md border border-dashed border-border px-4 py-10 text-center">
         <p className="text-base">No subjects yet.</p>
         <p className="text-sm text-muted">
           Import a question file to get started.

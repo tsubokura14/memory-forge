@@ -21,12 +21,8 @@ test.describe("ログインした状態を保存したもので開く", () => {
     );
     await page.goto("/");
     const subjects = page.getByRole("list", { name: "subjects" });
-    const links = subjects.getByRole("link");
-    await expect(links).toHaveCount(names.length);
-    // 文字には印（chevron_right）も入るので、印を除いた名前で比べる
-    for (const [i, name] of names.entries()) {
-      await expect(links.nth(i)).toHaveAccessibleName(name);
-    }
+    // 並びは listSubjects の Vitest で確かめる。ここでは読み終えるのを待つ
+    await expect(subjects.getByRole("link")).toHaveCount(names.length);
     await expect(page).toHaveScreenshot("home-default.png", { fullPage: true });
 
     await subjects.getByRole("link", { name: "Python" }).click();

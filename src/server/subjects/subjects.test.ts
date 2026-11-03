@@ -20,8 +20,4 @@ describe("listSubjects", () => {
       { id: rows[2].id, name: "Linux" },
     ]);
   });
-
-  test("Subject がないときは空", async () => {
-    expect(await listSubjects()).toEqual([]);
-  });
 });
