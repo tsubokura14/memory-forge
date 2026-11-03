@@ -388,7 +388,7 @@ test("result-default：得点・正答率・4つの数と、Topic ごとの行�
   await button(page, "skip").click();
 
   await expect(page.getByText("session complete")).toBeVisible();
-  await expect(page.getByText("67%", { exact: true })).toBeVisible();
+  await expect(page.getByText("6/9", { exact: true })).toBeVisible();
   await expect(page.getByTestId("count-correct")).toContainText("6");
   await expect(page.getByTestId("count-incorrect")).toContainText("2");
   await expect(page.getByTestId("count-skipped")).toContainText("1");

@@ -7,20 +7,23 @@ import { AppBar } from "@/components/app-bar";
 import { PageHeader } from "@/components/page-header";
 import { SolveBar } from "@/components/solve-bar";
 import { startNotice, topicStats } from "@/server/solve/pick";
+import { type SessionResult, summarizeSession } from "@/server/solve/result";
 import type { Setup } from "@/server/solve/setup";
 import type { SolveQuestion } from "@/server/solve/start";
 import { startSessionAction } from "./actions";
 import { BACK, KICKER, Main } from "./main";
+import { ResultView } from "./result-view";
 import { type Choices, SetupForm } from "./setup-form";
 import { SolveSkeleton, SolveView } from "./solve-view";
 
-// Setup と Solve を、ブラウザの中の状態だけで切り替える（docs/design.md の「解く画面の状態」）
+// Setup・Solve・Result を、ブラウザの中の状態だけで切り替える（docs/design.md の「解く画面の状態」）
 type Phase =
   // failed は、start で問題を読めなかったあと
   | { kind: "setup"; failed: boolean }
   // expected は、start に添えた数（読み込み中の上のバーに出す）
   | { kind: "loading"; expected: number }
-  | { kind: "solving"; questions: SolveQuestion[] };
+  | { kind: "solving"; questions: SolveQuestion[] }
+  | { kind: "result"; result: SessionResult };
 
 export function Study({
   subjectId,
@@ -89,5 +92,28 @@ export function Study({
       </>
     );
   }
-  return <SolveView questions={phase.questions} onFinish={backToSetup} />;
+  if (phase.kind === "result") {
+    return (
+      <ResultView
+        name={setup.name}
+        result={phase.result}
+        onTryAgain={backToSetup}
+      />
+    );
+  }
+  return (
+    <SolveView
+      questions={phase.questions}
+      onComplete={(outcomes) =>
+        setPhase({
+          kind: "result",
+          result: summarizeSession(
+            outcomes,
+            setup.topics.map((t) => t.name),
+          ),
+        })
+      }
+      onQuit={backToSetup}
+    />
+  );
 }

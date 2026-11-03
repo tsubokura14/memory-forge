@@ -1,4 +1,4 @@
-// 数の枠。上に等幅の数、下にラベル。数の色は呼ぶ側が決める（取り込む前の確認の new・replaced・unchanged）
+// 数の枠。上に等幅の数、下にラベル。数の色は呼ぶ側が決める（取り込む前の確認の new・replaced・unchanged、解き終わりの結果の4つの数）
 export function CountBox({
   count,
   label,
@@ -6,11 +6,12 @@ export function CountBox({
 }: {
   count: number;
   label: string;
-  tone: "success" | "warning" | "muted";
+  tone: "success" | "warning" | "danger" | "muted";
 }) {
   const color = {
     success: "text-success",
     warning: "text-warning",
+    danger: "text-danger",
     muted: "text-muted",
   }[tone];
   return (

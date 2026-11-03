@@ -10,22 +10,27 @@ import { RichText } from "@/components/rich-text";
 import { SolveBar } from "@/components/solve-bar";
 import { choiceLetter } from "@/server/import/validate";
 import type { AnswerResult } from "@/server/solve/answer";
+import type { Outcome } from "@/server/solve/result";
 import type { SolveQuestion } from "@/server/solve/start";
 import { answerAction, skipAction } from "./actions";
 
 // 保存できなかった操作。retry は同じ中身で送り直す
 type Failed = { kind: "submit"; selected: string[] } | { kind: "skip" };
 
-// 1問ずつ解く。最後の問題の results と skip、quit のダイアログの quit で onFinish（Setup に戻る。Result の画面は #8）
+// 1問ずつ解く。最後の問題の results と skip で onComplete（1問ずつの結果を渡す）、quit のダイアログの quit で onQuit
 export function SolveView({
   questions,
-  onFinish,
+  onComplete,
+  onQuit,
 }: {
   questions: SolveQuestion[];
-  onFinish: () => void;
+  onComplete: (outcomes: Outcome[]) => void;
+  onQuit: () => void;
 }) {
   const [index, setIndex] = useState(0);
   const [counts, setCounts] = useState({ correct: 0, wrong: 0 });
+  // 保存できた答えだけを足す（保存できなかった操作は数えない）
+  const [outcomes, setOutcomes] = useState<Outcome[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   // 答え合わせの結果。null の間は、まだ答えていない
   const [result, setResult] = useState<AnswerResult | null>(null);
@@ -40,9 +45,10 @@ export function SolveView({
   const multiple = question.type === "multiple";
   const last = index === questions.length - 1;
 
-  function advance() {
+  // skip は、足したばかりの結果がまだ outcomes に入っていないので、渡して使う
+  function advance(done = outcomes) {
     if (last) {
-      onFinish();
+      onComplete(done);
       return;
     }
     setIndex(index + 1);
@@ -71,6 +77,10 @@ export function SolveView({
       setSelected(answer);
       setFailed(null);
       setResult(answered);
+      setOutcomes([
+        ...outcomes,
+        outcomeOf(question, answered.correct ? "correct" : "incorrect"),
+      ]);
       setCounts((c) =>
         answered.correct
           ? { ...c, correct: c.correct + 1 }
@@ -90,7 +100,9 @@ export function SolveView({
       await skipAction(question.id);
       setFailed(null);
       setCounts((c) => ({ ...c, wrong: c.wrong + 1 }));
-      advance();
+      const done = [...outcomes, outcomeOf(question, "skipped")];
+      setOutcomes(done);
+      advance(done);
     } catch (error) {
       unstable_rethrow(error);
       setFailed({ kind: "skip" });
@@ -194,7 +206,7 @@ export function SolveView({
                 </Button>
               </div>
               <div className="flex-1">
-                <Button size="lg" onClick={advance}>
+                <Button size="lg" onClick={() => advance()}>
                   <span className="flex items-center justify-center gap-1">
                     {last ? "results" : "next"}
                     <span aria-hidden className="icon text-base">
@@ -246,12 +258,23 @@ export function SolveView({
             <Button variant="outline" onClick={() => setQuitting(false)}>
               continue
             </Button>
-            <Button onClick={onFinish}>quit</Button>
+            <Button onClick={onQuit}>quit</Button>
           </>
         }
       />
     </div>
   );
+}
+
+function outcomeOf(
+  question: SolveQuestion,
+  outcome: Outcome["outcome"],
+): Outcome {
+  return {
+    topic: question.topic,
+    outcome,
+    correctBefore: question.correctBefore,
+  };
 }
 
 // 正解は success の「correct」、不正解は danger の「incorrect — answer: B」（複数選択は「A, B」）

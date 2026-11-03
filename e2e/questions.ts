@@ -83,7 +83,10 @@ export async function insertAnswers(
   try {
     const db = drizzle({ client: pool, schema });
     const rows = await db
-      .select({ id: schema.questions.id, questionId: schema.questions.questionId })
+      .select({
+        id: schema.questions.id,
+        questionId: schema.questions.questionId,
+      })
       .from(schema.questions);
     const idOf = new Map(rows.map((r) => [r.questionId, r.id]));
     await db.insert(schema.answers).values(
