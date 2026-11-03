@@ -10,7 +10,7 @@ import { getSetup, type Setup } from "@/server/solve/setup";
 import { BACK, KICKER, Main } from "./main";
 import { Study } from "./study";
 
-// Setup と Solve。上のバーは、Setup と Solve で出し分けるので、ここ（と study.tsx）で出す（docs/design.md の「解く画面の状態」）
+// Setup と Solve。上のバーは、ここ（と study.tsx）で出す（docs/design.md の「解く画面の状態」）
 export default function SubjectPage({ params }: PageProps<"/subjects/[id]">) {
   return (
     <Suspense fallback={<SetupSkeleton />}>

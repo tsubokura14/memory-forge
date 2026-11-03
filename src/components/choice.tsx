@@ -1,3 +1,4 @@
+import { parseMarkup } from "@/server/questions/markup";
 import { RichText } from "./rich-text";
 
 // 答え合わせのあとの選択肢の見え方（docs/ui.md の「答え合わせのあと」）。
@@ -41,24 +42,30 @@ export function Choice({
           : mark === undefined && selected
             ? "border-primary bg-primary text-on-primary"
             : "border-border text-muted";
+  // コードブロックのある選択肢は、スマホの幅では記号を上の行に置き、コードを幅いっぱいに出す
+  const hasCode = parseMarkup(text).some((block) => block.kind === "code");
   return (
     <button
       type="button"
       aria-pressed={selected}
       disabled={disabled}
       onClick={onClick}
-      className={`flex items-start gap-3 rounded-md border px-3 py-3 text-left font-mono text-sm ${row}`}
+      className={`flex gap-3 rounded-md border px-3 py-3 text-left font-mono text-sm ${hasCode ? "flex-col sm:flex-row sm:items-start" : "items-start"} ${row}`}
     >
       <span
         className={`flex size-6 shrink-0 items-center justify-center border font-mono text-xs ${multiple ? "rounded-sm" : "rounded-full"} ${badge}`}
       >
         {letter}
       </span>
-      <span className="min-w-0 flex-1 self-center">
+      <span
+        className={`min-w-0 flex-1 ${hasCode ? "self-stretch sm:self-center" : "self-center"}`}
+      >
         <RichText text={text} />
       </span>
       {mark === "missed" && (
-        <span className="shrink-0 self-center font-mono text-xs text-success">
+        <span
+          className={`shrink-0 font-mono text-xs text-success ${hasCode ? "self-end sm:self-center" : "self-center"}`}
+        >
           missed
         </span>
       )}
