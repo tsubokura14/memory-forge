@@ -79,9 +79,9 @@
 - [x] Topic ごとの行の並び順。1つの Topic だけを解いたときも行を出すか → Setup と同じ順。1つでも出す
 - [x] Result の上のバーは、ふつうの上のバー（ロゴと sign out）にするか。戻るリンクは置くか → ふつうの上のバー。戻るリンクは置かない
 - [x] Result で読み込み直したときにどうするか → Setup の最初の選び方からになる
-- [ ] Setup を開いたあとに別のタブで取り込み直し、Setup にない Topic が解いた回に混ざったときの、Topic の行の並び（案：Setup の順のあとに、解いた回に出た順で置く）
-- [ ] Topic ごとの % の丸め方（案：全体と同じく、整数に四捨五入）
-- [ ] スマホの幅での、Topic の名前の決まった幅（案：PC より狭い幅にし、長いときは「…」で切る）
+- [x] Setup を開いたあとに別のタブで取り込み直し、Setup にない Topic が解いた回に混ざったときの、Topic の行の並び → Setup の順のあとに、解いた回に出た順で置く
+- [x] Topic ごとの % の丸め方 → 全体と同じく、整数に四捨五入
+- [x] スマホの幅での、Topic の名前の決まった幅 → PC より狭い幅にし、長いときは「…」で切る
 
 ## 調べたこと
 
@@ -109,9 +109,10 @@
 - 1問ずつの結果：`{ topic: string; outcome: "correct" | "incorrect" | "skipped"; correctBefore: boolean }`
 - 結果の数え方は、データベースを使わない関数 `summarizeSession(outcomes, topicOrder)` にする（新しいファイル `src/server/solve/result.ts`。ブラウザの `study.tsx` から読む。`docs/design.md` の「全体の構成」の決まりどおり）
   - `topicOrder` は、Setup の Topic の名前の並び（`setup.topics` の順）。Setup と同じ順に並べるため。解いた回の中で最初に出た順は、random や lowest accuracy では Setup の順と違うことがあるので使わない
+    - Setup を開いたあとに取り込み直して、`topicOrder` にない Topic が解いた回に混ざったときは、Setup の順のあとに、解いた回に出た順で置く
   - 返す形（`SessionResult`）
     - `correct`・`incorrect`・`skipped`・`flagged`（今はいつも 0）・`total`（解いた問題の数）・`accuracy`（整数の %）
-    - `topics`：`{ name; total; correct; slipped; wrong; accuracy }[]`。`slipped` は「前は正解したのに今回間違えた」（今回 incorrect か skipped で、`correctBefore` が true）、`wrong` はそれ以外の不正解（スキップを含む）
+    - `topics`：`{ name; total; correct; slipped; wrong; accuracy }[]`（`accuracy` は全体と同じく整数に四捨五入）。`slipped` は「前は正解したのに今回間違えた」（今回 incorrect か skipped で、`correctBefore` が true）、`wrong` はそれ以外の不正解（スキップを含む）
   - 得点と % は、スキップを不正解として数える（`correct / total`）。% は `Math.round` で整数にする
 - Topic の行の割合の線は、`correct`・`slipped`・`wrong` を `total` で割った幅で塗る（`style` の `width` の %。今の `SolveBar` と同じやり方）
 
@@ -131,6 +132,7 @@
 | `e2e/questions.ts` | 前の記録（正解）を入れる手段を足す（画像の黄色の線を作るため） |
 | `docs/specs/screens/result-default.png`（新規） | 本番から撮る |
 
+- Topic の名前は決まった幅に置き、スマホの幅では PC より狭い幅にする。長いときは `truncate` で「…」で切る
 - 4枚のカードは、今の `CountBox`（取り込む前の確認の数の枠）を使う。PC は横に4枚、スマホの幅では2行2列
 - 下に固定した操作は、`solve-view.tsx` と同じ `sticky` の下のバーに、`Button`（outline・lg）の try again と、`buttonClass()`（primary・lg）の `Link` の home を `flex-1` で並べる
 - 得点の数は display の書体（`docs/ui.md` の「文字」）
@@ -154,7 +156,7 @@
 | flagged はいつも 0 | コードを見て確かめる |
 | Topic の行の3色の塗り分け（前は正解の判定） | テスト（Vitest。今回不正解で前に正解あり → slipped、前に正解なし → wrong、スキップで前に正解あり → slipped）と、テスト（Vitest の `startSession`。正解の記録がある問題だけ `correctBefore` が true）。色は触って確かめる（画像） |
 | 黄色の問題も、得点・%・カードでは不正解 | テスト（Vitest。slipped のある回の得点・%・incorrect・skipped） |
-| Topic の並びは Setup の順で、出た Topic だけ。1つでも1行 | テスト（Vitest。出た順と Setup の順が違う回で、Setup の順になり、出なかった Topic は入らない）。1つの Topic の回は同じ扱いなので、テストを足さない |
+| Topic の並びは Setup の順で、出た Topic だけ。1つでも1行 | テスト（Vitest。出た順と Setup の順が違う回で、Setup の順になり、出なかった Topic は入らない。Setup にない Topic は最後に置く）。1つの Topic の回は同じ扱いなので、テストを足さない |
 | Topic の名前の幅と「…」、線が残りの幅に伸びる、Topic が多いとスクロール | 触って確かめる |
 | try again で、直前の選び方のままの Setup に移る | テスト（画面。今の「選び方が残る」の確かめを、Result の try again のあとに移す） |
 | home で Home に移る | 触って確かめる |
