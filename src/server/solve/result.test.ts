@@ -24,7 +24,6 @@ describe("summarizeSession", () => {
       correct: 6,
       incorrect: 2,
       skipped: 1,
-      flagged: 0,
       total: 9,
       accuracy: 67,
     });
