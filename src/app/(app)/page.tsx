@@ -9,23 +9,18 @@ import { listSubjects } from "@/server/subjects/subjects";
 // Home。上に menu、下に subjects
 export default function Home() {
   return (
-    <main className="mx-auto flex max-w-page flex-col gap-8 px-4 pt-6 pb-10">
+    <main className="mx-auto flex max-w-page flex-col gap-6 px-4 pt-6 pb-10">
       <section className="flex flex-col gap-2">
         <h2 className="font-mono text-xs text-muted">menu</h2>
         {/* manage は、2列の枠の左の1枚の大きさにする */}
         <div className="grid gap-2 sm:grid-cols-2">
           <Link
             href="/manage"
-            className="flex items-center justify-between gap-4 rounded-md border border-border bg-surface px-4 py-3 hover:bg-surface-raised"
+            className="flex flex-col gap-0.5 rounded-md border border-border bg-surface px-3 py-3 hover:bg-surface-raised"
           >
-            <span className="flex flex-col gap-0.5">
-              <span className="font-mono text-sm">manage</span>
-              <span className="text-xs text-muted">
-                Import, export, delete, flagged
-              </span>
-            </span>
-            <span aria-hidden className="icon text-lg text-muted">
-              chevron_right
+            <span className="font-mono text-sm">manage</span>
+            <span className="text-xs text-muted">
+              Import, export, delete, flagged
             </span>
           </Link>
         </div>
@@ -79,7 +74,11 @@ async function Subjects() {
             className="flex items-center justify-between gap-4 px-4 py-3 text-base hover:bg-surface-raised"
           >
             <span className="min-w-0 break-words">{subject.name}</span>
-            <span aria-hidden className="icon shrink-0 text-lg text-muted">
+            {/* 印の行の高さで行が高くならないように、行の高さを文字の大きさにそろえる */}
+            <span
+              aria-hidden
+              className="icon shrink-0 text-lg leading-none text-muted"
+            >
               chevron_right
             </span>
           </Link>
