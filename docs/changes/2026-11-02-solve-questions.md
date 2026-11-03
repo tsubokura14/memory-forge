@@ -184,6 +184,7 @@
 - [x] 問題を読み込んでいる間の quit は？ → 薄くして押せない（T5 の `/dev-impl` で決めた）
 - [x] ダイアログの後ろは？ → トークン backdrop で暗くし、`docs/ui.md` に足す（T5 の `/dev-impl` で決めた）
 - [x] Home の Subject の名前が長く1行に入らないときは？ → 行の中で折り返し、chevron_right の印は縦の真ん中のまま（T6 の `/dev-impl` で決めた）
+- [x] Home の manage の枠は、今の本番（右に chevron_right）とプロトタイプ（印なし）のどちらに合わせる？ → プロトタイプに合わせ、印を外す（T6 の `/dev-impl` で決めた）
 
 画面に見えるもの（選べる順番と問題数、Home の Subject の行と Setup の Topic の行に出すもの、押せない表示、文言）は、合意済みのプロトタイプ（Home・Setup・Solve は作成済み）に合わせる。`/dev-proto` でプロトタイプから写し、仕様と食い違うところだけを聞く。
 
