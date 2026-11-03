@@ -34,9 +34,9 @@
 - 開いたときは、取り込んだ順で最初の Subject と All topics、1ページ目を選んでいる
 - Subject を変えると、All topics と1ページ目に戻る
 - 読み込み直したときや、ほかの画面から戻ったときは、選んでいた Subject・Topic・ページのまま
-- 問題は取り込んだ順に並べる。行には、ID、Topic、問題文の1行目（長いときは「…」で切る）、種類（single / multi）、問題ごとの正答率（75% など）と解いた回数を出す。まだ解いていない問題は「—」
+- 問題は取り込んだ順に並べる。行には、問題文の1行目（長いときは「…」で切る）と、その下に ID、Topic、種類（multi のときだけ「multi」）、問題ごとの正答率と解いた回数（「75% · 3 tries」）を出す。まだ解いていない問題は「— · 0 tries」
 - 行を押しても、問題の中身は開かない
-- Subject が0件のときは、点線の枠で「No subjects yet.」「Import a question file to get started.」と import を出す。import で Import に移る
+- Subject が0件のときは、点線の枠で「No subjects yet.」「Import a question file to get started.」を出す（Import へは、上の import で移る）。export は出さない
 - 読み込めなかったときは、danger の帯「Couldn't load questions.」と retry を出す
 
 ### 書き出し
@@ -45,26 +45,44 @@
 - ファイルの名前は、Subject の名前を小文字にし、空白とファイル名に使えない記号を「-」にしたもの（Python → python.json、Web API → web-api.json）
 - ファイルには、取り込むファイルと同じ項目だけを入れる（記録は入れない）。問題は取り込んだ順
 - 書き出したファイルは、そのまま Import で取り込み直せる。取り込み直すと、全部「変わらない」になる
-- 書き出せなかったときは、danger の帯「Couldn't export Python.」を出す
+- 書き出せなかったときは、絞り込みの下に danger の帯「Couldn't export Python.」を出す（retry は置かない）
 
 ### 削除
 
 - Subject のプルダウンの右の delete で、その Subject を消す。Topic のプルダウンの右の delete で、その Topic を消す（All topics のときは、ボタンを出さない）。問題の行から、その1問を消す
 - 消す前に、確認のダイアログを出す。cancel と Esc ではそのまま、delete で消える
-  - Subject：「Delete Python?」「480 questions and their records will be deleted. This can't be undone.」
-  - Topic：「Delete Typing?」「12 questions and their records will be deleted. This can't be undone.」
-  - 1問：「Delete k3f9a2?」「This question and its records will be deleted. This can't be undone.」
+  - Subject：「Delete “Python”?」「5 topics, 480 questions and their records will be deleted. This can't be undone.」
+  - Topic：「Delete “Typing”?」「12 questions and their records will be deleted. This can't be undone.」
+  - 1問：「Delete this question?」、その下に問題文の1行目、「Its records will be deleted too. This can't be undone.」
 - 消した問題の記録も一緒に消える
 - 消したものは、一覧・Home・Setup から消える。問題が1つもなくなった Topic と Subject も消える
 - 消したあと：Subject を消したら次の Subject（なければ0件の表示）、Topic を消したら All topics、1問を消して今のページが空になったら前のページを出す。消したことの知らせは出さない
-- 消せなかったときは、ダイアログの中に「Couldn't delete.」を出し、何も消さない
+- 消せなかったときは、ダイアログを閉じずに、ボタンの上に danger の帯「Couldn't delete.」を出し、何も消さない
 
 ## 画面
 
-- Manage：Subject と Topic のプルダウン、問題の一覧、ページ、export、delete のボタンと確認のダイアログ
-- 状態：通常、Subject が0件、Topic が多い（プルダウンの中をスクロール）、問題が多い（ページ）、スマホの幅（ページの「4 / 10」）、読み込み中、読み込めない、書き出し・削除の失敗
+- Manage：上の右に import（primary）と export <Subject の名前>（枠だけ）を並べる。その下に、surface の枠の中に subject と topic のプルダウン（見出しは muted の等幅の小さな文字）を横に並べ、それぞれのすぐ右に delete の印のボタンを置く（スマホの幅では縦に並べる）
+- 枠の下に、ページ（`docs/ui.md` の「ページ」）、その下に問題の一覧
+- 問題の行：1行目に問題文、2行目に muted の等幅で ID、枠で囲んだ Topic、枠で囲んだ multi（multi のときだけ）、正答率と解いた回数。右に muted の等幅の「delete」を枠のない文字だけのボタンで置き、指を乗せると danger の文字と danger-soft の地
+- 削除の確認のダイアログ：見出し（lg）、説明（muted）、右下に cancel（枠だけ）と delete（danger の地）
+- 不備の印のもの（flagged の絞り込み、プルダウンの印の数、unflag、行の warning-soft の地）は #12 で足す。スクリーンショットは隠して撮る
 
-状態ごとの表示とスクリーンショットは、`/dev-proto` で合わせて足す。
+| 状態 | 表示 | スクリーンショット |
+| --- | --- | --- |
+| 通常 | Python・All topics の1ページ目 | ![](2026-11-04-list-export-delete-questions/manage-default.png) |
+| Subject を開く | Subject のプルダウンを開いたところ | ![](2026-11-04-list-export-delete-questions/manage-subject-open.png) |
+| Topic を開く | Topic のプルダウンを開いたところ（Decorators を選んでいる） | ![](2026-11-04-list-export-delete-questions/manage-topic-open.png) |
+| Topic が多い | プルダウンの一覧の高さを止め、中をスクロールする | ![](2026-11-04-list-export-delete-questions/manage-topics-many.png) |
+| Subject が0件 | 点線の枠。export とプルダウンは出さない | ![](2026-11-04-list-export-delete-questions/manage-empty.png) |
+| 問題が多い | 480問の4ページ目。「151–200 of 480」とページの番号 | ![](2026-11-04-list-export-delete-questions/manage-many.png) |
+| 問題が多い（スマホの幅） | 番号を出さず、前後のボタンの間に「4 / 10」 | ![](2026-11-04-list-export-delete-questions/manage-many-mobile.png) |
+| 読み込み中 | 行と同じ形の枠を点滅させる | ![](2026-11-04-list-export-delete-questions/manage-loading.png) |
+| 読み込めない | danger の帯「Couldn't load questions.」と retry | ![](2026-11-04-list-export-delete-questions/manage-error.png) |
+| 書き出せない | 絞り込みの下に danger の帯「Couldn't export Python.」 | ![](2026-11-04-list-export-delete-questions/manage-export-error.png) |
+| 1問を消す | 確認のダイアログ | ![](2026-11-04-list-export-delete-questions/manage-delete-question.png) |
+| Topic を消す | 確認のダイアログ | ![](2026-11-04-list-export-delete-questions/manage-delete-topic.png) |
+| Subject を消す | 確認のダイアログ | ![](2026-11-04-list-export-delete-questions/manage-delete-subject.png) |
+| 消せない | ダイアログの中に danger の帯「Couldn't delete.」 | ![](2026-11-04-list-export-delete-questions/manage-delete-error.png) |
 
 ## やらないこと
 
@@ -79,12 +97,13 @@
 - [x] Manage を開いたときに選んでいる Subject は？ 案：Home と同じ並び（取り込んだ順）の最初の Subject → 案のまま
 - [x] 問題の行に出すものは？ 案：ID、Topic、問題文の1行目（長いときは「…」で切る）、種類（single / multi）、正答率と解いた回数。並びは取り込んだ順（Setup の in order と同じ） → 案のまま
 - [x] 行を押すと、問題の中身（選択肢・正解・解説）を見られる？ 案：見られない（確かめは書き出したファイルで） → 案のまま
-- [x] 1問ずつの delete のボタンは、行のどこに、どんな形で出す？（`docs/ui.md` には Subject と Topic の delete しかない） → 合意済みのプロトタイプに合わせる（`/dev-proto` で撮って書く）
+- [x] 1問ずつの delete のボタンは、行のどこに、どんな形で出す？（`docs/ui.md` には Subject と Topic の delete しかない） → 合意済みのプロトタイプに合わせる（「画面」に書いた）
+- [x] 書き出し・削除の失敗、Topic が多いときは、プロトタイプになかった。どうする？ → プロトタイプに足して撮る（「画面」）
 - [x] Subject を変えたとき、Topic とページはどうなる？ 案：All topics と1ページ目に戻る → 案のまま
 - [x] 読み込み直したときや、Setup などから戻ったとき、選んでいた Subject・Topic・ページは残る？ → 残す
 - [x] 書き出すファイルの名前は？ 案：Subject の名前を小文字にしたもの（python.json）。Subject の名前に空白や記号があるときは？ → 小文字にし、空白とファイル名に使えない記号は「-」にする（「Web API」→ web-api.json）
 - [x] 書き出すファイルに記録（正答率など）は入れない？（案：入れない。取り込むファイルと同じ形だけ） → 案のまま
-- [x] 確認のダイアログの文言は？ 案：（下） → 案のまま
+- [x] 確認のダイアログの文言は？ 案：（下） → 案のまま。のちに `/dev-proto` で、合意済みのプロトタイプの文言に合わせた（受け入れ条件）
   - Subject：「Delete Python?」「480 questions and their records will be deleted. This can't be undone.」
   - Topic：「Delete Typing?」「12 questions and their records will be deleted. This can't be undone.」
   - 1問：「Delete k3f9a2?」「This question and its records will be deleted. This can't be undone.」
