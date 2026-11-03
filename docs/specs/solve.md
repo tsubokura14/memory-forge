@@ -1,6 +1,6 @@
 # 問題を解く
 
-Subject の中から Topic・順番・問題数を選び（Setup）、1問ずつ解く（Solve）。どちらも `/subjects/<Subject の id>` の1つの画面で、Setup から start で Solve に切り替わる。
+Subject の中から Topic・順番・問題数を選び（Setup）、1問ずつ解き（Solve）、解き終わりに結果を見る（Result）。どれも `/subjects/<Subject の id>` の1つの画面で、Setup から start で Solve に、Solve の最後の問題から Result に切り替わる。
 
 - ログインしていないと見られない（`docs/specs/sign-in.md`）
 - Home の Subject の行から入る（`docs/specs/home.md`）
@@ -20,7 +20,7 @@ Subject の中から Topic・順番・問題数を選び（Setup）、1問ずつ
 - 出せる問題が選んだ数より少ないときは、start の上に muted の等幅の小さな文字で「Decorators has only 8 questions to ask.」と出す。All を選んでいるときは、Topic の名前の代わりに Subject の名前（「Python has only 8 questions to ask.」）
 - lowest accuracy で、選んだ Topic に一度でも解いた問題がないときは、warning の文字で「No questions to ask — none in Typing have been answered yet.」と出し、start · 0 を薄くして押せない
 - start を押して問題を読めなかったときは、Setup のまま、start の上に danger の帯「Couldn't load questions.」と retry を出す。retry で、同じ選び方でもう一度始める
-- Solve から戻ったとき（quit・results・最後の問題の skip）は、直前に選んでいた Topic・順番・問題数のまま
+- Solve の quit と Result の try again で戻ったときは、直前に選んでいた Topic・順番・問題数のまま
 - 読み込んでいる間は、Subject の名前の場所と、Topic の行の形の枠を6つ点滅させる
 - 読み込めなかったときは、Subject の名前（見出し）を出さず、danger の帯「Couldn't load this subject.」と retry を出す
 - ない Subject の Setup を開くと、見つからない画面（This page could not be found.）を出す
@@ -47,8 +47,8 @@ Subject の中から Topic・順番・問題数を選び（Setup）、1問ずつ
   - 複数選択は、正解を全部選び、ほかを選んでいないときだけ正解（部分点なし）
   - 選択肢に、選んだ正解・選んだ不正解の色を付ける。選ばなかった正解には missed を出す
 - explanation で解説（枠の中に「explanation」の見出しと解説の文）に切り替え、question で問題に戻る
-- next で次の問題に進む。最後の問題の results は、Setup に戻る
-- skip で、答えずに次の問題に進む。スキップは不正解として数える。最後の問題の skip は、Setup に戻る
+- next で次の問題に進む。最後の問題の results は、Result に移る
+- skip で、答えずに次の問題に進む。スキップは不正解として数える。最後の問題の skip は、Result に移る
 - 答えを保存できなかったときは、数を進めずに、選択肢の下に danger の帯「Couldn't save your answer.」と retry を出す
   - retry は、失敗した操作（submit か skip）を同じ中身で送り直す
   - 帯を出している間も、選び直し・submit・skip はでき、どれかが通れば帯は消える
@@ -73,8 +73,37 @@ Subject の中から Topic・順番・問題数を選び（Setup）、1問ずつ
 | 保存のエラー | danger の帯と retry | ![](screens/solve-error.png) |
 | quit の確かめ | ダイアログ（continue と quit） | ![](screens/solve-quit.png) |
 
+## Result
+
+- いちばん上に上のバーが出る（`docs/specs/app-bar.md`）。戻るリンクは置かない
+- 上に、muted の等幅の小さな「session complete」と、Subject の名前（見出し）
+- 枠の真ん中に、正答率の円（success の線。真ん中に % と accuracy）と、得点（正解の数 / 解いた問題の数。例：6/9。正解の数は success）と「questions correct」を横に並べる
+  - 得点と正答率では、スキップを不正解として数える
+  - 正答率は、整数に四捨五入する（6/9 は 67%）
+- 枠の下に、correct（success）・incorrect（danger）・skipped（danger）・flagged · not counted（warning）の数を、小さなカード4枚で出す（PC は横に4枚、スマホの幅では2行2列）
+  - incorrect は、答えて間違えた数だけ（スキップは skipped にだけ数える）
+  - flagged は、いつも 0
+- 「by topic」の見出しの下に、Topic ごとの行を区切り線で並べる。行には、Topic の名前、割合の線、得点（3/4）、% を出す
+  - 割合の線は、左から、正解（success）、前は正解したのに今回間違えた（warning）、前にも正解したことがない不正解（danger）の順に塗り分ける
+  - 「前は正解したのに今回間違えた」は、今回不正解かスキップで、今回より前の記録に一度でも正解がある問題
+  - 黄色の問題も、得点・%・incorrect と skipped のカードでは、不正解として数える
+  - Topic ごとの % も、整数に四捨五入する
+  - 並びは Setup の Topic と同じ順。解いた回に出た Topic だけを出す。Setup を開いたあとに取り込み直して、Setup にない Topic が解いた回に出たときは、Setup の順のあとに、出た順で置く
+  - Topic を1つ選んで解いたときも、その1行を出す
+  - Topic の名前は決まった幅（スマホの幅では狭くする）に置き、長いときは1行に収めて「…」で切る。割合の線は、名前と得点の間の残りの幅いっぱいに伸ばす
+  - Topic が多いときは、行が続き、ページごとスクロールする
+- 下に固定して、try again（枠だけ）と home（主な操作）を同じ幅で横に並べる
+  - try again で、同じ Subject の Setup に移る。Topic・順番・問題数は、直前に選んでいたもののまま
+  - home で、Home に移る
+- 結果は解き終わったときに手元で数えるので、読み込み中とエラーの状態はない
+- Result で読み込み直すと、結果は出ず、Setup の最初の選び方（All・in order・10）からになる。それまでに答えた分の記録は残る
+
+| 状態 | 表示 | スクリーンショット |
+| --- | --- | --- |
+| 通常 | 正答率の円と得点、4つの数、Topic ごとの行、try again と home | ![](screens/result-default.png) |
+
 ## 記録
 
 - 答えるたびに（submit とスキップ）、その問題の正解・不正解を記録する。スキップは不正解
 - quit・読み込み直し・ページを閉じても、それまでに答えた分の記録は残る
-- 記録は、Setup の lowest accuracy の並びと、解いた問題の数に使う
+- 記録は、Setup の lowest accuracy の並びと解いた問題の数、Result の「前は正解したのに今回間違えた」に使う
