@@ -115,9 +115,19 @@ describe("getManage", () => {
 
   test("2ページ目は、51問目から出す", async () => {
     const python = await insertSubject("Python");
-    for (let i = 1; i <= 51; i++) {
-      await insertQuestion(python, `q${i}`, "Basics");
-    }
+    // 1問ずつ入れると遅いので、まとめて入れる
+    await db.insert(questions).values(
+      Array.from({ length: 51 }, (_, i) => ({
+        subjectId: python,
+        questionId: `q${i + 1}`,
+        topic: "Basics",
+        type: "single" as const,
+        text: "問題文",
+        choices: ["A の選択肢", "B の選択肢"],
+        correct: ["A"],
+        explanation: "解説",
+      })),
+    );
 
     const manage = await getManage({ subjectId: python, topic: null, page: 2 });
     expect(manage.selected).toMatchObject({ page: 2, lastPage: 2, total: 51 });
