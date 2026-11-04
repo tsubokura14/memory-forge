@@ -140,7 +140,7 @@
 | ファイル | すること |
 | --- | --- |
 | `list.ts` | `getManage(saved)` は、次を返す。<br>・Subject の一覧（取り込んだ順、問題数つき）<br>・選んだ Subject の Topic の一覧（Setup と同じ順、問題数つき）<br>・選んだ Topic の問題の1ページ分（`questions.id` の順に50問。ID・Topic・種類・問題文・正答率・解いた回数）<br>・全部の問題の数<br>正答率と解いた回数は、`answers` を問題ごとに数えて出す（`docs/design.md` の「データ」：数は記録から数える） |
-| `selection.ts` | データベースを使わない決まり。<br>・`resolveSelection`：覚えていた選び方を、今ある Subject・Topic・ページに合わせる。なくなった Subject は最初の Subject と All topics、なくなった Topic は All topics、なくなったページは最後のページにする<br>・`nextSubjectAfterDelete`：消した Subject の次の Subject。最後なら前、ほかになければなし |
+| `selection.ts` | データベースを使わない決まり。<br>・`parseSaved`：cookie の JSON を読む。ない・読めない・形が違うときは、覚えていないのと同じにする<br>・`resolveSelection`：覚えていた選び方を、今ある Subject・Topic・ページに合わせる。なくなった Subject は最初の Subject と All topics、なくなった Topic は All topics、なくなったページは最後のページにする<br>・`nextSubjectAfterDelete`：消した Subject の次の Subject。最後なら前、ほかになければなし |
 | `pages.ts` | データベースを使わない決まり。<br>・`pageItems(今, 最後)`：ページの番号の並び（最初・最後・今の前後、間は「…」）。1ページのときは何も出さない<br>・「151–200 of 480」の範囲 |
 | `export.ts` | ・`exportSubject(subjectId)`：取り込むファイルと同じ形の JSON の文字と、ファイルの名前を返す。形は、`subject` と問題の並び（`id`・`topic`・`type`・`text`・`choices`・`correct`・`explanation`）<br>・`exportFileName(name)`（データベースを使わない）：小文字にし、空白・`\ / : * ? " < > \|`・制御文字を「-」にする。続く「-」は1つにまとめ、頭と終わりの「-」は除く |
 | `delete.ts` | `deleteSubject(subjectId)`・`deleteTopic(subjectId, topic)`・`deleteQuestion(id)`。Topic や1問を消して Subject の問題が0問になったら、Subject も消す（1つのトランザクション） |

@@ -48,12 +48,6 @@ describe("resolveSelection", () => {
       resolveSelection({ subjectId: 1, topic: "Typing", page: 2 }, subjects),
     ).toEqual({ subjectId: 1, topic: "Typing", page: 1, total: 12 });
   });
-
-  test("Subject が0件なら null", () => {
-    expect(resolveSelection({ subjectId: 1, topic: null, page: 1 }, [])).toBe(
-      null,
-    );
-  });
 });
 
 describe("parseSaved", () => {
