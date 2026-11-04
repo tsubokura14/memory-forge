@@ -35,7 +35,7 @@
 - 開いたときは、取り込んだ順で最初の Subject と All topics、1ページ目を選んでいる
 - Subject を変えると、All topics と1ページ目に戻る
 - 読み込み直したときや、ほかの画面から戻ったときは、選んでいた Subject・Topic・ページのまま
-  - 選んでいた Subject がなくなっていたら最初の Subject と All topics、Topic がなくなっていたら All topics にする。選んでいたページがなくなっていたら、最後のページを出す
+  - 選んでいた Subject がなくなっていたら最初の Subject と All topics、Topic がなくなっていたら All topics と1ページ目にする。選んでいたページがなくなっていたら、最後のページを出す
 - 問題は取り込んだ順に並べる。行には、問題文の1行目（長いときは「…」で切る）と、その下に ID、Topic、種類（multi のときだけ「multi」）、問題ごとの正答率と解いた回数（「75% · 3 tries」）を出す。まだ解いていない問題は「— · 0 tries」
 - 行を押しても、問題の中身は開かない
 - Subject が0件のときは、点線の枠で「No subjects yet.」「Import a question file to get started.」を出す（Import へは、上の import で移る）。export は出さない
@@ -120,6 +120,7 @@
 - [x] （`/dev-plan` で）Subject が1,000問を超えると、書き出したファイルは Import の上限で取り込めない。どうする？ → 止めずに書き出す。取り込み直せるのは上限までと書く
 - [x] （`/dev-plan` で）覚えていたページがなくなったら（問題が減ったなど）？ → 最後のページ。覚えていた Subject・Topic がなくなっていたら、最初の Subject・All topics
 - [x] （`/dev-plan` で）最後の Subject を消したら（次がない）？ → 前の Subject
+- [x] （`/dev-impl` のタスク1で）覚えていた Topic がなくなって All topics にしたとき、ページは？ → 1ページ目
 - [x] （`/dev-plan` で）ファイルの名前で、空白や記号が続くときは？ → 1つの「-」にまとめ、頭と終わりの「-」は除く
 - [x] （`/dev-plan` で）delete を押してから消え終わるまでは？ → cancel と delete を押せなくする（文言は変えない）。Esc でも閉じない
 
