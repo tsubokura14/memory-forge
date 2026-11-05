@@ -35,7 +35,7 @@
 - 開いたときは、取り込んだ順で最初の Subject と All topics、1ページ目を選んでいる
 - Subject を変えると、All topics と1ページ目に戻る
 - 読み込み直したときや、ほかの画面から戻ったときは、選んでいた Subject・Topic・ページのまま
-  - 選んでいた Subject がなくなっていたら最初の Subject と All topics、Topic がなくなっていたら All topics にする。選んでいたページがなくなっていたら、最後のページを出す
+  - 選んでいた Subject がなくなっていたら最初の Subject と All topics、Topic がなくなっていたら All topics と1ページ目にする。選んでいたページがなくなっていたら、最後のページを出す
 - 問題は取り込んだ順に並べる。行には、問題文の1行目（長いときは「…」で切る）と、その下に ID、Topic、種類（multi のときだけ「multi」）、問題ごとの正答率と解いた回数（「75% · 3 tries」）を出す。まだ解いていない問題は「— · 0 tries」
 - 行を押しても、問題の中身は開かない
 - Subject が0件のときは、点線の枠で「No subjects yet.」「Import a question file to get started.」を出す（Import へは、上の import で移る）。export は出さない
@@ -120,6 +120,7 @@
 - [x] （`/dev-plan` で）Subject が1,000問を超えると、書き出したファイルは Import の上限で取り込めない。どうする？ → 止めずに書き出す。取り込み直せるのは上限までと書く
 - [x] （`/dev-plan` で）覚えていたページがなくなったら（問題が減ったなど）？ → 最後のページ。覚えていた Subject・Topic がなくなっていたら、最初の Subject・All topics
 - [x] （`/dev-plan` で）最後の Subject を消したら（次がない）？ → 前の Subject
+- [x] （`/dev-impl` のタスク1で）覚えていた Topic がなくなって All topics にしたとき、ページは？ → 1ページ目
 - [x] （`/dev-plan` で）ファイルの名前で、空白や記号が続くときは？ → 1つの「-」にまとめ、頭と終わりの「-」は除く
 - [x] （`/dev-plan` で）delete を押してから消え終わるまでは？ → cancel と delete を押せなくする（文言は変えない）。Esc でも閉じない
 
@@ -140,7 +141,7 @@
 | ファイル | すること |
 | --- | --- |
 | `list.ts` | `getManage(saved)` は、次を返す。<br>・Subject の一覧（取り込んだ順、問題数つき）<br>・選んだ Subject の Topic の一覧（Setup と同じ順、問題数つき）<br>・選んだ Topic の問題の1ページ分（`questions.id` の順に50問。ID・Topic・種類・問題文・正答率・解いた回数）<br>・全部の問題の数<br>正答率と解いた回数は、`answers` を問題ごとに数えて出す（`docs/design.md` の「データ」：数は記録から数える） |
-| `selection.ts` | データベースを使わない決まり。<br>・`resolveSelection`：覚えていた選び方を、今ある Subject・Topic・ページに合わせる。なくなった Subject は最初の Subject と All topics、なくなった Topic は All topics、なくなったページは最後のページにする<br>・`nextSubjectAfterDelete`：消した Subject の次の Subject。最後なら前、ほかになければなし |
+| `selection.ts` | データベースを使わない決まり。<br>・`parseSaved`：cookie の JSON を読む。ない・読めない・形が違うときは、覚えていないのと同じにする<br>・`resolveSelection`：覚えていた選び方を、今ある Subject・Topic・ページに合わせる。なくなった Subject は最初の Subject と All topics、なくなった Topic は All topics、なくなったページは最後のページにする<br>・`nextSubjectAfterDelete`：消した Subject の次の Subject。最後なら前、ほかになければなし |
 | `pages.ts` | データベースを使わない決まり。<br>・`pageItems(今, 最後)`：ページの番号の並び（最初・最後・今の前後、間は「…」）。1ページのときは何も出さない<br>・「151–200 of 480」の範囲 |
 | `export.ts` | ・`exportSubject(subjectId)`：取り込むファイルと同じ形の JSON の文字と、ファイルの名前を返す。形は、`subject` と問題の並び（`id`・`topic`・`type`・`text`・`choices`・`correct`・`explanation`）<br>・`exportFileName(name)`（データベースを使わない）：小文字にし、空白・`\ / : * ? " < > \|`・制御文字を「-」にする。続く「-」は1つにまとめ、頭と終わりの「-」は除く |
 | `delete.ts` | `deleteSubject(subjectId)`・`deleteTopic(subjectId, topic)`・`deleteQuestion(id)`。Topic や1問を消して Subject の問題が0問になったら、Subject も消す（1つのトランザクション） |
@@ -213,7 +214,7 @@
 
 ## タスク
 
-- [ ] 1. 一覧に出すものを読む決まり（`src/server/manage/list.ts`・`selection.ts`・`pages.ts` とテスト）ができたら完了。画面は変えない
+- [x] 1. 一覧に出すものを読む決まり（`src/server/manage/list.ts`・`selection.ts`・`pages.ts` とテスト）ができたら完了。画面は変えない
 - [ ] 2. Manage で、Subject・Topic を選んで問題の一覧をページごとに見られ、選び方が残ったら完了。書き出しと削除のボタンは、まだ出さない
   - 合わせるスクリーンショット：manage-default・manage-subject-open・manage-topic-open・manage-topics-many・manage-empty・manage-many・manage-many-mobile・manage-loading・manage-error。どれも、export と delete のボタンを除いて合わせる
 - [ ] 3. export <Subject の名前> で、Subject の問題を書き出せたら完了。`export.ts` とテストも、このタスクで作る
