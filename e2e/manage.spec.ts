@@ -128,6 +128,11 @@ async function choose(page: Page, name: "subject" | "topic", option: string) {
   await page.getByRole("option", { name: new RegExp(`^${option}`) }).click();
 }
 
+// Next.js が置く、ページの移動を知らせる alert と分けるため、main の中で探す
+function loadError(page: Page) {
+  return page.getByRole("main").getByRole("alert");
+}
+
 function rows(page: Page) {
   return page.getByRole("list", { name: "questions" }).getByRole("listitem");
 }
@@ -200,6 +205,9 @@ test("manage-empty", async ({ page }) => {
 test("manage-many：ページを移ると、その50問になる", async ({ page }) => {
   await resetManyPython();
   await openManage(page);
+  // 番号は今のページの前後だけなので、2・3と順に移る
+  await page.getByRole("button", { name: "page 2" }).click();
+  await expect(page.getByText("51–100 of 480")).toBeVisible();
   await page.getByRole("button", { name: "page 3" }).click();
   await expect(page.getByText("101–150 of 480")).toBeVisible();
   await page.getByRole("button", { name: "page 4" }).click();
@@ -264,11 +272,11 @@ test("manage-error：読み込めなかったら帯と retry を出し、retry �
     isServerAction(route.request()) ? route.abort() : route.continue(),
   );
   await choose(page, "topic", "Decorators");
-  await expect(page.getByRole("alert")).toHaveText(/Couldn't load questions\./);
+  await expect(loadError(page)).toHaveText(/Couldn't load questions\./);
   await expect(page).toHaveScreenshot("manage-error.png", { fullPage: true });
 
   await page.unrouteAll();
   await page.getByRole("button", { name: "retry" }).click();
   await expect(rows(page)).toHaveCount(3);
-  await expect(page.getByRole("alert")).toHaveCount(0);
+  await expect(loadError(page)).toHaveCount(0);
 });
