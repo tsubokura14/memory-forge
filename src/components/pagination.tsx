@@ -6,12 +6,10 @@ export function Pagination({
   page,
   last,
   onPage,
-  disabled = false,
 }: {
   page: number;
   last: number;
   onPage: (page: number) => void;
-  disabled?: boolean;
 }) {
   const items = pageItems(page, last);
   if (items.length === 0) return null;
@@ -23,7 +21,7 @@ export function Pagination({
       <button
         type="button"
         aria-label="previous page"
-        disabled={disabled || page === 1}
+        disabled={page === 1}
         onClick={() => onPage(page - 1)}
         className={`${box} border-border bg-surface`}
       >
@@ -45,7 +43,6 @@ export function Pagination({
             type="button"
             aria-label={`page ${item}`}
             aria-current={item === page ? "page" : undefined}
-            disabled={disabled}
             onClick={() => item !== page && onPage(item)}
             className={`${box} hidden sm:flex ${
               item === page
@@ -63,7 +60,7 @@ export function Pagination({
       <button
         type="button"
         aria-label="next page"
-        disabled={disabled || page === last}
+        disabled={page === last}
         onClick={() => onPage(page + 1)}
         className={`${box} border-border bg-surface`}
       >

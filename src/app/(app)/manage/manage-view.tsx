@@ -90,7 +90,10 @@ export function ManageView({
         </Field>
       </div>
 
-      {failed ? (
+      {/* retry を押したあとも、返事が来るまでは読み込み中を出す */}
+      {pending ? (
+        <QuestionsSkeleton />
+      ) : failed ? (
         <Banner
           action={
             <Button variant="danger" onClick={() => select(failed)}>
@@ -100,8 +103,6 @@ export function ManageView({
         >
           Couldn&apos;t load questions.
         </Banner>
-      ) : pending ? (
-        <QuestionsSkeleton />
       ) : (
         <>
           <div className="flex min-h-7 items-center justify-between gap-3">
