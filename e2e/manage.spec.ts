@@ -1,0 +1,274 @@
+import type { Page } from "@playwright/test";
+import { expect, test } from "./fixtures";
+import {
+  insertAnswers,
+  resetQuestions,
+  type TestQuestion,
+  testQuestion,
+} from "./questions";
+import { SIGNED_IN_STATE } from "./test-user";
+
+test.use({ storageState: SIGNED_IN_STATE });
+
+// 合意したスクリーンショットと同じ10問（Python）
+const python: TestQuestion[] = [
+  [
+    "k3f9a2",
+    "Decorators",
+    "single",
+    "次のコードを実行したとき、出力されるものはどれか。",
+  ],
+  [
+    "p81xq0",
+    "Decorators",
+    "multiple",
+    "functools.wraps について、正しいものをすべて選べ。",
+  ],
+  [
+    "m2v7c4",
+    "Decorators",
+    "single",
+    "デコレータを重ねて付けたとき、適用される順番はどれか。",
+  ],
+  [
+    "z9d1e8",
+    "Generators",
+    "single",
+    "ジェネレータの中で yield from がすることはどれか。",
+  ],
+  [
+    "b4n6t1",
+    "Generators",
+    "multiple",
+    "ジェネレータオブジェクトを作るものをすべて選べ。",
+  ],
+  [
+    "h7r2w5",
+    "Basics",
+    "single",
+    "ミュータブルな値をデフォルト引数にしたとき、起こることはどれか。",
+  ],
+  ["c0y8u3", "Basics", "multiple", "イミュータブルな型をすべて選べ。"],
+  ["e5s4j9", "Typing", "single", "TypedDict でできることはどれか。"],
+  ["t1g6l7", "Async", "single", "asyncio.gather が返すものはどれか。"],
+  ["w8a3k2", "Async", "multiple", "await について、正しいものをすべて選べ。"],
+].map(([id, topic, type, text]) =>
+  testQuestion(id, {
+    topic,
+    type: type as TestQuestion["type"],
+    text,
+    correct: type === "multiple" ? ["A", "B"] : ["C"],
+  }),
+);
+
+// 問題ごとの [正解の数, 不正解の数]
+const records: Record<string, [number, number]> = {
+  k3f9a2: [1, 0],
+  p81xq0: [1, 1],
+  m2v7c4: [2, 1],
+  b4n6t1: [3, 1],
+  h7r2w5: [1, 2],
+  c0y8u3: [4, 1],
+  t1g6l7: [2, 2],
+  w8a3k2: [2, 1],
+};
+
+function many(prefix: string, count: number): TestQuestion[] {
+  return Array.from({ length: count }, (_, i) =>
+    testQuestion(`${prefix}${i + 1}`, { topic: "Basics" }),
+  );
+}
+
+async function resetPython(extraTopics: string[] = []) {
+  await resetQuestions([
+    {
+      name: "Python",
+      questions: [
+        ...python,
+        ...extraTopics.map((topic, i) =>
+          testQuestion(`x${i + 1}`, { topic, text: `${topic} の問題文` }),
+        ),
+      ],
+    },
+    { name: "AWS SAA", questions: many("aws", 240) },
+    { name: "TypeScript", questions: many("ts", 72) },
+    { name: "Linux", questions: many("linux", 30) },
+  ]);
+  await insertAnswers(
+    Object.entries(records).flatMap(([questionId, [right, wrong]]) => [
+      ...Array.from({ length: right }, () => ({ questionId, correct: true })),
+      ...Array.from({ length: wrong }, () => ({ questionId, correct: false })),
+    ]),
+  );
+}
+
+// 480問（10問を48回くり返す）の Python
+async function resetManyPython() {
+  await resetQuestions([
+    {
+      name: "Python",
+      questions: Array.from({ length: 48 }, (_, round) =>
+        python.map((q) => ({ ...q, id: `${q.id}${round + 100}` })),
+      ).flat(),
+    },
+  ]);
+}
+
+// サーバーアクションの通信（next-action の付いた POST）だけを選ぶ
+function isServerAction(request: { method(): string; headers(): object }) {
+  return request.method() === "POST" && "next-action" in request.headers();
+}
+
+function dropdown(page: Page, name: "subject" | "topic") {
+  return page.getByRole("button", { name, exact: true });
+}
+
+async function choose(page: Page, name: "subject" | "topic", option: string) {
+  await dropdown(page, name).click();
+  await page.getByRole("option", { name: new RegExp(`^${option}`) }).click();
+}
+
+function rows(page: Page) {
+  return page.getByRole("list", { name: "questions" }).getByRole("listitem");
+}
+
+async function openManage(page: Page) {
+  await page.goto("/manage");
+  await expect(rows(page).first()).toBeVisible();
+}
+
+test("manage-default：開くと、最初の Subject と All topics の1ページ目", async ({
+  page,
+}) => {
+  await resetPython();
+  await openManage(page);
+  await expect(dropdown(page, "subject")).toHaveText(/Python/);
+  await expect(dropdown(page, "topic")).toHaveText(/All topics/);
+  await expect(rows(page)).toHaveCount(10);
+  await expect(page).toHaveScreenshot("manage-default.png", { fullPage: true });
+});
+
+test("manage-subject-open", async ({ page }) => {
+  await resetPython();
+  await openManage(page);
+  await dropdown(page, "subject").click();
+  await expect(page.getByRole("option")).toHaveCount(4);
+  await expect(page).toHaveScreenshot("manage-subject-open.png", {
+    fullPage: true,
+  });
+});
+
+test("manage-topic-open：Topic を選ぶと、その問題だけになる", async ({
+  page,
+}) => {
+  await resetPython();
+  await openManage(page);
+  await choose(page, "topic", "Decorators");
+  await expect(rows(page)).toHaveCount(3);
+  await dropdown(page, "topic").click();
+  await expect(page).toHaveScreenshot("manage-topic-open.png", {
+    fullPage: true,
+  });
+});
+
+test("manage-topics-many", async ({ page }) => {
+  await resetPython([
+    "Closures",
+    "Comprehensions",
+    "Context managers",
+    "Dataclasses",
+    "Exceptions",
+    "Iterators",
+    "Modules",
+    "Testing",
+  ]);
+  await openManage(page);
+  await dropdown(page, "topic").click();
+  await expect(page).toHaveScreenshot("manage-topics-many.png", {
+    fullPage: true,
+  });
+});
+
+test("manage-empty", async ({ page }) => {
+  await resetQuestions();
+  await page.goto("/manage");
+  await expect(page.getByText("No subjects yet.")).toBeVisible();
+  await expect(dropdown(page, "subject")).toHaveCount(0);
+  await expect(page).toHaveScreenshot("manage-empty.png", { fullPage: true });
+});
+
+test("manage-many：ページを移ると、その50問になる", async ({ page }) => {
+  await resetManyPython();
+  await openManage(page);
+  await page.getByRole("button", { name: "page 3" }).click();
+  await expect(page.getByText("101–150 of 480")).toBeVisible();
+  await page.getByRole("button", { name: "page 4" }).click();
+  await expect(page.getByText("151–200 of 480")).toBeVisible();
+  await expect(rows(page)).toHaveCount(50);
+  await expect(page).toHaveScreenshot("manage-many.png", { fullPage: true });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByText("4 / 10")).toBeVisible();
+  await expect(page).toHaveScreenshot("manage-many-mobile.png", {
+    fullPage: true,
+  });
+});
+
+test("Subject を変えると All topics と1ページ目に戻り、読み込み直しても Home から戻っても同じ選び方のまま", async ({
+  page,
+}) => {
+  await resetPython();
+  await openManage(page);
+  await choose(page, "subject", "AWS SAA");
+  await page.getByRole("button", { name: "page 2" }).click();
+  await expect(page.getByText("51–100 of 240")).toBeVisible();
+
+  await choose(page, "subject", "Python");
+  await choose(page, "topic", "Typing");
+  await expect(rows(page)).toHaveCount(1);
+  await choose(page, "subject", "AWS SAA");
+  await expect(dropdown(page, "topic")).toHaveText(/All topics/);
+  await expect(page.getByText("1–50 of 240")).toBeVisible();
+
+  await page.getByRole("button", { name: "page 2" }).click();
+  await expect(page.getByText("51–100 of 240")).toBeVisible();
+  await page.reload();
+  await expect(page.getByText("51–100 of 240")).toBeVisible();
+
+  await page.goto("/");
+  await page.getByRole("link", { name: /manage/ }).click();
+  await expect(dropdown(page, "subject")).toHaveText(/AWS SAA/);
+  await expect(page.getByText("51–100 of 240")).toBeVisible();
+});
+
+test("manage-loading：選び方を変えて読み込んでいる間は、行の形の枠を点滅させる", async ({
+  page,
+}) => {
+  await resetPython();
+  await openManage(page);
+  // 返事を返さずに止めて、読み込み中の画面を撮る
+  await page.route("/manage", async (route) => {
+    if (!isServerAction(route.request())) await route.continue();
+  });
+  await choose(page, "topic", "Decorators");
+  await expect(page.getByTestId("questions-loading")).toBeVisible();
+  await expect(page).toHaveScreenshot("manage-loading.png", { fullPage: true });
+});
+
+test("manage-error：読み込めなかったら帯と retry を出し、retry で出る", async ({
+  page,
+}) => {
+  await resetPython();
+  await openManage(page);
+  await page.route("/manage", (route) =>
+    isServerAction(route.request()) ? route.abort() : route.continue(),
+  );
+  await choose(page, "topic", "Decorators");
+  await expect(page.getByRole("alert")).toHaveText(/Couldn't load questions\./);
+  await expect(page).toHaveScreenshot("manage-error.png", { fullPage: true });
+
+  await page.unrouteAll();
+  await page.getByRole("button", { name: "retry" }).click();
+  await expect(rows(page)).toHaveCount(3);
+  await expect(page.getByRole("alert")).toHaveCount(0);
+});
