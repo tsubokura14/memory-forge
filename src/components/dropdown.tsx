@@ -76,9 +76,7 @@ export function Dropdown({
             return (
               <li
                 key={option.key}
-                className={
-                  option.divider ? "mb-1 border-b border-border" : ""
-                }
+                className={option.divider ? "mb-1 border-b border-border" : ""}
               >
                 <button
                   type="button"
