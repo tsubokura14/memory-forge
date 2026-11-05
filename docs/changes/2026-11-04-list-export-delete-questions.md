@@ -215,7 +215,7 @@
 ## タスク
 
 - [x] 1. 一覧に出すものを読む決まり（`src/server/manage/list.ts`・`selection.ts`・`pages.ts` とテスト）ができたら完了。画面は変えない
-- [ ] 2. Manage で、Subject・Topic を選んで問題の一覧をページごとに見られ、選び方が残ったら完了。書き出しと削除のボタンは、まだ出さない
+- [x] 2. Manage で、Subject・Topic を選んで問題の一覧をページごとに見られ、選び方が残ったら完了。書き出しと削除のボタンは、まだ出さない
   - 合わせるスクリーンショット：manage-default・manage-subject-open・manage-topic-open・manage-topics-many・manage-empty・manage-many・manage-many-mobile・manage-loading・manage-error。どれも、export と delete のボタンを除いて合わせる
 - [ ] 3. export <Subject の名前> で、Subject の問題を書き出せたら完了。`export.ts` とテストも、このタスクで作る
   - 合わせるスクリーンショット：manage-export-error
