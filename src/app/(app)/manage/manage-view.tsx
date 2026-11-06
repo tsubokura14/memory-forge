@@ -173,7 +173,8 @@ function download(fileName: string, content: string) {
   link.href = url;
   link.download = fileName;
   link.click();
-  URL.revokeObjectURL(url);
+  // 保存が始まる前に捨てると、ブラウザによっては保存が切れるので、次の処理の順番まで待つ
+  setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
 function Field({

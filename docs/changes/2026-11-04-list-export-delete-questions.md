@@ -122,6 +122,9 @@
 - [x] （`/dev-plan` で）最後の Subject を消したら（次がない）？ → 前の Subject
 - [x] （`/dev-impl` のタスク1で）覚えていた Topic がなくなって All topics にしたとき、ページは？ → 1ページ目
 - [x] （`/dev-impl` のタスク3で）Subject の名前が記号だけで、ファイルの名前が空になるときは？ → subject.json
+- [x] （`/dev-impl` のタスク3で）上の部分を `manage-header.tsx` に分け、export は `manage-view.tsx` で出してよい？（設計では `page.tsx` が出すとしていた） → 設計を直す（「設計」の「画面」の表）
+- [x] （`/dev-impl` のタスク3で）最初に開いて読み込んでいる間と、読み込めなかったときの export は？ → 出さない（import だけ）
+- [x] （`/dev-impl` のタスク3で）export の文字の色は？（合意した画像は muted に近い） → 今のまま text（`docs/ui.md` の「ほかの操作：枠だけ」と、ほかの枠だけのボタンに合わせる）
 - [x] （`/dev-plan` で）ファイルの名前で、空白や記号が続くときは？ → 1つの「-」にまとめ、頭と終わりの「-」は除く
 - [x] （`/dev-plan` で）delete を押してから消え終わるまでは？ → cancel と delete を押せなくする（文言は変えない）。Esc でも閉じない
 
@@ -175,9 +178,10 @@
 
 | ファイル | すること |
 | --- | --- |
-| `src/app/(app)/manage/page.tsx` | 上の部分（戻るリンク・見出し・import・export）を出す。`<Suspense>` の中で cookie を読み、`getManage` を呼ぶ。読めなかったら、danger の帯「Couldn't load questions.」と retry（`RetryButton`）を出す |
+| `src/app/(app)/manage/page.tsx` | `<Suspense>` の中で cookie を読み、`getManage` を呼ぶ。読み込み中・読み込めないとき・0件のときは、export のない上の部分（`ManageHeader`）を出す。読めなかったら、danger の帯「Couldn't load questions.」と retry（`RetryButton`）を出す |
 | `src/app/(app)/manage/actions.ts` | `selectAction`・`exportAction`・`deleteSubjectAction`・`deleteTopicAction`・`deleteQuestionAction`。どれも最初に `requireSession()` を呼ぶ |
-| `src/app/(app)/manage/manage-view.tsx` | ブラウザで動く部品。絞り込み・ページ・一覧・ダイアログを出す。<br>・選び方を変えている間（`useTransition`）は、一覧の場所に行の形の枠を点滅させる<br>・アクションが失敗したら、帯「Couldn't load questions.」と retry を出す。retry は、同じ選び方でもう一度送る |
+| `src/app/(app)/manage/manage-header.tsx` | 上の部分（戻るリンク・見出しと説明・import）。右に、選んでいる Subject の export を受け取って並べる |
+| `src/app/(app)/manage/manage-view.tsx` | ブラウザで動く部品。上の部分（export つき）・絞り込み・ページ・一覧・ダイアログを出す。export は選んでいる Subject がわかってから出し、書き出しの失敗の帯もこの部品で持つ。<br>・選び方を変えている間（`useTransition`）は、一覧の場所に行の形の枠を点滅させる<br>・アクションが失敗したら、帯「Couldn't load questions.」と retry を出す。retry は、同じ選び方でもう一度送る |
 | `src/components/dropdown.tsx` | 新しい部品。`docs/ui.md` の「プルダウン」。押すと下に一覧を開く。選ぶ・Esc・外側を押すと閉じる。一覧の高さを止めて、中をスクロールさせる |
 | `src/components/pagination.tsx` | 新しい部品。`docs/ui.md` の「ページ」。番号の並びは `pages.ts` から受け取る |
 | `src/components/question-row.tsx` | 新しい部品。問題の行。1行目に問題文、2行目に ID・Topic・multi・正答率と解いた回数、右に delete を出す |
