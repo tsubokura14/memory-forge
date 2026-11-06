@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { parseSaved, resolveSelection } from "./selection";
+import {
+  nextSubjectAfterDelete,
+  parseSaved,
+  resolveSelection,
+} from "./selection";
 
 const subjects = [
   {
@@ -64,5 +68,20 @@ describe("parseSaved", () => {
     expect(
       parseSaved(JSON.stringify({ subjectId: 2, topic: null, page: 0 })),
     ).toBeNull();
+  });
+});
+
+describe("nextSubjectAfterDelete", () => {
+  // 残っている Subject の id（取り込んだ順）と、消した Subject の id から選ぶ
+  test("消した Subject の次の Subject", () => {
+    expect(nextSubjectAfterDelete([1, 3, 4], 2)).toBe(3);
+  });
+
+  test("消した Subject が最後なら、前の Subject", () => {
+    expect(nextSubjectAfterDelete([1, 3], 4)).toBe(3);
+  });
+
+  test("ほかに Subject がなければ null", () => {
+    expect(nextSubjectAfterDelete([], 2)).toBeNull();
   });
 });
