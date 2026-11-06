@@ -127,6 +127,13 @@
 - [x] （`/dev-impl` のタスク3で）export の文字の色は？（合意した画像は muted に近い） → 今のまま text（`docs/ui.md` の「ほかの操作：枠だけ」と、ほかの枠だけのボタンに合わせる）
 - [x] （`/dev-plan` で）ファイルの名前で、空白や記号が続くときは？ → 1つの「-」にまとめ、頭と終わりの「-」は除く
 - [x] （`/dev-plan` で）delete を押してから消え終わるまでは？ → cancel と delete を押せなくする（文言は変えない）。Esc でも閉じない
+- [x] （`/dev-impl` のタスク4で）最後の Topic や最後の1問を消して Subject ごと消えたとき、次に出す Subject は？ → Subject を消したときと同じ（次の Subject、最後なら前、なければ0件の表示）
+- [x] （`/dev-impl` のタスク4で）ダイアログの数が1のときは？ → 単数にする（1 topic、1 question and its records）
+- [x] （`/dev-impl` のタスク4で）1問の削除のダイアログで、問題文の1行目が長いときは？ → 折り返して全部出す
+- [x] （`/dev-impl` のタスク4で）Topic の最後の1問を消して Topic がなくなったら？ → All topics の1ページ目（なくなった Topic と同じ）
+- [x] （`/dev-impl` のタスク4で）「Couldn't delete.」の帯はいつ消す？ → 閉じて開き直したときと、もう一度 delete を押したとき
+- [x] （`/dev-impl` のタスク4で）別のタブで消していて、消すものがもうなかったら？ → 消せたのと同じに扱う（帯を出さず、一覧を組み立て直す）
+- [x] （`/dev-impl` のタスク4で）合意した画像では、問題文の1行目がダイアログの説明の上にある。設計（説明の下に中身を足す）と違うが？ → 説明の上にも足せる形に設計を直す（「設計」の「画面」の表）
 
 ## 調べたこと
 
@@ -185,7 +192,7 @@
 | `src/components/dropdown.tsx` | 新しい部品。`docs/ui.md` の「プルダウン」。押すと下に一覧を開く。選ぶ・Esc・外側を押すと閉じる。一覧の高さを止めて、中をスクロールさせる |
 | `src/components/pagination.tsx` | 新しい部品。`docs/ui.md` の「ページ」。番号の並びは `pages.ts` から受け取る |
 | `src/components/question-row.tsx` | 新しい部品。問題の行。1行目に問題文、2行目に ID・Topic・multi・正答率と解いた回数、右に delete を出す |
-| `src/components/dialog.tsx` | 説明の下に中身を足せるようにする。1問の削除で問題文の1行目を出し、消せなかったときに帯「Couldn't delete.」を出すため |
+| `src/components/dialog.tsx` | 説明の上と下に中身を足せるようにする。説明の上には1問の削除で問題文の1行目を出し、説明の下には消せなかったときの帯「Couldn't delete.」を出すため |
 | `src/components/button.tsx` | 3つの見た目を足す。<br>・delete の印だけの枠のボタン（指を乗せると danger）<br>・行の delete（muted の文字だけ。指を乗せると danger の文字と danger-soft の地）<br>・ダイアログの delete（danger の地と on-primary の文字。`src/components/choice.tsx` と同じ組み合わせ） |
 
 - 0件の点線の枠は、Home と同じ見た目にする。今は `src/app/(app)/page.tsx` の中にあるので、2か所で使えるように `src/components/empty-state.tsx` に分ける
