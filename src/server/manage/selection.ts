@@ -52,3 +52,12 @@ export function resolveSelection(
   const page = keepPage ? Math.min(saved?.page ?? 1, lastPage(total)) : 1;
   return { subjectId: subject.id, topic: topic?.name ?? null, page, total };
 }
+
+// 消した Subject の次に出す Subject。remaining は残っている Subject の id（取り込んだ順）。
+// 取り込んだ順は id の順なので、消した id より後の最初の Subject、なければ前の最後の Subject。ほかになければ null
+export function nextSubjectAfterDelete(
+  remaining: number[],
+  deletedId: number,
+): number | null {
+  return remaining.find((id) => id > deletedId) ?? remaining.at(-1) ?? null;
+}

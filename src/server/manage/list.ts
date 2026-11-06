@@ -30,7 +30,7 @@ export type Manage = {
 // （その Topic の問題が最初に出てくる順。src/server/solve/setup.ts）に、問題数つきで並べる。
 // 問題は、選んだ Topic（null なら Subject の全部）のうち、今のページの50問を取り込んだ順（questions.id の順）に返す
 export async function getManage(saved: Saved | null): Promise<Manage> {
-  // 問題のない Subject は、消す操作の中で一緒に消すので来ない。来ても一覧には出さない
+  // 問題のない Subject は出さない（docs/design.md の「データ」）
   const rows = await db
     .select({
       subjectId: subjects.id,

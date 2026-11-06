@@ -3,19 +3,33 @@
 import { useState, useTransition } from "react";
 import { Banner } from "@/components/banner";
 import { Button } from "@/components/button";
+import { Dialog } from "@/components/dialog";
 import { Dropdown } from "@/components/dropdown";
 import { Pagination } from "@/components/pagination";
 import { QuestionRow } from "@/components/question-row";
-import type { Manage } from "@/server/manage/list";
+import type { Manage, ManageQuestion } from "@/server/manage/list";
 import { rangeText } from "@/server/manage/pages";
 import type { Saved } from "@/server/manage/selection";
-import { exportAction, selectAction } from "./actions";
+import {
+  deleteQuestionAction,
+  deleteSubjectAction,
+  deleteTopicAction,
+  exportAction,
+  selectAction,
+} from "./actions";
 import { ManageHeader } from "./manage-header";
 
 // Topic のプルダウンの、All topics の行の key（Topic の名前と重ならないように、名前には入らない空の文字にする）
 const ALL_TOPICS = "";
 
-// 上の export、絞り込みと問題の一覧。選び方を変えると、サーバーアクションが cookie を書き、サーバーが組み立て直した一覧が届く
+// 確認のダイアログを開いている、消すもの
+type Deleting =
+  | { kind: "subject" }
+  | { kind: "topic"; topic: string; count: number }
+  | { kind: "question"; question: ManageQuestion };
+
+// 上の export、絞り込みと問題の一覧、削除の確認のダイアログ。
+// 選び方を変える・消すと、サーバーアクションが cookie を書き、サーバーが組み立て直した一覧が届く
 export function ManageView({
   subjects,
   selected,
@@ -28,9 +42,14 @@ export function ManageView({
   const [failed, setFailed] = useState<Saved | null>(null);
   // 書き出せなかった Subject の名前。もう一度書き出せたときと、選び方を変えたときに消す
   const [exportFailed, setExportFailed] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<Deleting | null>(null);
+  // 消している間（返事が来て、組み立て直した一覧が出るまで）は、cancel と delete を押せず、Esc でも閉じない
+  const [deletePending, startDelete] = useTransition();
+  // 「Couldn't delete.」の帯。開き直したときと、もう一度 delete を押したときに消す
+  const [deleteFailed, setDeleteFailed] = useState(false);
 
-  const subjectName =
-    subjects.find((s) => s.id === selected.subjectId)?.name ?? "";
+  const subject = subjects.find((s) => s.id === selected.subjectId);
+  const subjectName = subject?.name ?? "";
 
   function select(next: Saved) {
     setExportFailed(null);
@@ -55,6 +74,41 @@ export function ManageView({
     }
   }
 
+  function openDelete(target: Deleting) {
+    setDeleteFailed(false);
+    setDeleting(target);
+  }
+
+  function closeDelete() {
+    if (!deletePending) setDeleting(null);
+  }
+
+  function confirmDelete() {
+    if (!deleting) return;
+    const target = deleting;
+    const current: Saved = {
+      subjectId: selected.subjectId,
+      topic: selected.topic,
+      page: selected.page,
+    };
+    setDeleteFailed(false);
+    startDelete(async () => {
+      try {
+        if (target.kind === "subject") {
+          await deleteSubjectAction(selected.subjectId);
+        } else if (target.kind === "topic") {
+          await deleteTopicAction(selected.subjectId, target.topic);
+        } else {
+          await deleteQuestionAction(target.question.id, current);
+        }
+        // 組み立て直した一覧と一緒に閉じる
+        startDelete(() => setDeleting(null));
+      } catch {
+        setDeleteFailed(true);
+      }
+    });
+  }
+
   const topicTotal = selected.topics.reduce((sum, t) => sum + t.count, 0);
   const [first, ...rest] = rangeText(selected.page, selected.total).split(
     " of ",
@@ -73,7 +127,7 @@ export function ManageView({
           <Field label="subject">
             <Dropdown
               label="subject"
-              className="w-full sm:w-54"
+              className="min-w-0 flex-1"
               options={subjects.map((s) => ({
                 key: String(s.id),
                 label: s.name,
@@ -84,11 +138,15 @@ export function ManageView({
                 select({ subjectId: Number(key), topic: null, page: 1 })
               }
             />
+            <DeleteIcon
+              label="delete subject"
+              onClick={() => openDelete({ kind: "subject" })}
+            />
           </Field>
           <Field label="topic">
             <Dropdown
               label="topic"
-              className="w-full sm:w-64"
+              className="min-w-0 flex-1"
               options={[
                 {
                   key: ALL_TOPICS,
@@ -111,6 +169,19 @@ export function ManageView({
                 })
               }
             />
+            {/* All topics のときは、Topic の delete を出さない */}
+            {selected.topic !== null && (
+              <DeleteIcon
+                label="delete topic"
+                onClick={() =>
+                  openDelete({
+                    kind: "topic",
+                    topic: selected.topic!,
+                    count: selected.total,
+                  })
+                }
+              />
+            )}
           </Field>
         </div>
 
@@ -154,13 +225,108 @@ export function ManageView({
               className="flex flex-col divide-y divide-border overflow-hidden rounded-md border border-border bg-surface"
             >
               {selected.questions.map((q) => (
-                <QuestionRow key={q.id} question={q} />
+                <QuestionRow
+                  key={q.id}
+                  question={q}
+                  onDelete={() => openDelete({ kind: "question", question: q })}
+                />
               ))}
             </ul>
           </>
         )}
       </div>
+
+      <Dialog
+        open={deleting !== null}
+        title={deleteTitle(deleting, subjectName)}
+        lead={
+          deleting?.kind === "question" && (
+            // 長いときは折り返して全部出す（どの問題を消すのか確かめられるように）
+            <p className="wrap-break-word">
+              {deleting.question.text.split("\n")[0]}
+            </p>
+          )
+        }
+        description={deleteDescription(
+          deleting,
+          selected.topics.length,
+          subject?.count ?? 0,
+        )}
+        onCancel={closeDelete}
+        actions={
+          <>
+            <Button
+              variant="outline"
+              disabled={deletePending}
+              onClick={closeDelete}
+            >
+              cancel
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={deletePending}
+              onClick={confirmDelete}
+            >
+              delete
+            </Button>
+          </>
+        }
+      >
+        {deleteFailed && <Banner>Couldn&apos;t delete.</Banner>}
+      </Dialog>
     </>
+  );
+}
+
+function deleteTitle(deleting: Deleting | null, subjectName: string) {
+  if (deleting?.kind === "question") return "Delete this question?";
+  const name = deleting?.kind === "topic" ? deleting.topic : subjectName;
+  return `Delete “${name}”?`;
+}
+
+function deleteDescription(
+  deleting: Deleting | null,
+  topicCount: number,
+  questionCount: number,
+) {
+  const end = "This can't be undone.";
+  if (deleting?.kind === "question") {
+    return `Its records will be deleted too. ${end}`;
+  }
+  if (deleting?.kind === "topic") {
+    return `${questionsText(deleting.count)} will be deleted. ${end}`;
+  }
+  return `${plural(topicCount, "topic")}, ${questionsText(questionCount)} will be deleted. ${end}`;
+}
+
+// 数が1のときは単数にする（1 topic、1 question and its records）
+function plural(count: number, word: string) {
+  return `${count} ${word}${count === 1 ? "" : "s"}`;
+}
+
+function questionsText(count: number) {
+  return `${plural(count, "question")} and ${count === 1 ? "its" : "their"} records`;
+}
+
+// Subject・Topic のプルダウンのすぐ右に置く、delete の印だけのボタン
+function DeleteIcon({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <Button
+      variant="deleteIcon"
+      size="icon"
+      aria-label={label}
+      onClick={onClick}
+    >
+      <span aria-hidden className="icon text-lg leading-none">
+        delete
+      </span>
+    </Button>
   );
 }
 
@@ -177,6 +343,7 @@ function download(fileName: string, content: string) {
   setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
+// 見出しの下に、プルダウンと、そのすぐ右の delete を横に並べる
 function Field({
   label,
   children,
@@ -185,11 +352,11 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-1.5 sm:w-64">
       <span aria-hidden className="font-mono text-xs text-muted">
         {label}
       </span>
-      {children}
+      <div className="flex gap-2">{children}</div>
     </div>
   );
 }

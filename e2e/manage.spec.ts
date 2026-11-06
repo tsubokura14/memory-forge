@@ -382,6 +382,7 @@ test("manage-delete-topic：All topics では Topic の delete を出さず、To
     0,
   );
   await choose(page, "topic", "Typing");
+  await expect(rows(page)).toHaveCount(1);
   await page.getByRole("button", { name: "delete topic" }).click();
   await expect(dialog(page)).toContainText(
     "1 question and its records will be deleted.",
@@ -389,6 +390,7 @@ test("manage-delete-topic：All topics では Topic の delete を出さず、To
   await page.keyboard.press("Escape");
 
   await choose(page, "topic", "Decorators");
+  await expect(rows(page)).toHaveCount(3);
   await page.getByRole("button", { name: "delete topic" }).click();
   await expect(dialog(page)).toContainText(
     "3 questions and their records will be deleted.",
@@ -455,6 +457,7 @@ test("manage-delete-error：消せなかったら、ダイアログの中に帯�
   await resetPython();
   await openManage(page);
   await choose(page, "topic", "Decorators");
+  await expect(rows(page)).toHaveCount(3);
   await page.route("/manage", (route) =>
     isServerAction(route.request()) ? route.abort() : route.continue(),
   );
