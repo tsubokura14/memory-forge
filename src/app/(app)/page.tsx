@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { Banner } from "@/components/banner";
 import { buttonClass } from "@/components/button";
+import { EmptyState } from "@/components/empty-state";
 import { RetryButton } from "@/components/retry-button";
 import { listSubjects } from "@/server/subjects/subjects";
 
@@ -49,15 +50,14 @@ async function Subjects() {
 
   if (subjects.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-1 rounded-md border border-dashed border-border px-4 py-10 text-center">
-        <p className="text-base">No subjects yet.</p>
-        <p className="text-sm text-muted">
-          Import a question file to get started.
-        </p>
+      <EmptyState
+        title="No subjects yet."
+        description="Import a question file to get started."
+      >
         <Link href="/manage/import" className={`mt-3 ${buttonClass()}`}>
           import
         </Link>
-      </div>
+      </EmptyState>
     );
   }
 

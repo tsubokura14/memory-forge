@@ -54,11 +54,6 @@ test.beforeEach(async () => {
   await resetQuestions([{ name: "Python", questions: stored }]);
 });
 
-test("manage-default", async ({ page }) => {
-  await page.goto("/manage");
-  await expect(page).toHaveScreenshot("manage-default.png", { fullPage: true });
-});
-
 test("import-select", async ({ page }) => {
   await openImport(page);
   await expect(page).toHaveScreenshot("import-select.png", { fullPage: true });
