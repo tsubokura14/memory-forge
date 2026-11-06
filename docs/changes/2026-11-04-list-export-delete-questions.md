@@ -234,6 +234,6 @@
 - [x] 3. export <Subject の名前> で、Subject の問題を書き出せたら完了。`export.ts` とテストも、このタスクで作る
   - 合わせるスクリーンショット：manage-export-error
   - export が写る次の画像も撮り直す：manage-default・manage-subject-open・manage-topic-open・manage-topics-many・manage-many・manage-many-mobile・manage-loading・manage-error
-- [ ] 4. Subject・Topic・1問を、確認してから消せたら完了。`delete.ts`・`nextSubjectAfterDelete` とテストも、このタスクで作る
+- [x] 4. Subject・Topic・1問を、確認してから消せたら完了。`delete.ts`・`nextSubjectAfterDelete` とテストも、このタスクで作る
   - 合わせるスクリーンショット：manage-delete-subject・manage-delete-topic・manage-delete-question・manage-delete-error
   - delete が写る次の画像も撮り直す：manage-default・manage-subject-open・manage-topic-open・manage-topics-many・manage-many・manage-many-mobile・manage-loading・manage-error・manage-export-error
