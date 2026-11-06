@@ -280,3 +280,41 @@ test("manage-error：読み込めなかったら帯と retry を出し、retry �
   await expect(rows(page)).toHaveCount(3);
   await expect(loadError(page)).toHaveCount(0);
 });
+
+test("export Python で、Topic で絞っていても Subject の問題を python.json に保存する", async ({
+  page,
+}) => {
+  await resetPython();
+  await openManage(page);
+  await choose(page, "topic", "Decorators");
+  await expect(rows(page)).toHaveCount(3);
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "export Python" }).click();
+  const file = await download;
+  expect(file.suggestedFilename()).toBe("python.json");
+  // 中身の項目と並びは export.test.ts で確かめる。ここでは Subject の全部が入っていることだけを見る
+  const content = JSON.parse(
+    await (
+      await file.createReadStream()
+    )
+      .toArray()
+      .then((chunks) => Buffer.concat(chunks).toString("utf8")),
+  );
+  expect(content.questions).toHaveLength(10);
+});
+
+test("manage-export-error：書き出せなかったら、絞り込みの下に帯を出す", async ({
+  page,
+}) => {
+  await resetPython();
+  await openManage(page);
+  await page.route("/manage", (route) =>
+    isServerAction(route.request()) ? route.abort() : route.continue(),
+  );
+  await page.getByRole("button", { name: "export Python" }).click();
+  await expect(loadError(page)).toHaveText(/Couldn't export Python\./);
+  await expect(rows(page)).toHaveCount(10);
+  await expect(page).toHaveScreenshot("manage-export-error.png", {
+    fullPage: true,
+  });
+});
