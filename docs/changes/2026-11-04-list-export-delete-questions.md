@@ -44,7 +44,7 @@
 ### 書き出し
 
 - export <Subject の名前>（例：export Python）で、選んでいる Subject の全部の問題を、1つのファイルに保存する。Topic で絞っていても、Subject の全部を書き出す
-- ファイルの名前は、Subject の名前を小文字にし、空白とファイル名に使えない記号を「-」にしたもの（Python → python.json、Web API → web-api.json）。続くものは1つの「-」にまとめ、頭と終わりの「-」は除く（C++ / Rust → c++-rust.json）
+- ファイルの名前は、Subject の名前を小文字にし、空白とファイル名に使えない記号を「-」にしたもの（Python → python.json、Web API → web-api.json）。続くものは1つの「-」にまとめ、頭と終わりの「-」は除く（C++ / Rust → c++-rust.json）。それで名前が空になるときは subject.json
 - ファイルには、取り込むファイルと同じ項目だけを入れる（記録は入れない）。問題は取り込んだ順
 - 書き出したファイルは、そのまま Import で取り込み直せる。取り込み直すと、全部「変わらない」になる
   - 取り込み直せるのは、Import の上限（1,000問・4MB）までの Subject。上限を超える Subject も、止めずに書き出す
@@ -121,6 +121,7 @@
 - [x] （`/dev-plan` で）覚えていたページがなくなったら（問題が減ったなど）？ → 最後のページ。覚えていた Subject・Topic がなくなっていたら、最初の Subject・All topics
 - [x] （`/dev-plan` で）最後の Subject を消したら（次がない）？ → 前の Subject
 - [x] （`/dev-impl` のタスク1で）覚えていた Topic がなくなって All topics にしたとき、ページは？ → 1ページ目
+- [x] （`/dev-impl` のタスク3で）Subject の名前が記号だけで、ファイルの名前が空になるときは？ → subject.json
 - [x] （`/dev-plan` で）ファイルの名前で、空白や記号が続くときは？ → 1つの「-」にまとめ、頭と終わりの「-」は除く
 - [x] （`/dev-plan` で）delete を押してから消え終わるまでは？ → cancel と delete を押せなくする（文言は変えない）。Esc でも閉じない
 
