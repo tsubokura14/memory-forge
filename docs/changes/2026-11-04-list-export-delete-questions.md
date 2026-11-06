@@ -134,6 +134,8 @@
 - [x] （`/dev-impl` のタスク4で）「Couldn't delete.」の帯はいつ消す？ → 閉じて開き直したときと、もう一度 delete を押したとき
 - [x] （`/dev-impl` のタスク4で）別のタブで消していて、消すものがもうなかったら？ → 消せたのと同じに扱う（帯を出さず、一覧を組み立て直す）
 - [x] （`/dev-impl` のタスク4で）合意した画像では、問題文の1行目がダイアログの説明の上にある。設計（説明の下に中身を足す）と違うが？ → 説明の上にも足せる形に設計を直す（「設計」の「画面」の表）
+- [x] （`/dev-impl` のタスク4で）削除のダイアログの幅が、合意した画像より狭い（解く画面の quit のダイアログと同じ幅）。どうする？ → 今の幅のまま
+- [x] （`/dev-impl` のタスク4で）manage-export-error にも delete が写る。撮り直す？ → 撮り直す（タスク4の撮り直しに足す）
 
 ## 調べたこと
 
@@ -234,4 +236,4 @@
   - export が写る次の画像も撮り直す：manage-default・manage-subject-open・manage-topic-open・manage-topics-many・manage-many・manage-many-mobile・manage-loading・manage-error
 - [ ] 4. Subject・Topic・1問を、確認してから消せたら完了。`delete.ts`・`nextSubjectAfterDelete` とテストも、このタスクで作る
   - 合わせるスクリーンショット：manage-delete-subject・manage-delete-topic・manage-delete-question・manage-delete-error
-  - delete が写る次の画像も撮り直す：manage-default・manage-subject-open・manage-topic-open・manage-topics-many・manage-many・manage-many-mobile・manage-loading・manage-error
+  - delete が写る次の画像も撮り直す：manage-default・manage-subject-open・manage-topic-open・manage-topics-many・manage-many・manage-many-mobile・manage-loading・manage-error・manage-export-error
