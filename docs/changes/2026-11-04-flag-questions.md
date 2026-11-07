@@ -140,6 +140,7 @@
 - [x] （`/dev-plan` で）Setup の Topic の行の印の数と、身についている具合に印を数えないことは、まだない #9 の線と数の上にある。どうする？ → #9 に回す。#12 では作らず、Issue #9 に書き残す。Setup の画像は #9 の分を除いて合わせる
 - [x] （`/dev-plan` で）unflag できなかったときは？ → 絞り込みの下に danger の帯「Couldn't unflag k3f9a2.」（retry なし）
 - [x] （`/dev-plan` で）flagged を押したあとの読み込み中と読み込めなかったときは？ → Subject・Topic を選んだときと同じ
+- [x] （`/dev-impl` のタスク1で）Result の % を null にすると、今の Result の画面が型エラーになる。どうする？ → タスク1では `result-view.tsx` で null のときに 0 を渡す1行を足す（印を付ける画面がまだないので null にならず、見た目は変わらない）。タスク2で「—」の表示に置き換える
 
 ## 調べたこと
 
