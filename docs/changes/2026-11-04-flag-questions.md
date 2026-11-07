@@ -19,6 +19,7 @@
   - Solve：flag のボタン、答える前・答えたあとの flag、進み具合の数
   - Result：flagged · not counted の数（今は いつも 0）、数える問題が0問のときの表示
   - 記録：答える前に印を付けた問題は記録しない
+- `docs/specs/home.md`：Subject の今の身についている具合（印の付いた問題を除く）
 - `docs/specs/import.md`：取り込む前の確認（印の付いた問題が置き換わるとき）、取り込んだあと（印と記録のリセット）
 - `docs/specs/manage.md`：印の付いた問題の一覧、unflag、export flagged（→「決まっていないこと」の1つ目）
 
@@ -34,29 +35,41 @@
 
 - 答える前・答えたあとのどちらでも、flag を押せる
 - 答える前に flag を押すと、答えずに次の問題に進み、その問題は記録しない。上に「flagged — moved on without recording」の知らせを出す
+  - 知らせは、次の操作（選ぶ・submit・skip・flag）まで出す
+  - 最後の問題で答える前に flag を押すと、Result に移る（知らせは出さない）
+  - 正解・不正解の数は増やさず、問題の番号と線は進める
 - 答えたあとに flag を押すと、その場でボタンが flagged に変わる。答えた記録は残る
 - 印を付けた問題は、ほかの解く回でも出題しない
+- 印を付けられなかったときは、答えの保存と同じ danger の帯「Couldn't flag this question.」と retry を出す。答える前の flag なら、次の問題に進まない
 
 ### Setup
 
 - 出せる問題の数・start の数・「〜 has only 8 questions to ask.」は、印の付いた問題を除いて数える
-- 選んだ Topic（All なら Subject）の問題に全部印が付いていると、start を押せない
+- 選んだ Topic（All なら Subject）の問題に全部印が付いていると、warning の文字で「No questions to ask — all in Decorators are flagged.」（All なら Subject の名前）と出し、start · 0 を薄くして押せない。lowest accuracy で、解いた問題が全部印付きのときも同じ
+- Topic の行には、印の付いた問題の数を出さない
+
+### Home・Setup の今の身についている具合
+
+- Home の Subject と Setup の Topic の線・「30 correct · 10 wrong · 8 new」・% には、印の付いた問題を数えない
 
 ### Result
 
 - flagged · not counted に、この回で印を付けた問題の数を出す
+- 印を付けた問題は、答える前でも答えたあとでも、得点・正答率・correct / incorrect / skipped・by topic に数えない（答えたあとに付けた問題の記録は残る）
 - 数える問題が0問のときは、円を線だけにし、% と得点を muted の「—」、得点の下を「no questions counted」にする。by topic の一覧は出さない
 
 ### Manage
 
 - Subject ごとに、印の付いた問題だけの一覧を見られる
+  - 0件のときは、点線の枠で「No flagged questions in Python.」を出す
 - unflag で、その場で印が外れる。外しても記録は変わらない
 - export flagged · <Subject の名前> で、印の付いた問題を書き出す
 
 ### Import
 
-- 取り込む前の確認で、印の付いた問題が置き換わるときは「flag and records reset」と出す
+- 取り込む前の確認で、印の付いた問題が置き換わるときは、その問題の行の右に warning の文字で「flag and records reset」と出す
 - 取り込むと、置き換わった印の付いた問題は、印が消え、その問題の記録も消える
+- 印の付いた問題が「変わらない」ときは、印も記録もそのまま
 
 ## 画面
 
@@ -77,15 +90,16 @@
 ## 決まっていないこと
 
 - [x] Manage の一覧・書き出しは、まだない #11（一覧・書き出し・削除）で作る。#12 をどう進める？ 案：(a) #11 を先に作り、そのあと #12 を全部作る (b) #12 は Solve・Setup・Result・Import だけにし、Manage の flagged・unflag・export flagged は #11 のあと（#11 に含めるか、別の Issue） → (a)。#11 を先に作り、#12 は Manage の flagged・unflag・export flagged も含めて全部作る
-- [ ] 答える前の flag の知らせは、いつ消える？（次の操作まで／数秒で）。最後の問題で答える前に flag したら、Result に移り、知らせは出さない？
-- [ ] 答える前に flag した問題は、Solve の上の数（正解・不正解）と番号・線をどう進める？ 案：正解・不正解の数は増やさず、番号と線は進める
-- [ ] 答えたあとに flag した問題は、Result の得点・正答率・correct / incorrect / skipped・by topic に数える？ 「flagged · not counted」「全部に印を付けて数える問題がないとき」からは、数えない（答える前でも答えたあとでも、印の付いた問題は全部 not counted）と読める
-- [ ] 印を付けるのに失敗したとき（つながらない）の表示と文言は？ 案：答えの保存と同じ danger の帯「Couldn't flag this question.」と retry
-- [ ] Setup で全部に印が付いているときの文言は？ 案：warning の文字で「No questions to ask — all in Decorators are flagged.」（lowest accuracy の案内に合わせる）。lowest accuracy で、解いた問題が全部印付きのときも同じ？
-- [ ] Setup の Topic の行に、印の付いた問題の数を出す？（出さない案）
-- [ ] 印の付いた問題が、取り込み直して「変わらない」（中身が同じ）だったときは、印と記録はそのまま？
-- [ ] 取り込む前の確認の「flag and records reset」は、どこに出す？ 案：置き換わる問題の行の右に、warning の文字で
-- [ ] Manage の flagged の一覧が0件のときの文言は？ 案：点線の枠で「No flagged questions in Python.」
+- [x] 答える前の flag の知らせは、いつ消える？（次の操作まで／数秒で）。最後の問題で答える前に flag したら、Result に移り、知らせは出さない？ → 次の操作（選ぶ・submit・skip・flag）まで出す。最後の問題では Result に移り、知らせは出さない
+- [x] 答える前に flag した問題は、Solve の上の数（正解・不正解）と番号・線をどう進める？ 案：正解・不正解の数は増やさず、番号と線は進める → 案のまま
+- [x] 答えたあとに flag した問題は、Result の得点・正答率・correct / incorrect / skipped・by topic に数える？ 「flagged · not counted」「全部に印を付けて数える問題がないとき」からは、数えない（答える前でも答えたあとでも、印の付いた問題は全部 not counted）と読める → 数えない（答えた記録は残す）
+- [x] 印を付けるのに失敗したとき（つながらない）の表示と文言は？ 案：答えの保存と同じ danger の帯「Couldn't flag this question.」と retry → 案のまま
+- [x] Setup で全部に印が付いているときの文言は？ 案：warning の文字で「No questions to ask — all in Decorators are flagged.」（lowest accuracy の案内に合わせる）。lowest accuracy で、解いた問題が全部印付きのときも同じ？ → 案のまま。lowest accuracy のときも同じ
+- [x] Setup の Topic の行に、印の付いた問題の数を出す？（出さない案） → 出さない
+- [x] 印の付いた問題が、取り込み直して「変わらない」（中身が同じ）だったときは、印と記録はそのまま？ → そのまま
+- [x] 取り込む前の確認の「flag and records reset」は、どこに出す？ 案：置き換わる問題の行の右に、warning の文字で → 案のまま
+- [x] Manage の flagged の一覧が0件のときの文言は？ 案：点線の枠で「No flagged questions in Python.」 → 案のまま
+- [x] Home の Subject と Setup の Topic の今の身についている具合（線・数・%）に、印の付いた問題を数える？ → 数えない
 
 ## 調べたこと
 
