@@ -58,21 +58,27 @@ describe("pickQuestions", () => {
 
 describe("startNotice", () => {
   test("出せる数が選んだ問題数と同じなら、その数で案内なし", () => {
-    expect(startNotice({ total: 10, answered: 0 }, "in-order", 10)).toEqual({
+    expect(
+      startNotice({ total: 10, answered: 0, flagged: 0 }, "in-order", 10),
+    ).toEqual({
       count: 10,
       notice: "none",
     });
   });
 
   test("出せる数が選んだ問題数より1つ少ないと、ある分の数で few", () => {
-    expect(startNotice({ total: 9, answered: 0 }, "random", 10)).toEqual({
+    expect(
+      startNotice({ total: 9, answered: 0, flagged: 0 }, "random", 10),
+    ).toEqual({
       count: 9,
       notice: "few",
     });
   });
 
   test("all は、出せる数の全部で案内なし", () => {
-    expect(startNotice({ total: 8, answered: 0 }, "in-order", "all")).toEqual({
+    expect(
+      startNotice({ total: 8, answered: 0, flagged: 0 }, "in-order", "all"),
+    ).toEqual({
       count: 8,
       notice: "none",
     });
@@ -80,28 +86,55 @@ describe("startNotice", () => {
 
   test("lowest accuracy は、解いた問題の数で数える", () => {
     expect(
-      startNotice({ total: 12, answered: 3 }, "lowest-accuracy", 5),
+      startNotice({ total: 12, answered: 3, flagged: 0 }, "lowest-accuracy", 5),
     ).toEqual({ count: 3, notice: "few" });
   });
 
   test("lowest accuracy で解いた問題がないと unanswered", () => {
     expect(
-      startNotice({ total: 12, answered: 0 }, "lowest-accuracy", "all"),
+      startNotice(
+        { total: 12, answered: 0, flagged: 0 },
+        "lowest-accuracy",
+        "all",
+      ),
+    ).toEqual({ count: 0, notice: "unanswered" });
+  });
+
+  test("選んだ問題が全部印付きなら、どの順番でも flagged", () => {
+    expect(
+      startNotice({ total: 0, answered: 0, flagged: 8 }, "in-order", 10),
+    ).toEqual({ count: 0, notice: "flagged" });
+    expect(
+      startNotice({ total: 0, answered: 0, flagged: 8 }, "lowest-accuracy", 10),
+    ).toEqual({ count: 0, notice: "flagged" });
+  });
+
+  test("lowest accuracy で、印のない問題があって解いた問題がないだけなら unanswered", () => {
+    expect(
+      startNotice({ total: 5, answered: 0, flagged: 3 }, "lowest-accuracy", 10),
     ).toEqual({ count: 0, notice: "unanswered" });
   });
 });
 
 describe("topicStats", () => {
   const topics = [
-    { name: "Decorators", total: 12, answered: 3 },
-    { name: "Typing", total: 8, answered: 0 },
+    { name: "Decorators", total: 12, answered: 3, flagged: 1 },
+    { name: "Typing", total: 8, answered: 0, flagged: 2 },
   ];
 
   test("Topic を選ぶと、その Topic の数", () => {
-    expect(topicStats(topics, "Typing")).toEqual({ total: 8, answered: 0 });
+    expect(topicStats(topics, "Typing")).toEqual({
+      total: 8,
+      answered: 0,
+      flagged: 2,
+    });
   });
 
   test("All（null）は、全部の Topic の数を足す", () => {
-    expect(topicStats(topics, null)).toEqual({ total: 20, answered: 3 });
+    expect(topicStats(topics, null)).toEqual({
+      total: 20,
+      answered: 3,
+      flagged: 3,
+    });
   });
 });

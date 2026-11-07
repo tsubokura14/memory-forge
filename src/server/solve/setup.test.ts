@@ -1,3 +1,4 @@
+import { inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test } from "vitest";
 import { db } from "@/server/db/client";
 import { answers, questions, subjects } from "@/server/db/schema";
@@ -51,9 +52,29 @@ describe("getSetup", () => {
     expect(await getSetup(python)).toEqual({
       name: "Python",
       topics: [
-        { name: "Generators", total: 2, answered: 2 },
-        { name: "Decorators", total: 1, answered: 0 },
+        { name: "Generators", total: 2, answered: 2, flagged: 0 },
+        { name: "Decorators", total: 1, answered: 0, flagged: 0 },
       ],
+    });
+  });
+
+  test("印の付いた問題は、問題の数と解いた問題の数に入れず、印の数に数える", async () => {
+    const python = await insertSubject("Python");
+    const a = await insertQuestion(python, "a1", "Typing");
+    const b = await insertQuestion(python, "b2", "Typing");
+    const c = await insertQuestion(python, "c3", "Typing");
+    await db.insert(answers).values([
+      { questionId: a, correct: true },
+      { questionId: b, correct: false },
+    ]);
+    await db
+      .update(questions)
+      .set({ flagged: true })
+      .where(inArray(questions.id, [a, c]));
+
+    expect(await getSetup(python)).toEqual({
+      name: "Python",
+      topics: [{ name: "Typing", total: 1, answered: 1, flagged: 2 }],
     });
   });
 

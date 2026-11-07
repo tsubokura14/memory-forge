@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test } from "vitest";
 import { db } from "@/server/db/client";
 import { answers, questions, subjects } from "@/server/db/schema";
@@ -58,6 +59,15 @@ describe("startSession", () => {
       },
       expect.objectContaining({ questionId: "c3" }),
     ]);
+  });
+
+  test("印の付いた問題は出さない", async () => {
+    await db
+      .update(questions)
+      .set({ flagged: true })
+      .where(eq(questions.id, ids.a1));
+    const picked = await startSession(python, null, "in-order", "all");
+    expect(questionIds(picked)).toEqual(["b2", "c3"]);
   });
 
   test("All（null）は、その Subject の全部の Topic から出す", async () => {
