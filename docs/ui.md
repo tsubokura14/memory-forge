@@ -116,7 +116,9 @@
   - 数える問題が0問（全部に不備の印）のときは、円を線だけにし、% と得点を muted の「—」、得点の下を「no questions counted」にする。Topic ごとの一覧は出さない
 - 外のページ（GitHub のドキュメントなど）へのリンク：枠で囲んだ1行にし、左に内容を表す印（説明なら menu_book を primary の色で）、真ん中に題と短い説明、右に open_in_new の印を置く。別のタブで開く
   - アプリの中の画面へ移るリンクと見分けられるようにするため
-- 取り消せない操作（削除）：ボタンは danger の文字。Subject と Topic の削除は、それぞれのプルダウンのすぐ右に、delete の印だけの枠のボタンを置く（指を乗せると danger）。Topic が「All topics」のときは、Topic の削除のボタンを出さない。押したら確認のダイアログを出し、消えるもの（問題数、記録）と、取り消せないことを書く
+- 取り消せない操作（削除）：Subject と Topic の削除は、それぞれのプルダウンのすぐ右に、delete の印だけの枠のボタンを置く（指を乗せると danger）。Topic が「All topics」のときは、Topic の削除のボタンを出さない。押したら確認のダイアログを出し、消えるもの（問題数、記録）と、取り消せないことを書く
+  - 一覧の行の削除（Manage の1問）：行の右に、muted の等幅の「delete」を枠のない文字だけのボタンで置く。指を乗せると danger の文字と danger-soft の地
+  - 確認のダイアログ：右下に cancel（枠だけ）と delete（danger の地と on-primary の文字）。1つのものを消すときは、何を消すのか（問題文の1行目など）を説明の上に出す。消せなかったときは、ダイアログを閉じずに、ボタンの上に danger の帯を出す
 - 不備の印が付いているもの：warning の色で flag の印と数を出す。一覧の行は、warning-soft の地にする
   - Manage の問題の行には、flag の印と「unflag」を warning の文字のボタンで出し、押すと印が外れる
 - 書き出しのボタン（Manage）：「export Python」のように Subject の名前を入れる。印の一覧を見ているときは「export flagged · Python」
