@@ -2,7 +2,7 @@ import { eq, min, sql } from "drizzle-orm";
 import { db } from "@/server/db/client";
 import { answers, questions, subjects } from "@/server/db/schema";
 
-// total と answered は印のない問題だけを数え、印の付いた問題は flagged に数える（印の付いた問題は出題しないため）
+// total と answered は印のない問題だけを数え、印の付いた問題は flagged に数える
 export type TopicStats = {
   name: string;
   total: number;
