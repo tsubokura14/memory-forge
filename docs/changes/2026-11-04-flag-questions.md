@@ -212,7 +212,7 @@
 
 ## タスク
 
-- [ ] 1. `questions.flagged` と、印を付ける・外す決まり、解く側の数え方（`flag.ts`・`setup.ts`・`pick.ts`・`start.ts`・`result.ts` とテスト）ができたら完了。画面は変えない
+- [x] 1. `questions.flagged` と、印を付ける・外す決まり、解く側の数え方（`flag.ts`・`setup.ts`・`pick.ts`・`start.ts`・`result.ts` とテスト）ができたら完了。画面は変えない
 - [ ] 2. Solve で印を付けられ、Setup と Result が印を除いて数えたら完了
   - 合わせるスクリーンショット：solve-question・solve-answered-flagged・solve-flagged・setup-default・setup-none・result-default・result-all-flagged（Setup は、身についている具合の線と数を除いて合わせる）
   - flag が写る次の画像も撮り直す：solve-question・solve-answered・solve-explanation・solve-multiple・solve-answered-multiple・solve-code-choices・solve-answered-code-choices・solve-last・solve-many・solve-error・solve-quit
