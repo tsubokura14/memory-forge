@@ -56,7 +56,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 
 - Manage で選んでいる Subject の id・Topic の名前（All topics は null）・ページは、1つの cookie（`manage`。JSON）に持つ。名前は `src/app/(app)/manage/cookie.ts`
   - 画面（`src/app/(app)/manage/page.tsx`）は、cookie を読んで一覧をサーバーで組み立てる
-  - 選び方を変えるアクション（`src/app/(app)/manage/actions.ts`）が cookie を書く。cookie を書くと、Next.js が同じ画面をサーバーで組み立て直して返すので、一覧を読み直す処理を別に持たない
+  - 選び方を変えるアクションと消すアクション（`src/app/(app)/manage/actions.ts`）が cookie を書く。消すアクションは、消したあとに出す選び方を書く。cookie を書くと、Next.js が同じ画面をサーバーで組み立て直して返すので、一覧を読み直す処理を別に持たない
   - 読むときも書くときも `src/server/manage/selection.ts` の `parseSaved` で形を確かめ、なくなった Subject・Topic・ページは `resolveSelection` で今あるものに合わせる
 - 理由：読み込み直したときと、ほかの画面（Home の manage、Import の戻るリンク）から来たときに、同じ選び方のまま開くため。URL に持つと、リンクから来たときに選び方がなくなる
 - 前提（崩れたら見直す）：選び方を、ほかの端末と分け合わない。ブラウザの戻るで、ページを1つずつ戻らなくてよい。cookie はブラウザを閉じるまでのもの（期限を付けない）
@@ -139,6 +139,9 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 - 問題
   - `subjects`：Subject ごとの行。名前は重ならない
   - `questions`：問題ごとの行。Subject とファイルの ID の組み合わせは重ならない（データベースの決まりでも守る）。Subject を消すと、その問題も消える
+  - 問題が1つもなくなった Subject は、Manage で Topic や1問を消すときに、同じトランザクションの中で消す（`src/server/manage/delete.ts`）
+    - 理由：Home の一覧（`src/server/subjects/subjects.ts`）は `subjects` の表をそのまま並べるので、残すと問題のない Subject が出るため。Manage の一覧（`src/server/manage/list.ts`）は、問題のある Subject だけを並べる
+    - 前提（崩れたら見直す）：問題を減らす操作は Manage の削除だけ（取り込み直しは問題を消さない）。問題を消すほかの操作を足すときは、同じように空の Subject を消す
   - Topic は表にせず、`questions` の列に名前で持つ。Topic の一覧は、問題を Topic の名前でまとめて作る
     - 理由：Topic は Subject の中の名前で見分ける（`docs/overview.md`）。問題が1つもなくなった Topic は、何もしなくても消える
     - 前提（崩れたら見直す）：Topic に、名前のほかの情報（並び順、説明など）を持たせない。持たせるなら表にする

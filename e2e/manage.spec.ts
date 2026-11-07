@@ -318,3 +318,160 @@ test("manage-export-error：書き出せなかったら、絞り込みの下に�
     fullPage: true,
   });
 });
+
+function dialog(page: Page) {
+  return page.getByRole("dialog");
+}
+
+test("manage-delete-subject：cancel と Esc ではそのまま、delete で消えて次の Subject になる", async ({
+  page,
+}) => {
+  await resetPython();
+  await openManage(page);
+  await page.getByRole("button", { name: "delete subject" }).click();
+  await expect(dialog(page)).toContainText(
+    "5 topics, 10 questions and their records will be deleted.",
+  );
+  await expect(page).toHaveScreenshot("manage-delete-subject.png", {
+    fullPage: true,
+  });
+
+  await page.keyboard.press("Escape");
+  await expect(dialog(page)).toBeHidden();
+  await page.getByRole("button", { name: "delete subject" }).click();
+  await dialog(page).getByRole("button", { name: "cancel" }).click();
+  await expect(dialog(page)).toBeHidden();
+  await expect(rows(page)).toHaveCount(10);
+
+  await page.getByRole("button", { name: "delete subject" }).click();
+  await dialog(page).getByRole("button", { name: "delete" }).click();
+  await expect(dropdown(page, "subject")).toHaveText(/AWS SAA/);
+  await expect(page.getByText("1–50 of 240")).toBeVisible();
+  await dropdown(page, "subject").click();
+  await expect(page.getByRole("option")).toHaveCount(3);
+});
+
+test("最後の Subject を消すと前の Subject、Subject が1つもなくなると0件の表示", async ({
+  page,
+}) => {
+  await resetQuestions([
+    { name: "Python", questions: many("py", 1) },
+    { name: "Linux", questions: many("linux", 1) },
+  ]);
+  await openManage(page);
+  await choose(page, "subject", "Linux");
+  await page.getByRole("button", { name: "delete subject" }).click();
+  await expect(dialog(page)).toContainText(
+    "1 topic, 1 question and its records will be deleted.",
+  );
+  await dialog(page).getByRole("button", { name: "delete" }).click();
+  await expect(dropdown(page, "subject")).toHaveText(/Python/);
+
+  // 最後の1問を消すと、Subject も消える
+  await rows(page).first().getByRole("button", { name: "delete" }).click();
+  await dialog(page).getByRole("button", { name: "delete" }).click();
+  await expect(page.getByText("No subjects yet.")).toBeVisible();
+});
+
+test("manage-delete-topic：All topics では Topic の delete を出さず、Topic を消すと All topics になる", async ({
+  page,
+}) => {
+  await resetPython();
+  await openManage(page);
+  await expect(page.getByRole("button", { name: "delete topic" })).toHaveCount(
+    0,
+  );
+  await choose(page, "topic", "Typing");
+  await expect(rows(page)).toHaveCount(1);
+  await page.getByRole("button", { name: "delete topic" }).click();
+  await expect(dialog(page)).toContainText(
+    "1 question and its records will be deleted.",
+  );
+  await page.keyboard.press("Escape");
+
+  await choose(page, "topic", "Decorators");
+  await expect(rows(page)).toHaveCount(3);
+  await page.getByRole("button", { name: "delete topic" }).click();
+  await expect(dialog(page)).toContainText(
+    "3 questions and their records will be deleted.",
+  );
+  await expect(page).toHaveScreenshot("manage-delete-topic.png", {
+    fullPage: true,
+  });
+  await dialog(page).getByRole("button", { name: "delete" }).click();
+  await expect(dropdown(page, "topic")).toHaveText(/All topics/);
+  await expect(rows(page)).toHaveCount(7);
+});
+
+test("manage-delete-question：1問を消す", async ({ page }) => {
+  await resetPython();
+  await openManage(page);
+  await rows(page).first().getByRole("button", { name: "delete" }).click();
+  await expect(dialog(page)).toContainText(
+    "次のコードを実行したとき、出力されるものはどれか。",
+  );
+  await expect(page).toHaveScreenshot("manage-delete-question.png", {
+    fullPage: true,
+  });
+  await dialog(page).getByRole("button", { name: "delete" }).click();
+  await expect(rows(page)).toHaveCount(9);
+  await expect(page.getByText("k3f9a2")).toHaveCount(0);
+});
+
+test("1問を消して今のページが空になったら、前のページを出す", async ({
+  page,
+}) => {
+  await resetQuestions([{ name: "Python", questions: many("py", 51) }]);
+  await openManage(page);
+  await page.getByRole("button", { name: "page 2" }).click();
+  await expect(page.getByText("51–51 of 51")).toBeVisible();
+  await rows(page).first().getByRole("button", { name: "delete" }).click();
+  await dialog(page).getByRole("button", { name: "delete" }).click();
+  await expect(page.getByText("1–50 of 50")).toBeVisible();
+});
+
+test("消している間は cancel と delete を押せず、Esc でも閉じない", async ({
+  page,
+}) => {
+  await resetPython();
+  await openManage(page);
+  // 返事を返さずに止める
+  await page.route("/manage", async (route) => {
+    if (!isServerAction(route.request())) await route.continue();
+  });
+  await rows(page).first().getByRole("button", { name: "delete" }).click();
+  await dialog(page).getByRole("button", { name: "delete" }).click();
+  await expect(
+    dialog(page).getByRole("button", { name: "delete" }),
+  ).toBeDisabled();
+  await expect(
+    dialog(page).getByRole("button", { name: "cancel" }),
+  ).toBeDisabled();
+  await page.keyboard.press("Escape");
+  await expect(dialog(page)).toBeVisible();
+});
+
+test("manage-delete-error：消せなかったら、ダイアログの中に帯を出し、何も消さない", async ({
+  page,
+}) => {
+  await resetPython();
+  await openManage(page);
+  await choose(page, "topic", "Decorators");
+  await expect(rows(page)).toHaveCount(3);
+  await page.route("/manage", (route) =>
+    isServerAction(route.request()) ? route.abort() : route.continue(),
+  );
+  await page.getByRole("button", { name: "delete topic" }).click();
+  await dialog(page).getByRole("button", { name: "delete" }).click();
+  await expect(dialog(page).getByRole("alert")).toHaveText("Couldn't delete.");
+  await expect(page).toHaveScreenshot("manage-delete-error.png", {
+    fullPage: true,
+  });
+
+  // 閉じて開き直すと、帯は消えている
+  await dialog(page).getByRole("button", { name: "cancel" }).click();
+  await page.getByRole("button", { name: "delete topic" }).click();
+  await expect(dialog(page).getByRole("alert")).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await expect(rows(page)).toHaveCount(3);
+});
