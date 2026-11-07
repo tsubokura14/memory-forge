@@ -33,24 +33,26 @@
 
 ### Solve
 
-- 答える前・答えたあとのどちらでも、flag を押せる
-- 答える前に flag を押すと、答えずに次の問題に進み、その問題は記録しない。上に「flagged — moved on without recording」の知らせを出す
+- 問題の上の行の右に、flag のボタンを出す。答える前・答えたあとのどちらでも押せる
+- 答える前に flag を押すと、答えずに次の問題に進み、その問題は記録しない。上に「k3f9a2 flagged — moved on without recording.」（印を付けた問題の ID）の知らせを出す
   - 知らせは、次の操作（選ぶ・submit・skip・flag）まで出す
   - 最後の問題で答える前に flag を押すと、Result に移る（知らせは出さない）
   - 正解・不正解の数は増やさず、問題の番号と線は進める
-- 答えたあとに flag を押すと、その場でボタンが flagged に変わる。答えた記録は残る
+- 答えたあとに flag を押すと、その場でボタンが flagged に変わる。答えた記録は残る。Solve の中では印を外せない
 - 印を付けた問題は、ほかの解く回でも出題しない
 - 印を付けられなかったときは、答えの保存と同じ danger の帯「Couldn't flag this question.」と retry を出す。答える前の flag なら、次の問題に進まない
 
 ### Setup
 
 - 出せる問題の数・start の数・「〜 has only 8 questions to ask.」は、印の付いた問題を除いて数える
-- 選んだ Topic（All なら Subject）の問題に全部印が付いていると、warning の文字で「No questions to ask — all in Decorators are flagged.」（All なら Subject の名前）と出し、start · 0 を薄くして押せない。lowest accuracy で、解いた問題が全部印付きのときも同じ
-- Topic の行には、印の付いた問題の数を出さない
+- Topic の行（All を含む）の数の並びの終わりに、印の付いた問題があれば、warning の flag の印と数を出す
+- 選んだ Topic（All なら Subject）に印の付いた問題があり、出せる問題が1問以上あるときは、start の上に「⚑1 flagged excluded」（印と数は warning）を出す
+- 選んだ Topic（All なら Subject）の問題に全部印が付いていると、どの順番でも、warning の文字で「No questions to ask — all 8 in Typing are flagged.」（問題の数と Topic の名前。All なら Subject の名前）と出し、start · 0 を薄くして押せない
+  - lowest accuracy で、全部ではないが、印のない解いた問題がないときは、今の「No questions to ask — none in Typing have been answered yet.」
 
 ### Home・Setup の今の身についている具合
 
-- Home の Subject と Setup の Topic の線・「30 correct · 10 wrong · 8 new」・% には、印の付いた問題を数えない
+- Home の Subject と Setup の Topic の線・「30 correct · 10 wrong · 8 new」・% には、印の付いた問題を数えない（全部に印が付いた Topic は「0 correct · 0 wrong · 0 new」と「—」）
 
 ### Result
 
@@ -60,26 +62,48 @@
 
 ### Manage
 
-- Subject ごとに、印の付いた問題だけの一覧を見られる
-  - 0件のときは、点線の枠で「No flagged questions in Python.」を出す
+- 絞り込みの枠の中、Topic のプルダウン（と delete）の右に、flagged のボタンを置く。押すと、印の付いた問題だけの一覧になり、もう一度押すと戻る。押すと1ページ目に戻る
+  - Topic と組み合わせて絞れる（Decorators の印の付いた問題だけ）
+  - Topic を変えても、flagged のまま。Subject を変えると、flagged が外れる
+  - 読み込み直したときや、ほかの画面から戻ったときは、flagged かどうかも、選んでいた Topic・ページと同じく残る
+- flagged の一覧を見ている間は、上の export が「export flagged · Python」になり、Subject の印の付いた問題を全部書き出す（Topic で絞っていても、Subject の全部の印の付いた問題）。ファイルの名前と形は、export <Subject の名前> と同じ
+- Subject と Topic のプルダウンの一覧の行に、印の付いた問題があれば、問題数の左に warning の flag の印と数を出す
+- 印の付いた問題の行は、flagged の一覧でもふつうの一覧でも、warning-soft の地にし、delete の左に「unflag」（flag の印と warning の文字）を出す
 - unflag で、その場で印が外れる。外しても記録は変わらない
-- export flagged · <Subject の名前> で、印の付いた問題を書き出す
+  - ふつうの一覧では、行の地が戻り、unflag が消える
+  - flagged の一覧では、行がすぐに消える。今のページが空になったら前のページ、全部外したら0件の表示
+- flagged の一覧が0件のときは、一覧の場所に点線の枠で「No flagged questions in Python.」を出す（Topic で絞っているときは「No flagged questions in Decorators.」）
+  - Subject に印の付いた問題が1問もないときは、export flagged を出さない（Topic で絞って0件でも、Subject のほかの Topic にあれば出す）
 
 ### Import
 
-- 取り込む前の確認で、印の付いた問題が置き換わるときは、その問題の行の右に warning の文字で「flag and records reset」と出す
+- 取り込む前の確認で、置き換わる問題の見出しを「replaced — records are kept, except for flagged questions」にする
+- 印の付いた問題が置き換わるときは、その問題の行の右に、warning の flag の印と文字で「flag and records reset」と出す
 - 取り込むと、置き換わった印の付いた問題は、印が消え、その問題の記録も消える
 - 印の付いた問題が「変わらない」ときは、印も記録もそのまま
 
 ## 画面
 
-- Solve：flag のボタン、答えたあとの flagged、答える前の flag のあとの知らせ
-- Setup：全部に印が付いているときの表示
-- Result：数える問題が0問のとき（`docs/ui.md` の「解き終わりの結果」に決まりがある）
-- Manage：印の付いた問題の一覧（行は warning-soft の地、flag の印と unflag。`docs/ui.md` にある）、0件のとき
-- Import：取り込む前の確認の「flag and records reset」
+- Solve：問題の上の行の右に、flag（muted の等幅の文字だけのボタン。指を乗せると warning の文字と warning-soft の地）。答えたあとに押すと、warning-soft の地と warning の文字の「flagged」。答える前の flag のあとの知らせは、問題の上に warning の枠と warning-soft の地の帯で、flag の印と等幅の文字
+- Setup：Topic の行の数の並びの終わりに「· ⚑1」（warning）。start の上に「⚑1 flagged excluded」（muted の等幅の小さな文字、印と数は warning）
+- Manage：flagged のボタンは枠だけ（muted の等幅の文字と flag の印）。押している間は warning の枠・warning-soft の地・warning の文字。flagged の一覧の0件は、Subject が0件のときと同じ点線の枠
+- 印を付けられなかったときの帯は、答えの保存の失敗（`docs/specs/screens/solve-error.png`）と同じ見た目で、文言だけが違うので、スクリーンショットを付けない
 
-状態ごとの表示とスクリーンショットは、`/dev-proto` で合わせて足す。
+| 画面 | 状態 | 表示 | スクリーンショット |
+| --- | --- | --- | --- |
+| Setup | 印がある | Decorators と All に「⚑1」、start の上に「⚑1 flagged excluded」 | ![](2026-11-04-flag-questions/setup-default.png) |
+| Setup | 全部に印 | Typing を選び、「No questions to ask — all 8 in Typing are flagged.」と start · 0 | ![](2026-11-04-flag-questions/setup-none.png) |
+| Solve | 答える前 | 問題の上の行の右に flag | ![](2026-11-04-flag-questions/solve-question.png) |
+| Solve | 答えたあとに印 | flagged に変わる | ![](2026-11-04-flag-questions/solve-answered-flagged.png) |
+| Solve | 答える前に印 | 次の問題の上に「k3f9a2 flagged — moved on without recording.」 | ![](2026-11-04-flag-questions/solve-flagged.png) |
+| Result | 印がある | flagged · not counted が 1 | ![](2026-11-04-flag-questions/result-default.png) |
+| Result | 全部に印 | 円を線だけにし、「—」と no questions counted | ![](2026-11-04-flag-questions/result-all-flagged.png) |
+| Manage | 通常 | 印の付いた行は warning-soft の地と unflag、右に flagged のボタン | ![](2026-11-04-flag-questions/manage-default.png) |
+| Manage | Subject を開く | プルダウンの行に印の数 | ![](2026-11-04-flag-questions/manage-subject-open.png) |
+| Manage | Topic を開く | プルダウンの行に印の数 | ![](2026-11-04-flag-questions/manage-topic-open.png) |
+| Manage | flagged | 印の付いた問題だけ。export flagged · Python | ![](2026-11-04-flag-questions/manage-flagged.png) |
+| Manage | flagged が0件 | 点線の枠「No flagged questions in Python.」。export は出さない | ![](2026-11-04-flag-questions/manage-flagged-empty.png) |
+| Import | 取り込む前の確認 | 見出しの「except for flagged questions」と、行の右の「flag and records reset」 | ![](2026-11-04-flag-questions/import-preview.png) |
 
 ## やらないこと
 
@@ -100,6 +124,15 @@
 - [x] 取り込む前の確認の「flag and records reset」は、どこに出す？ 案：置き換わる問題の行の右に、warning の文字で → 案のまま
 - [x] Manage の flagged の一覧が0件のときの文言は？ 案：点線の枠で「No flagged questions in Python.」 → 案のまま
 - [x] Home の Subject と Setup の Topic の今の身についている具合（線・数・%）に、印の付いた問題を数える？ → 数えない
+- [x] （`/dev-proto` で）合意済みのプロトタイプは、Setup の Topic の行に印の数を出している（上では「出さない」と答えた） → プロトタイプどおり出す
+- [x] （`/dev-proto` で）Manage の flagged の一覧が0件の状態が、プロトタイプにない → プロトタイプに足して撮る
+- [x] （`/dev-proto` で）Manage の flagged の絞り込みは、Subject・Topic を変えたとき、読み込み直したときにどうなる？ → Subject を変えると外れ、Topic を変えても残る。読み込み直しても残る
+- [x] （`/dev-proto` で）flagged の一覧で unflag を押すと？ → 行がすぐに消える。ページが空になったら前のページ、全部外したら0件の表示
+- [x] （`/dev-proto` で）flagged の一覧が0件でも、プロトタイプは export flagged を出している（押すと0問のファイルで、取り込めない） → Subject に印の付いた問題がないときは出さない（プロトタイプも直した）
+- [x] （`/dev-proto` で）Topic で絞った flagged の一覧が0件で、Subject のほかの Topic にはあるときは？ → 「No flagged questions in Decorators.」と Topic の名前で出し、export flagged は出す
+- [x] （`/dev-proto` で）プロトタイプの Setup は、身についている具合の数に印の付いた問題を入れていた（上では「数えない」と答えた） → プロトタイプの表示用の数を直す（見た目は変えない）
+- [x] （`/dev-proto` で）印を付けられなかったときの状態が、プロトタイプにない → 文だけ仕様に残す（スクリーンショットは付けない）
+- [x] （`/dev-proto` で）lowest accuracy で、解いた問題は全部印付きだが、印のない解いていない問題があるときは、「all 8 … are flagged」が事実と合わない → 全部に印のときだけ flagged の文言。そうでなければ今の「none … have been answered yet」
 
 ## 調べたこと
 
