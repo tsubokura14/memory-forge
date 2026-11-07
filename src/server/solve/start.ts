@@ -41,6 +41,7 @@ export async function startSession(
     .where(
       and(
         eq(questions.subjectId, subjectId),
+        eq(questions.flagged, false),
         topic === null ? undefined : eq(questions.topic, topic),
       ),
     )

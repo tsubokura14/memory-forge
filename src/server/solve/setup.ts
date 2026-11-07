@@ -1,8 +1,14 @@
-import { countDistinct, eq, min } from "drizzle-orm";
+import { eq, min, sql } from "drizzle-orm";
 import { db } from "@/server/db/client";
 import { answers, questions, subjects } from "@/server/db/schema";
 
-export type TopicStats = { name: string; total: number; answered: number };
+// total と answered は印のない問題だけを数え、印の付いた問題は flagged に数える（印の付いた問題は出題しないため）
+export type TopicStats = {
+  name: string;
+  total: number;
+  answered: number;
+  flagged: number;
+};
 
 export type Setup = { name: string; topics: TopicStats[] };
 
@@ -18,8 +24,18 @@ export async function getSetup(subjectId: number): Promise<Setup | null> {
   const topics = await db
     .select({
       name: questions.topic,
-      total: countDistinct(questions.id),
-      answered: countDistinct(answers.questionId),
+      total:
+        sql<number>`count(distinct ${questions.id}) filter (where not ${questions.flagged})`.mapWith(
+          Number,
+        ),
+      answered:
+        sql<number>`count(distinct ${answers.questionId}) filter (where not ${questions.flagged})`.mapWith(
+          Number,
+        ),
+      flagged:
+        sql<number>`count(distinct ${questions.id}) filter (where ${questions.flagged})`.mapWith(
+          Number,
+        ),
     })
     .from(questions)
     .leftJoin(answers, eq(answers.questionId, questions.id))

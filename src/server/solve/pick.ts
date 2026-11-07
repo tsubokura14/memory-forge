@@ -10,7 +10,8 @@ export type Candidate = {
   answerCount: number;
 };
 
-export type Notice = "none" | "few" | "unanswered";
+// flagged は、選んだ Topic の問題が全部印付きのとき
+export type Notice = "none" | "few" | "unanswered" | "flagged";
 
 // 乱数は、テストで並びを決められるように引数で受け取る
 export function pickQuestions<T extends Candidate>(
@@ -65,13 +66,17 @@ function shuffle<T>(items: T[], random: () => number): T[] {
   return result;
 }
 
-// start に添える数と、案内の種類。stats は、選んだ Topic（All なら全部）の問題の数と解いた問題の数。
+// start に添える数と、案内の種類。stats は、選んだ Topic（All なら全部）の印のない問題の数・解いた問題の数と、印の付いた問題の数。
 // 文言（Topic の名前か Subject の名前か）は画面で決める
 export function startNotice(
-  stats: { total: number; answered: number },
+  stats: TopicTotals,
   order: Order,
   count: Count,
 ): { count: number; notice: Notice } {
+  // 全部に印のときは、どの順番でも flagged（lowest accuracy の unanswered より先に見る）
+  if (stats.total === 0 && stats.flagged > 0) {
+    return { count: 0, notice: "flagged" };
+  }
   const available = order === "lowest-accuracy" ? stats.answered : stats.total;
   if (available === 0 && order === "lowest-accuracy") {
     return { count: 0, notice: "unanswered" };
@@ -82,15 +87,18 @@ export function startNotice(
   return { count: available, notice: "few" };
 }
 
-// 選んだ Topic（null は All で、全部の Topic を足す）の、問題の数と解いた問題の数
+type TopicTotals = { total: number; answered: number; flagged: number };
+
+// 選んだ Topic（null は All で、全部の Topic を足す）の、問題の数・解いた問題の数・印の付いた問題の数
 export function topicStats(
-  topics: { name: string; total: number; answered: number }[],
+  topics: ({ name: string } & TopicTotals)[],
   topic: string | null,
-): { total: number; answered: number } {
+): TopicTotals {
   const chosen =
     topic === null ? topics : topics.filter((t) => t.name === topic);
   return {
     total: chosen.reduce((sum, t) => sum + t.total, 0),
     answered: chosen.reduce((sum, t) => sum + t.answered, 0),
+    flagged: chosen.reduce((sum, t) => sum + t.flagged, 0),
   };
 }
