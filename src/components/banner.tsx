@@ -1,8 +1,10 @@
-// 帯。danger は誤り（読み込み・保存のエラーなど）、success は答え合わせの正解（解く画面の結果の帯）。
+// 帯。danger は誤り（読み込み・保存のエラーなど）、success は答え合わせの正解（解く画面の結果の帯）、
+// warning は答える前に印を付けたときの知らせ。
 // action には、右に置くボタン（読み込みのエラーの retry など）を渡す
 const TONES = {
   danger: "border-danger bg-danger-soft text-danger",
   success: "border-success bg-success-soft text-success",
+  warning: "border-warning bg-warning-soft text-warning",
 };
 
 export function Banner({

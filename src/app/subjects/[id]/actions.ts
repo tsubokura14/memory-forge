@@ -6,6 +6,7 @@ import {
   answerQuestion,
   skipQuestion,
 } from "@/server/solve/answer";
+import { flagQuestion } from "@/server/solve/flag";
 import type { Count, Order } from "@/server/solve/pick";
 import { type SolveQuestion, startSession } from "@/server/solve/start";
 
@@ -30,4 +31,9 @@ export async function answerAction(
 export async function skipAction(id: number): Promise<void> {
   await requireSession();
   await skipQuestion(id);
+}
+
+export async function flagAction(id: number): Promise<void> {
+  await requireSession();
+  await flagQuestion(id);
 }

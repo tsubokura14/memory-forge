@@ -27,15 +27,22 @@ export function ResultView({
         <PageHeader crumbs={["session complete"]} title={name} />
         <div className="flex flex-col gap-2">
           <section className="flex items-center justify-center gap-8 rounded-md border border-border bg-surface px-4 py-6">
-            {/* 数える問題が0問（null）のときの表示は、印を付ける画面と一緒に作る（#12 のタスク2）。それまで null にはならない */}
-            <AccuracyRing accuracy={result.accuracy ?? 0} />
+            <AccuracyRing accuracy={result.accuracy} />
             <div className="flex flex-col gap-2">
-              <p className="text-display">
-                <span className="text-success">{result.correct}</span>
-                <span className="text-muted">/</span>
-                {result.total}
+              {result.accuracy === null ? (
+                <p className="text-display text-muted">—</p>
+              ) : (
+                <p className="text-display">
+                  <span className="text-success">{result.correct}</span>
+                  <span className="text-muted">/</span>
+                  {result.total}
+                </p>
+              )}
+              <p className="font-mono text-xs text-muted">
+                {result.accuracy === null
+                  ? "no questions counted"
+                  : "questions correct"}
               </p>
-              <p className="font-mono text-xs text-muted">questions correct</p>
             </div>
           </section>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -53,14 +60,16 @@ export function ResultView({
             />
           </div>
         </div>
-        <section className="flex flex-col gap-2">
-          <h2 className="font-mono text-xs text-muted">by topic</h2>
-          <ul className="divide-y divide-border rounded-md border border-border bg-surface">
-            {result.topics.map((topic) => (
-              <TopicResultRow key={topic.name} topic={topic} />
-            ))}
-          </ul>
-        </section>
+        {result.accuracy !== null && (
+          <section className="flex flex-col gap-2">
+            <h2 className="font-mono text-xs text-muted">by topic</h2>
+            <ul className="divide-y divide-border rounded-md border border-border bg-surface">
+              {result.topics.map((topic) => (
+                <TopicResultRow key={topic.name} topic={topic} />
+              ))}
+            </ul>
+          </section>
+        )}
       </main>
       <div className="sticky bottom-0 border-t border-border bg-surface">
         <div className="mx-auto flex max-w-page gap-2 px-4 py-3">

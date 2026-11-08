@@ -43,7 +43,8 @@ export function SetupForm({
   failed: boolean;
 }) {
   const { topic, order, count } = choices;
-  const start = startNotice(topicStats(setup.topics, topic), order, count);
+  const stats = topicStats(setup.topics, topic);
+  const start = startNotice(stats, order, count);
   // All のときは、Topic の名前の代わりに Subject の名前で案内する
   const scope = topic ?? setup.name;
 
@@ -77,6 +78,17 @@ export function SetupForm({
         />
       </Field>
       <div className="flex flex-col gap-3">
+        {stats.flagged > 0 && start.count > 0 && (
+          <p className="flex items-center gap-1 font-mono text-xs text-muted">
+            <span className="flex items-center gap-0.5 text-warning">
+              <span aria-hidden className="icon text-sm leading-none">
+                flag
+              </span>
+              {stats.flagged}
+            </span>{" "}
+            flagged excluded
+          </p>
+        )}
         {start.notice === "few" && (
           <p className="font-mono text-xs text-muted">
             {scope} has only {start.count} questions to ask.
@@ -85,6 +97,11 @@ export function SetupForm({
         {start.notice === "unanswered" && (
           <p className="font-mono text-xs text-warning">
             No questions to ask — none in {scope} have been answered yet.
+          </p>
+        )}
+        {start.notice === "flagged" && (
+          <p className="font-mono text-xs text-warning">
+            No questions to ask — all {stats.flagged} in {scope} are flagged.
           </p>
         )}
         {failed && (

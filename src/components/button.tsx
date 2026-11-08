@@ -1,7 +1,8 @@
 // ボタン。primary は画面の主な操作（1画面に1つ）、outline はほかの操作（docs/ui.md の「ボタン」）。
 // danger は、danger の帯の中に置く操作（retry）。
 // 取り消せない操作（docs/ui.md の「取り消せない操作（削除）」）は3つ。destructive は確認のダイアログの delete、
-// deleteIcon はプルダウンの右の delete の印だけのボタン（size は icon）、deleteText は一覧の行の delete（size は sm）
+// deleteIcon はプルダウンの右の delete の印だけのボタン（size は icon）、deleteText は一覧の行の delete（size は sm）。
+// flag は解く画面の問題に印を付ける操作（size は sm）、flagged は印を付けたあとの同じボタン
 const VARIANTS = {
   primary: "bg-primary text-on-primary",
   outline: "border border-border bg-surface",
@@ -10,6 +11,8 @@ const VARIANTS = {
   deleteIcon:
     "border border-border bg-surface hover:border-danger hover:text-danger",
   deleteText: "hover:bg-danger-soft hover:text-danger",
+  flag: "hover:bg-warning-soft hover:text-warning",
+  flagged: "bg-warning-soft text-warning",
 };
 
 // lg は、幅いっぱいに大きく置く操作（Setup の start、解く画面の下に固定した操作）。
@@ -25,6 +28,7 @@ const SIZES = {
 function textClass(variant: keyof typeof VARIANTS, size: keyof typeof SIZES) {
   if (variant === "deleteIcon") return "text-muted";
   if (variant === "deleteText") return "text-xs text-muted";
+  if (variant === "flag") return "text-sm text-muted";
   if (variant === "outline") {
     return size === "lg" ? "text-sm text-muted" : "text-sm text-text";
   }
