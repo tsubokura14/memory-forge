@@ -27,7 +27,8 @@ export function ResultView({
         <PageHeader crumbs={["session complete"]} title={name} />
         <div className="flex flex-col gap-2">
           <section className="flex items-center justify-center gap-8 rounded-md border border-border bg-surface px-4 py-6">
-            <AccuracyRing accuracy={result.accuracy} />
+            {/* 数える問題が0問（null）のときの表示は、印を付ける画面と一緒に作る（#12 のタスク2）。それまで null にはならない */}
+            <AccuracyRing accuracy={result.accuracy ?? 0} />
             <div className="flex flex-col gap-2">
               <p className="text-display">
                 <span className="text-success">{result.correct}</span>

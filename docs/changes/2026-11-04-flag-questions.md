@@ -140,6 +140,7 @@
 - [x] （`/dev-plan` で）Setup の Topic の行の印の数と、身についている具合に印を数えないことは、まだない #9 の線と数の上にある。どうする？ → #9 に回す。#12 では作らず、Issue #9 に書き残す。Setup の画像は #9 の分を除いて合わせる
 - [x] （`/dev-plan` で）unflag できなかったときは？ → 絞り込みの下に danger の帯「Couldn't unflag k3f9a2.」（retry なし）
 - [x] （`/dev-plan` で）flagged を押したあとの読み込み中と読み込めなかったときは？ → Subject・Topic を選んだときと同じ
+- [x] （`/dev-impl` のタスク1で）Result の % を null にすると、今の Result の画面が型エラーになる。どうする？ → タスク1では `result-view.tsx` で null のときに 0 を渡す1行を足す（印を付ける画面がまだないので null にならず、見た目は変わらない）。タスク2で「—」の表示に置き換える
 
 ## 調べたこと
 
@@ -211,7 +212,7 @@
 
 ## タスク
 
-- [ ] 1. `questions.flagged` と、印を付ける・外す決まり、解く側の数え方（`flag.ts`・`setup.ts`・`pick.ts`・`start.ts`・`result.ts` とテスト）ができたら完了。画面は変えない
+- [x] 1. `questions.flagged` と、印を付ける・外す決まり、解く側の数え方（`flag.ts`・`setup.ts`・`pick.ts`・`start.ts`・`result.ts` とテスト）ができたら完了。画面は変えない
 - [ ] 2. Solve で印を付けられ、Setup と Result が印を除いて数えたら完了
   - 合わせるスクリーンショット：solve-question・solve-answered-flagged・solve-flagged・setup-default・setup-none・result-default・result-all-flagged（Setup は、身についている具合の線と数を除いて合わせる）
   - flag が写る次の画像も撮り直す：solve-question・solve-answered・solve-explanation・solve-multiple・solve-answered-multiple・solve-code-choices・solve-answered-code-choices・solve-last・solve-many・solve-error・solve-quit

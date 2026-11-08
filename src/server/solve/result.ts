@@ -1,9 +1,10 @@
 // 解き終わりの結果の数え方。データベースは使わない（解く画面がブラウザで数える）
 
-// 1問ずつの結果。correctBefore は SolveQuestion のもの
+// 1問ずつの結果。correctBefore は SolveQuestion のもの。
+// flagged は印を付けた問題（答える前でも答えたあとでも）で、得点・%・数・by topic に入れない
 export type Outcome = {
   topic: string;
-  outcome: "correct" | "incorrect" | "skipped";
+  outcome: "correct" | "incorrect" | "skipped" | "flagged";
   correctBefore: boolean;
 };
 
@@ -22,10 +23,11 @@ export type SessionResult = {
   // 答えて間違えた数だけ。スキップは skipped にだけ数える
   incorrect: number;
   skipped: number;
-  // 不備の印を付ける機能（#12）ができるまで、いつも 0
   flagged: number;
+  // 数える問題（印を付けた問題を除く）の数
   total: number;
-  accuracy: number;
+  // 数える問題が0問なら null
+  accuracy: number | null;
   topics: TopicResult[];
 };
 
@@ -40,8 +42,9 @@ export function summarizeSession(
   outcomes: Outcome[],
   topicOrder: string[],
 ): SessionResult {
+  const counted = outcomes.filter((o) => o.outcome !== "flagged");
   const byTopic = new Map<string, TopicResult>();
-  for (const { topic, outcome, correctBefore } of outcomes) {
+  for (const { topic, outcome, correctBefore } of counted) {
     let row = byTopic.get(topic);
     if (!row) {
       row = {
@@ -76,9 +79,9 @@ export function summarizeSession(
     correct,
     incorrect: count("incorrect"),
     skipped: count("skipped"),
-    flagged: 0,
-    total: outcomes.length,
-    accuracy: accuracyOf(correct, outcomes.length),
+    flagged: count("flagged"),
+    total: counted.length,
+    accuracy: counted.length === 0 ? null : accuracyOf(correct, counted.length),
     topics,
   };
 }

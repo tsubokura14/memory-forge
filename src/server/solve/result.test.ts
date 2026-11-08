@@ -77,4 +77,41 @@ describe("summarizeSession", () => {
       ["New A", 1, 100],
     ]);
   });
+
+  test("印を付けた問題は、得点・%・数・by topic に入れず、flagged に数える", () => {
+    const result = summarizeSession(
+      [
+        outcome("Decorators", "correct"),
+        outcome("Decorators", "flagged"),
+        outcome("Async", "incorrect"),
+        outcome("Typing", "flagged"),
+      ],
+      ["Decorators", "Typing", "Async"],
+    );
+    expect(result).toMatchObject({
+      correct: 1,
+      incorrect: 1,
+      skipped: 0,
+      flagged: 2,
+      total: 2,
+      accuracy: 50,
+    });
+    expect(result.topics.map((t) => [t.name, t.total])).toEqual([
+      ["Decorators", 1],
+      ["Async", 1],
+    ]);
+  });
+
+  test("数える問題が0問なら、% は null で by topic は空", () => {
+    const result = summarizeSession(
+      [outcome("Decorators", "flagged"), outcome("Typing", "flagged")],
+      ["Decorators", "Typing"],
+    );
+    expect(result).toMatchObject({
+      flagged: 2,
+      total: 0,
+      accuracy: null,
+      topics: [],
+    });
+  });
 });

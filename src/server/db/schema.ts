@@ -137,6 +137,8 @@ export const questions = pgTable(
     choices: jsonb("choices").$type<string[]>().notNull(),
     correct: jsonb("correct").$type<string[]>().notNull(),
     explanation: text("explanation").notNull(),
+    // 誤りがありそうだと付けた印（docs/design.md の「データ」）
+    flagged: boolean("flagged").default(false).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
