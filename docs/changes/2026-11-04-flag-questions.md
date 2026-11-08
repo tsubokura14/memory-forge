@@ -183,6 +183,7 @@
 | --- | --- |
 | `src/app/subjects/[id]/actions.ts` | `flagAction(id)` を足す。最初に `requireSession()` を呼ぶ |
 | `src/app/subjects/[id]/solve-view.tsx` | 問題の上の行の右に flag を出す。<br>・答える前：`flagAction` が通ったら、結果を `flagged` にして次の問題に進み、知らせを出す（最後の問題なら Result）<br>・答えたあと：`flagAction` が通ったら、その問題の結果を `flagged` に変え、ボタンを flagged にする<br>・知らせは、次の操作（選ぶ・submit・skip・flag）で消す<br>・失敗したら、保存の失敗と同じ場所に帯「Couldn't flag this question.」と retry（失敗した操作に `flag` を足す） |
+| `src/components/solve-bar.tsx`・`src/app/subjects/[id]/study.tsx` | 線の長さを、正解・不正解の数でなく、終えた問題の数（`answered`）で決める。答える前の flag でも線を進めるため |
 | `src/app/subjects/[id]/setup-form.tsx` | 「⚑1 flagged excluded」と、全部に印の案内（`flagged`） |
 | `src/app/subjects/[id]/result-view.tsx` | 数える問題が0問のときの表示（`docs/ui.md` の「解き終わりの結果」）。`src/components/accuracy-ring.tsx` は % が null のとき、円を線だけにして「—」を出す |
 | `src/app/(app)/manage/actions.ts` | `unflagAction(id, current)`：印を外し、今の選び方を cookie に書き直す（今のページが空になったら、`resolveSelection` が最後のページにする）。`exportAction` に `flaggedOnly` を渡す。どれも最初に `requireSession()` を呼ぶ |

@@ -18,7 +18,7 @@ import { answerAction, flagAction, skipAction } from "./actions";
 type Failed =
   { kind: "submit"; selected: string[] } | { kind: "skip" } | { kind: "flag" };
 
-// 1問ずつ解く。最後の問題の results と skip で onComplete（1問ずつの結果を渡す）、quit のダイアログの quit で onQuit
+// 1問ずつ解く。最後の問題の results・skip・答える前の flag で onComplete（1問ずつの結果を渡す）、quit のダイアログの quit で onQuit
 export function SolveView({
   questions,
   onComplete,
@@ -38,7 +38,7 @@ export function SolveView({
   const [view, setView] = useState<"question" | "explanation">("question");
   // 答えを送っている間は、下のボタンを押せない（二重に記録しないため）
   const [busy, setBusy] = useState(false);
-  // 帯を出している間も、選び直し・submit・skip はできる。どれかが通れば消す
+  // 帯を出している間も、選び直し・submit・skip・flag はできる。送る操作のどれかが通るか、次の問題に進むと消す
   const [failed, setFailed] = useState<Failed | null>(null);
   const [quitting, setQuitting] = useState(false);
   // 答えたあとに、今の問題へ印を付けたか
@@ -50,7 +50,7 @@ export function SolveView({
   const multiple = question.type === "multiple";
   const last = index === questions.length - 1;
 
-  // skip は、足したばかりの結果がまだ outcomes に入っていないので、渡して使う
+  // skip と答える前の flag は、足したばかりの結果がまだ outcomes に入っていないので、渡して使う
   function advance(done = outcomes) {
     if (last) {
       onComplete(done);
