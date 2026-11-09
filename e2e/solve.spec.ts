@@ -1,6 +1,7 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures";
 import {
+  countAnswers,
   insertAnswers,
   resetQuestions,
   type TestQuestion,
@@ -37,9 +38,32 @@ function start(page: Page) {
   return page.getByRole("button", { name: /^start/ });
 }
 
-test("setup-default", async ({ page }) => {
-  await openSetup(page, python);
+test("setup-default：印の付いた問題があると、除いたことを start の上に出す", async ({
+  page,
+}) => {
+  await openSetup(
+    page,
+    python.map((q) => (q.id === "dec1" ? { ...q, flagged: true } : q)),
+  );
+  await expect(page.getByText("1 flagged excluded")).toBeVisible();
   await expect(page).toHaveScreenshot("setup-default.png", { fullPage: true });
+});
+
+test("setup-none：Topic の問題が全部印付きだと、理由を出し、start を押せない", async ({
+  page,
+}) => {
+  await openSetup(
+    page,
+    python.map((q) => (q.topic === "Typing" ? { ...q, flagged: true } : q)),
+  );
+  await page.getByRole("radio", { name: "Typing" }).click();
+  await expect(
+    page.getByText("No questions to ask — all 8 in Typing are flagged."),
+  ).toBeVisible();
+  await expect(page.getByText("flagged excluded")).toHaveCount(0);
+  await expect(start(page)).toHaveText("start · 0");
+  await expect(start(page)).toBeDisabled();
+  await expect(page).toHaveScreenshot("setup-none.png", { fullPage: true });
 });
 
 test("setup-few：Topic の問題が足りないと、Topic の名前で案内し、ある分の数を添える", async ({
@@ -371,15 +395,21 @@ test("最後の問題の skip も、Result に移る", async ({ page }) => {
 test("result-default：解き終わりの結果", async ({ page }) => {
   // 正解はどれも C。d4 は前に正解した記録があり、今回間違えるので、線の黄色になる
   await openSetup(page, [
-    ...topicQuestions("Decorators", 4),
+    ...topicQuestions("Decorators", 5),
     ...topicQuestions("Generators", 3),
     ...topicQuestions("Async", 2),
   ]);
   await insertAnswers([{ questionId: "dec4", correct: true }]);
   await start(page).click();
-  await expect(page.getByText("1/9", { exact: true })).toBeVisible();
-  // Decorators 3/4・Generators 2/3・Async 1/2（最後はスキップ）
-  for (const letter of ["C", "C", "C", "A", "C", "C", "A", "C"]) {
+  await expect(page.getByText("1/10", { exact: true })).toBeVisible();
+  // Decorators 3/4（dec5 は答える前に印を付ける）・Generators 2/3・Async 1/2（最後はスキップ）
+  for (const letter of ["C", "C", "C", "A"]) {
+    await answer(page, letter);
+    await next(page);
+  }
+  await button(page, "flag").click();
+  await expect(page.getByText("6/10", { exact: true })).toBeVisible();
+  for (const letter of ["C", "C", "A", "C"]) {
     await answer(page, letter);
     await next(page);
   }
@@ -476,6 +506,101 @@ test("skip を保存できなかったら、同じ帯を出して進まず、ret
   await button(page, "retry").click();
   await expect(page.getByText("2/10", { exact: true })).toBeVisible();
   await expect(page.getByLabel("wrong answers")).toHaveText("1");
+  await expect(saveError(page)).toHaveCount(0);
+});
+
+test("solve-flagged：答える前に flag すると、記録せず、数を増やさずに次の問題に進み、知らせは次の操作で消える", async ({
+  page,
+}) => {
+  await toFourth(page);
+  await button(page, "flag").click();
+  const notice = page.getByText("k3f9a2 flagged — moved on without recording.");
+  await expect(notice).toBeVisible();
+  await expect(page.getByText("5/10", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("correct answers")).toHaveText("2");
+  await expect(page.getByLabel("wrong answers")).toHaveText("1");
+  expect(await countAnswers()).toBe(3);
+  await expect(page).toHaveScreenshot("solve-flagged.png", { fullPage: true });
+
+  await choice(page, "A").click();
+  await expect(notice).toHaveCount(0);
+});
+
+test("result-all-flagged：全部の問題に印を付けると、最後は Result に移り、数える問題がない表示になる", async ({
+  page,
+}) => {
+  await openSetup(page, topicQuestions("Decorators", 3));
+  await start(page).click();
+  for (const n of [2, 3]) {
+    await button(page, "flag").click();
+    await expect(page.getByText(`${n}/3`, { exact: true })).toBeVisible();
+  }
+  await button(page, "flag").click();
+  await expect(page.getByText("no questions counted")).toBeVisible();
+  await expect(page.getByText("by topic")).toHaveCount(0);
+  await expect(page).toHaveScreenshot("result-all-flagged.png", {
+    fullPage: true,
+  });
+});
+
+test("solve-answered-flagged：答えたあとに flag すると、その場で flagged に変わり、上の数は減らさない", async ({
+  page,
+}) => {
+  await toFourth(page);
+  await button(page, "submit").click();
+  await button(page, "explanation").click();
+  await button(page, "flag").click();
+  await expect(button(page, "flagged")).toBeVisible();
+  await expect(page.getByLabel("correct answers")).toHaveText("3");
+  await expect(page).toHaveScreenshot("solve-answered-flagged.png", {
+    fullPage: true,
+  });
+});
+
+test("答えたあとに flag した問題は、Result で flagged に数え、得点に入れない", async ({
+  page,
+}) => {
+  await openSetup(page, topicQuestions("Decorators", 1));
+  await start(page).click();
+  await answer(page, "C");
+  await button(page, "flag").click();
+  await expect(button(page, "flagged")).toBeVisible();
+  await page.getByRole("button", { name: /^results/ }).click();
+  await expect(page.getByText("no questions counted")).toBeVisible();
+});
+
+test("答える前の flag を保存できなかったら、帯と retry を出して進まず、retry で次に進む", async ({
+  page,
+}) => {
+  await startDecorators(page);
+  await failActions(page);
+  await button(page, "flag").click();
+  await expect(saveError(page)).toHaveText(/Couldn't flag this question\./);
+  await expect(page.getByText("1/10", { exact: true })).toBeVisible();
+
+  await page.unrouteAll();
+  await button(page, "retry").click();
+  await expect(page.getByText("2/10", { exact: true })).toBeVisible();
+  await expect(saveError(page)).toHaveCount(0);
+  await expect(
+    page.getByText("flagged — moved on without recording."),
+  ).toBeVisible();
+});
+
+test("解説を見ているときに flag を保存できなかったら、解説の下に帯を出し、次の問題に進むと消える", async ({
+  page,
+}) => {
+  await startDecorators(page);
+  await answer(page, "A");
+  await button(page, "explanation").click();
+  await failActions(page);
+  await button(page, "flag").click();
+  await expect(saveError(page)).toHaveText(/Couldn't flag this question\./);
+  await expect(button(page, "flag")).toBeVisible();
+
+  await page.unrouteAll();
+  await next(page);
+  await expect(page.getByText("2/10", { exact: true })).toBeVisible();
   await expect(saveError(page)).toHaveCount(0);
 });
 

@@ -12,12 +12,13 @@ import { choiceLetter } from "@/server/import/validate";
 import type { AnswerResult } from "@/server/solve/answer";
 import type { Outcome } from "@/server/solve/result";
 import type { SolveQuestion } from "@/server/solve/start";
-import { answerAction, skipAction } from "./actions";
+import { answerAction, flagAction, skipAction } from "./actions";
 
 // 保存できなかった操作。retry は同じ中身で送り直す
-type Failed = { kind: "submit"; selected: string[] } | { kind: "skip" };
+type Failed =
+  { kind: "submit"; selected: string[] } | { kind: "skip" } | { kind: "flag" };
 
-// 1問ずつ解く。最後の問題の results と skip で onComplete（1問ずつの結果を渡す）、quit のダイアログの quit で onQuit
+// 1問ずつ解く。最後の問題の results・skip・答える前の flag で onComplete（1問ずつの結果を渡す）、quit のダイアログの quit で onQuit
 export function SolveView({
   questions,
   onComplete,
@@ -37,15 +38,19 @@ export function SolveView({
   const [view, setView] = useState<"question" | "explanation">("question");
   // 答えを送っている間は、下のボタンを押せない（二重に記録しないため）
   const [busy, setBusy] = useState(false);
-  // 帯を出している間も、選び直し・submit・skip はできる。どれかが通れば消す
+  // 帯を出している間も、選び直し・submit・skip・flag はできる。送る操作のどれかが通るか、次の問題に進むと消す
   const [failed, setFailed] = useState<Failed | null>(null);
   const [quitting, setQuitting] = useState(false);
+  // 答えたあとに、今の問題へ印を付けたか
+  const [flagged, setFlagged] = useState(false);
+  // 答える前に印を付けた問題の ID。次の操作（選ぶ・submit・skip・flag）で消す
+  const [notice, setNotice] = useState<string | null>(null);
 
   const question = questions[index];
   const multiple = question.type === "multiple";
   const last = index === questions.length - 1;
 
-  // skip は、足したばかりの結果がまだ outcomes に入っていないので、渡して使う
+  // skip と答える前の flag は、足したばかりの結果がまだ outcomes に入っていないので、渡して使う
   function advance(done = outcomes) {
     if (last) {
       onComplete(done);
@@ -55,9 +60,12 @@ export function SolveView({
     setSelected([]);
     setResult(null);
     setView("question");
+    setFailed(null);
+    setFlagged(false);
   }
 
   function toggle(letter: string) {
+    setNotice(null);
     if (!multiple) {
       setSelected([letter]);
       return;
@@ -71,6 +79,7 @@ export function SolveView({
 
   // 保存できなかったときは、数を進めずに帯を出す
   async function submit(answer = selected) {
+    setNotice(null);
     setBusy(true);
     try {
       const answered = await answerAction(question.id, answer);
@@ -95,6 +104,7 @@ export function SolveView({
   }
 
   async function skip() {
+    setNotice(null);
     setBusy(true);
     try {
       await skipAction(question.id);
@@ -111,8 +121,35 @@ export function SolveView({
     }
   }
 
+  // 答える前は、答えていないので記録も上の数も増やさず、次の問題に進む（問題の誤りは、解いた人の間違いではないため）。
+  // 答えたあとは、その問題の結果だけを flagged に置き換え、上の数と記録はそのままにする
+  async function flag() {
+    setNotice(null);
+    setBusy(true);
+    try {
+      await flagAction(question.id);
+      setFailed(null);
+      const flaggedOutcome = outcomeOf(question, "flagged");
+      if (result) {
+        setOutcomes([...outcomes.slice(0, -1), flaggedOutcome]);
+        setFlagged(true);
+      } else {
+        const done = [...outcomes, flaggedOutcome];
+        setOutcomes(done);
+        setNotice(question.questionId);
+        advance(done);
+      }
+    } catch (error) {
+      unstable_rethrow(error);
+      setFailed({ kind: "flag" });
+    } finally {
+      setBusy(false);
+    }
+  }
+
   function retry() {
     if (failed?.kind === "submit") submit(failed.selected);
+    else if (failed?.kind === "flag") flag();
     else skip();
   }
 
@@ -124,30 +161,71 @@ export function SolveView({
     return isSelected ? "wrong" : null;
   }
 
+  const failedBanner = failed && (
+    <Banner
+      action={
+        <Button variant="danger" disabled={busy} onClick={retry}>
+          retry
+        </Button>
+      }
+    >
+      {failed.kind === "flag"
+        ? "Couldn't flag this question."
+        : "Couldn't save your answer."}
+    </Banner>
+  );
+
   return (
     <div className="flex min-h-screen flex-col">
       <SolveBar
         correct={counts.correct}
         wrong={counts.wrong}
+        answered={outcomes.length}
         current={index + 1}
         total={questions.length}
         onQuit={() => setQuitting(true)}
       />
       <main className="mx-auto flex w-full max-w-page flex-1 flex-col gap-4 px-4 pt-5 pb-8">
+        {notice && (
+          <Banner tone="warning">
+            <span className="flex items-center gap-1 font-mono">
+              <span aria-hidden className="icon text-base leading-none">
+                flag
+              </span>
+              <span>{`${notice} flagged — moved on without recording.`}</span>
+            </span>
+          </Banner>
+        )}
         <div className="flex items-center gap-2 font-mono text-xs text-muted">
           <span className="rounded-sm border border-border bg-surface px-1.5 py-0.5">
             {multiple ? "multi" : "single"}
           </span>
           <span>{question.topic}</span>
           <span>{question.questionId}</span>
+          {/* flagged のあとは押しても何もしない（Solve では外せないため）。押せない見た目にはしない */}
+          <Button
+            variant={flagged ? "flagged" : "flag"}
+            size="sm"
+            className="ml-auto flex items-center gap-1"
+            disabled={busy}
+            onClick={flagged ? undefined : flag}
+          >
+            <span aria-hidden className="icon text-base leading-none">
+              flag
+            </span>
+            {flagged ? "flagged" : "flag"}
+          </Button>
         </div>
         {view === "explanation" && result ? (
-          <section className="flex flex-col gap-2 rounded-md border border-border bg-surface p-4">
-            <h2 className="font-mono text-xs text-muted">explanation</h2>
-            <div className="text-base">
-              <RichText text={result.explanation} />
-            </div>
-          </section>
+          <>
+            <section className="flex flex-col gap-2 rounded-md border border-border bg-surface p-4">
+              <h2 className="font-mono text-xs text-muted">explanation</h2>
+              <div className="text-base">
+                <RichText text={result.explanation} />
+              </div>
+            </section>
+            {failedBanner}
+          </>
         ) : (
           <>
             <div className="text-lg">
@@ -175,17 +253,7 @@ export function SolveView({
                 );
               })}
             </div>
-            {failed && (
-              <Banner
-                action={
-                  <Button variant="danger" disabled={busy} onClick={retry}>
-                    retry
-                  </Button>
-                }
-              >
-                Couldn&apos;t save your answer.
-              </Banner>
-            )}
+            {failedBanner}
           </>
         )}
       </main>
@@ -206,7 +274,8 @@ export function SolveView({
                 </Button>
               </div>
               <div className="flex-1">
-                <Button size="lg" onClick={() => advance()}>
+                {/* 印を送っている間に進むと、次の問題の結果を置き換えてしまう */}
+                <Button size="lg" disabled={busy} onClick={() => advance()}>
                   <span className="flex items-center justify-center gap-1">
                     {last ? "results" : "next"}
                     <span aria-hidden className="icon text-base">

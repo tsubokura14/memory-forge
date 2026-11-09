@@ -87,7 +87,13 @@ export function Study({
   if (phase.kind === "loading") {
     return (
       <>
-        <SolveBar correct={0} wrong={0} current={1} total={phase.expected} />
+        <SolveBar
+          correct={0}
+          wrong={0}
+          answered={0}
+          current={1}
+          total={phase.expected}
+        />
         <SolveSkeleton />
       </>
     );

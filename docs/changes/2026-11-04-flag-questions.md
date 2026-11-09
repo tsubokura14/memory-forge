@@ -39,7 +39,9 @@
   - 正解・不正解の数は増やさず、問題の番号と線は進める
 - 答えたあとに flag を押すと、その場でボタンが flagged に変わる。答えた記録は残る。Solve の中では印を外せない
 - 印を付けた問題は、ほかの解く回でも出題しない
+- 答えたあとに flag を押しても、上の正解・不正解の数は減らさない
 - 印を付けられなかったときは、答えの保存と同じ danger の帯「Couldn't flag this question.」と retry を出す。答える前の flag なら、次の問題に進まない
+  - 解説を見ているときは、解説の枠の下に出す。帯が出たまま次の問題に進むと消える（印は付かないまま）
 
 ### Setup
 
@@ -140,6 +142,8 @@
 - [x] （`/dev-plan` で）Setup の Topic の行の印の数と、身についている具合に印を数えないことは、まだない #9 の線と数の上にある。どうする？ → #9 に回す。#12 では作らず、Issue #9 に書き残す。Setup の画像は #9 の分を除いて合わせる
 - [x] （`/dev-plan` で）unflag できなかったときは？ → 絞り込みの下に danger の帯「Couldn't unflag k3f9a2.」（retry なし）
 - [x] （`/dev-plan` で）flagged を押したあとの読み込み中と読み込めなかったときは？ → Subject・Topic を選んだときと同じ
+- [x] （`/dev-impl` のタスク2で）答えたあとに flag したとき、上のバーの正解・不正解の数は？ → そのまま残す（減らさない）
+- [x] （`/dev-impl` のタスク2で）解説を開いたまま flag に失敗したときの帯の場所と、帯が出たまま next を押したら？ → 解説の枠の下に出す。次の問題に進むと消える（印は付かないまま）
 - [x] （`/dev-impl` のタスク1で）Result の % を null にすると、今の Result の画面が型エラーになる。どうする？ → タスク1では `result-view.tsx` で null のときに 0 を渡す1行を足す（印を付ける画面がまだないので null にならず、見た目は変わらない）。タスク2で「—」の表示に置き換える
 
 ## 調べたこと
@@ -179,6 +183,7 @@
 | --- | --- |
 | `src/app/subjects/[id]/actions.ts` | `flagAction(id)` を足す。最初に `requireSession()` を呼ぶ |
 | `src/app/subjects/[id]/solve-view.tsx` | 問題の上の行の右に flag を出す。<br>・答える前：`flagAction` が通ったら、結果を `flagged` にして次の問題に進み、知らせを出す（最後の問題なら Result）<br>・答えたあと：`flagAction` が通ったら、その問題の結果を `flagged` に変え、ボタンを flagged にする<br>・知らせは、次の操作（選ぶ・submit・skip・flag）で消す<br>・失敗したら、保存の失敗と同じ場所に帯「Couldn't flag this question.」と retry（失敗した操作に `flag` を足す） |
+| `src/components/solve-bar.tsx`・`src/app/subjects/[id]/study.tsx` | 線の長さを、正解・不正解の数でなく、終えた問題の数（`answered`）で決める。答える前の flag でも線を進めるため |
 | `src/app/subjects/[id]/setup-form.tsx` | 「⚑1 flagged excluded」と、全部に印の案内（`flagged`） |
 | `src/app/subjects/[id]/result-view.tsx` | 数える問題が0問のときの表示（`docs/ui.md` の「解き終わりの結果」）。`src/components/accuracy-ring.tsx` は % が null のとき、円を線だけにして「—」を出す |
 | `src/app/(app)/manage/actions.ts` | `unflagAction(id, current)`：印を外し、今の選び方を cookie に書き直す（今のページが空になったら、`resolveSelection` が最後のページにする）。`exportAction` に `flaggedOnly` を渡す。どれも最初に `requireSession()` を呼ぶ |
@@ -213,7 +218,7 @@
 ## タスク
 
 - [x] 1. `questions.flagged` と、印を付ける・外す決まり、解く側の数え方（`flag.ts`・`setup.ts`・`pick.ts`・`start.ts`・`result.ts` とテスト）ができたら完了。画面は変えない
-- [ ] 2. Solve で印を付けられ、Setup と Result が印を除いて数えたら完了
+- [x] 2. Solve で印を付けられ、Setup と Result が印を除いて数えたら完了
   - 合わせるスクリーンショット：solve-question・solve-answered-flagged・solve-flagged・setup-default・setup-none・result-default・result-all-flagged（Setup は、身についている具合の線と数を除いて合わせる）
   - flag が写る次の画像も撮り直す：solve-question・solve-answered・solve-explanation・solve-multiple・solve-answered-multiple・solve-code-choices・solve-answered-code-choices・solve-last・solve-many・solve-error・solve-quit
 - [ ] 3. Manage の一覧で、印の数・印の付いた問題だけ・export flagged を読む決まり（`list.ts`・`selection.ts`・`export.ts` とテスト）ができたら完了。画面は変えない

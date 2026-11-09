@@ -14,6 +14,7 @@ export type TestQuestion = {
   choices: string[];
   correct: string[];
   explanation: string;
+  flagged?: boolean;
 };
 
 export function testQuestion(
@@ -64,6 +65,7 @@ export async function resetQuestions(
           choices: q.choices,
           correct: q.correct,
           explanation: q.explanation,
+          flagged: q.flagged ?? false,
         })),
       );
     }
@@ -71,6 +73,19 @@ export async function resetQuestions(
     await pool.end();
   }
   return ids;
+}
+
+// 答えた記録の行の数
+export async function countAnswers(): Promise<number> {
+  const pool = new Pool({
+    connectionString: withVerifyFull(process.env.DATABASE_URL),
+  });
+  try {
+    const db = drizzle({ client: pool, schema });
+    return (await db.select().from(schema.answers)).length;
+  } finally {
+    await pool.end();
+  }
 }
 
 // 答えた記録を入れる。questionId はファイルの ID（resetQuestions で入れた問題の中から探す）
