@@ -108,7 +108,7 @@ export async function deleteQuestionAction(
   await saveSelection(afterDelete(result, current.subjectId, current));
 }
 
-// 印を外したら、今の選び方を書き直して、一覧を組み立て直す。flagged の一覧で今のページが空になったら前のページになる
+// 印を外したら、今の選び方のまま。flagged の一覧で今のページが空になったら前のページになる
 // （画面を組み立てるときの resolveSelection）
 export async function unflagAction(id: number, current: Saved): Promise<void> {
   await requireSession();
