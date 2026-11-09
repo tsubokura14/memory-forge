@@ -9,11 +9,11 @@ const subjects = [
   {
     id: 1,
     topics: [
-      { name: "Decorators", count: 120 },
-      { name: "Typing", count: 12 },
+      { name: "Decorators", count: 120, flagged: 60 },
+      { name: "Typing", count: 12, flagged: 0 },
     ],
   },
-  { id: 2, topics: [{ name: "IAM", count: 30 }] },
+  { id: 2, topics: [{ name: "IAM", count: 30, flagged: 0 }] },
 ];
 
 describe("resolveSelection", () => {
@@ -23,42 +23,129 @@ describe("resolveSelection", () => {
       topic: null,
       page: 1,
       total: 132,
+      flagged: false,
     });
   });
 
   test("覚えていた Subject・Topic・ページがあれば、そのまま", () => {
     expect(
       resolveSelection(
-        { subjectId: 1, topic: "Decorators", page: 3 },
+        { subjectId: 1, topic: "Decorators", page: 3, flagged: false },
         subjects,
       ),
-    ).toEqual({ subjectId: 1, topic: "Decorators", page: 3, total: 120 });
+    ).toEqual({
+      subjectId: 1,
+      topic: "Decorators",
+      page: 3,
+      total: 120,
+      flagged: false,
+    });
   });
 
   test("覚えていた Subject がなくなっていたら、最初の Subject と All topics", () => {
     expect(
-      resolveSelection({ subjectId: 9, topic: "IAM", page: 1 }, subjects),
-    ).toEqual({ subjectId: 1, topic: null, page: 1, total: 132 });
+      resolveSelection(
+        { subjectId: 9, topic: "IAM", page: 1, flagged: false },
+        subjects,
+      ),
+    ).toEqual({
+      subjectId: 1,
+      topic: null,
+      page: 1,
+      total: 132,
+      flagged: false,
+    });
   });
 
   test("覚えていた Topic がなくなっていたら、All topics", () => {
     expect(
-      resolveSelection({ subjectId: 2, topic: "Typing", page: 1 }, subjects),
-    ).toEqual({ subjectId: 2, topic: null, page: 1, total: 30 });
+      resolveSelection(
+        { subjectId: 2, topic: "Typing", page: 1, flagged: false },
+        subjects,
+      ),
+    ).toEqual({
+      subjectId: 2,
+      topic: null,
+      page: 1,
+      total: 30,
+      flagged: false,
+    });
   });
 
   test("覚えていたページがなくなっていたら、最後のページ", () => {
     expect(
-      resolveSelection({ subjectId: 1, topic: "Typing", page: 2 }, subjects),
-    ).toEqual({ subjectId: 1, topic: "Typing", page: 1, total: 12 });
+      resolveSelection(
+        { subjectId: 1, topic: "Typing", page: 2, flagged: false },
+        subjects,
+      ),
+    ).toEqual({
+      subjectId: 1,
+      topic: "Typing",
+      page: 1,
+      total: 12,
+      flagged: false,
+    });
+  });
+
+  test("flagged のときは、印の数を全体の数にして、なくなったページを最後のページにする", () => {
+    expect(
+      resolveSelection(
+        { subjectId: 1, topic: "Decorators", page: 5, flagged: true },
+        subjects,
+      ),
+    ).toEqual({
+      subjectId: 1,
+      topic: "Decorators",
+      page: 2,
+      total: 60,
+      flagged: true,
+    });
+  });
+
+  test("Topic がなくなっても flagged は残り、Subject の印の数を全体の数にする", () => {
+    expect(
+      resolveSelection(
+        { subjectId: 1, topic: "Async", page: 1, flagged: true },
+        subjects,
+      ),
+    ).toEqual({
+      subjectId: 1,
+      topic: null,
+      page: 1,
+      total: 60,
+      flagged: true,
+    });
+  });
+
+  test("Subject がなくなって最初の Subject にするときは、flagged を外す", () => {
+    expect(
+      resolveSelection(
+        { subjectId: 9, topic: null, page: 1, flagged: true },
+        subjects,
+      ),
+    ).toEqual({
+      subjectId: 1,
+      topic: null,
+      page: 1,
+      total: 132,
+      flagged: false,
+    });
   });
 });
 
 describe("parseSaved", () => {
   test("cookie の JSON から、覚えていた選び方を読む", () => {
     expect(
+      parseSaved(
+        JSON.stringify({ subjectId: 2, topic: "IAM", page: 4, flagged: true }),
+      ),
+    ).toEqual({ subjectId: 2, topic: "IAM", page: 4, flagged: true });
+  });
+
+  test("flagged がない cookie は、flagged でないものとして読む", () => {
+    expect(
       parseSaved(JSON.stringify({ subjectId: 2, topic: "IAM", page: 4 })),
-    ).toEqual({ subjectId: 2, topic: "IAM", page: 4 });
+    ).toEqual({ subjectId: 2, topic: "IAM", page: 4, flagged: false });
   });
 
   test("ない・読めない・形が違うときは null", () => {
@@ -67,6 +154,11 @@ describe("parseSaved", () => {
     expect(parseSaved(JSON.stringify({ subjectId: "2", page: 1 }))).toBeNull();
     expect(
       parseSaved(JSON.stringify({ subjectId: 2, topic: null, page: 0 })),
+    ).toBeNull();
+    expect(
+      parseSaved(
+        JSON.stringify({ subjectId: 2, topic: null, page: 1, flagged: "yes" }),
+      ),
     ).toBeNull();
   });
 });
