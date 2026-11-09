@@ -70,7 +70,9 @@
   - 選んでいた Topic がなくなっても（Topic を消した、最後の1問を消したなど）、All topics の flagged の一覧のまま
   - 読み込み直したときや、ほかの画面から戻ったときは、flagged かどうかも、選んでいた Topic・ページと同じく残る
   - flagged を押したあとの読み込み中と読み込めなかったときは、Subject・Topic を選んだときと同じ（行の形の枠の点滅、「Couldn't load questions.」と retry）
+  - スマホの幅では、Topic のプルダウンの下の行に、左寄せで置く
 - flagged の一覧を見ている間は、上の export が「export flagged · Python」になり、Subject の印の付いた問題を全部書き出す（Topic で絞っていても、Subject の全部の印の付いた問題）。ファイルの名前と形は、export <Subject の名前> と同じ
+  - 書き出せなかったときの帯は、export <Subject の名前> と同じ「Couldn't export Python.」
 - Subject と Topic のプルダウンの一覧の行に、印の付いた問題があれば、問題数の左に warning の flag の印と数を出す
 - 印の付いた問題の行は、flagged の一覧でもふつうの一覧でも、warning-soft の地にし、delete の左に「unflag」（flag の印と warning の文字）を出す
 - unflag で、その場で印が外れる。外しても記録は変わらない
@@ -143,6 +145,8 @@
 - [x] （`/dev-plan` で）Setup の Topic の行の印の数と、身についている具合に印を数えないことは、まだない #9 の線と数の上にある。どうする？ → #9 に回す。#12 では作らず、Issue #9 に書き残す。Setup の画像は #9 の分を除いて合わせる
 - [x] （`/dev-plan` で）unflag できなかったときは？ → 絞り込みの下に danger の帯「Couldn't unflag k3f9a2.」（retry なし）
 - [x] （`/dev-plan` で）flagged を押したあとの読み込み中と読み込めなかったときは？ → Subject・Topic を選んだときと同じ
+- [x] （`/dev-impl` のタスク4で）スマホの幅で、flagged のボタンはどこに置く？ → Topic のプルダウンの下の行に、左寄せ（PC と同じ大きさ）
+- [x] （`/dev-impl` のタスク4で）export flagged で書き出せなかったときの帯の文言は？ → ふつうの export と同じ「Couldn't export Python.」
 - [x] （`/dev-impl` のタスク3で）flagged の一覧で Topic の delete でその Topic を丸ごと消したら、flagged の絞り込みは？ → flagged のまま（All topics の flagged の一覧の1ページ目）
 - [x] （`/dev-impl` のタスク3で）flagged の一覧で、選んでいた Topic がなくなったら（最後の1問を消した、ほかの画面で消えたなど）、flagged の絞り込みは？ → flagged のまま（All topics の flagged の一覧）
 - [x] （`/dev-impl` のタスク2で）答えたあとに flag したとき、上のバーの正解・不正解の数は？ → そのまま残す（減らさない）
@@ -192,6 +196,7 @@
 | `src/app/(app)/manage/actions.ts` | `unflagAction(id, current)`：印を外し、今の選び方を cookie に書き直す（今のページが空になったら、`resolveSelection` が最後のページにする）。`exportAction` に `flaggedOnly` を渡す。`deleteTopicAction` は今の `flagged` を受け取り、残す。どれも最初に `requireSession()` を呼ぶ |
 | `src/app/(app)/manage/manage-view.tsx` | flagged のボタン（押すと `selectAction` で `flagged` を反転し、1ページ目。Subject を変えると false）、export の文言と出し分け、unflag の失敗の帯、flagged の一覧の0件（`EmptyState`）。Topic を消す確認の問題数は、flagged でも Topic の全部の問題の数を出す |
 | `src/components/dropdown.tsx` | 行に印の数（`flagged`。0なら出さない）を出せるようにする |
+| `src/components/empty-state.tsx` | 説明（`description`）を省けるようにする。flagged の一覧の0件は1行だけのため |
 | `src/components/question-row.tsx` | `flagged` の行は warning-soft の地にし、delete の左に unflag（押すと `onUnflag`） |
 | `src/components/button.tsx` | 見た目を足す。<br>・flag（muted の文字だけ。指を乗せると warning の文字と warning-soft の地。押したあとの flagged は warning-soft の地と warning の文字）<br>・unflag（warning の文字だけ）<br>・Manage の flagged（枠だけ。押している間は warning の枠・地・文字） |
 | `src/components/banner.tsx` | warning の色（warning の枠と warning-soft の地）を足す。答える前の flag の知らせに使う |
