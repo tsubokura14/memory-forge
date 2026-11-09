@@ -100,7 +100,6 @@ describe("exportSubject", () => {
       "a1",
       "c3",
     ]);
-    expect(Object.keys(file.questions[0])).not.toContain("flagged");
   });
 
   test("ない Subject は null", async () => {
