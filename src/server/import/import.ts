@@ -1,6 +1,6 @@
-import { eq, sql } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/server/db/client";
-import { questions, subjects } from "@/server/db/schema";
+import { answers, questions, subjects } from "@/server/db/schema";
 import { type Change, diffQuestions } from "./diff";
 import {
   type FileError,
@@ -21,7 +21,12 @@ export type ImportPreview =
       subject: string;
       isNewSubject: boolean;
       counts: ImportCounts;
-      replaced: { id: string; text: string; changes: Change[] }[];
+      replaced: {
+        id: string;
+        text: string;
+        flagged: boolean;
+        changes: Change[];
+      }[];
     };
 
 export type ImportResult =
@@ -41,6 +46,7 @@ export async function previewImport(content: string): Promise<ImportPreview> {
   const stored =
     subjectId === undefined ? [] : await readQuestions(db, subjectId);
   const diff = diffQuestions(incoming, stored);
+  const flagged = new Set(stored.filter((q) => q.flagged).map((q) => q.id));
   return {
     ok: true,
     subject,
@@ -49,13 +55,15 @@ export async function previewImport(content: string): Promise<ImportPreview> {
     replaced: diff.replaced.map(({ question, changes }) => ({
       id: question.id,
       text: question.text,
+      flagged: flagged.has(question.id),
       changes,
     })),
   };
 }
 
 // 取り込み。確認のあとに送られた中身を確かめ直し、1つのトランザクションの中で比べて書く。
-// 全部が入るか、何も入らないかのどちらか。変わらない問題とファイルにない問題には触らない
+// 全部が入るか、何も入らないかのどちらか。変わらない問題とファイルにない問題には触らない。
+// 置き換わる問題に印が付いていたら、印を外し、その問題の記録を消す（docs/design.md の「データ」の「問題」）
 export async function applyImport(content: string): Promise<ImportResult> {
   const validated = validateQuestionFile(content);
   if (!validated.ok) return validated;
@@ -63,8 +71,17 @@ export async function applyImport(content: string): Promise<ImportResult> {
 
   return db.transaction(async (tx) => {
     const subjectId = await findOrCreateSubjectId(tx, subject);
-    const diff = diffQuestions(incoming, await readQuestions(tx, subjectId));
+    const stored = await readQuestions(tx, subjectId);
+    const diff = diffQuestions(incoming, stored);
     const toWrite = [...diff.added, ...diff.replaced.map((r) => r.question)];
+
+    const replacedIds = new Set(diff.replaced.map((r) => r.question.id));
+    const resetIds = stored
+      .filter((q) => q.flagged && replacedIds.has(q.id))
+      .map((q) => q.rowId);
+    if (resetIds.length > 0) {
+      await tx.delete(answers).where(inArray(answers.questionId, resetIds));
+    }
 
     if (toWrite.length > 0) {
       // 増える問題と置き換わる問題を、1つの SQL で書く。問題は多くても1,000問なので、1回に収まる
@@ -91,6 +108,7 @@ export async function applyImport(content: string): Promise<ImportResult> {
             choices: sql`excluded.choices`,
             correct: sql`excluded.correct`,
             explanation: sql`excluded.explanation`,
+            flagged: false,
             updatedAt: sql`now()`,
           },
         });
@@ -133,9 +151,11 @@ async function findOrCreateSubjectId(tx: Tx, name: string): Promise<number> {
 async function readQuestions(
   executor: Db | Tx,
   subjectId: number,
-): Promise<FileQuestion[]> {
+): Promise<(FileQuestion & { rowId: number; flagged: boolean })[]> {
   return executor
     .select({
+      rowId: questions.id,
+      flagged: questions.flagged,
       id: questions.questionId,
       topic: questions.topic,
       type: questions.type,

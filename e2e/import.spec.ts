@@ -10,11 +10,11 @@ import { SIGNED_IN_STATE } from "./test-user";
 
 test.use({ storageState: SIGNED_IN_STATE });
 
-// 取り込み済みの Python（変わらない2問と、置き換わる1問）
+// 取り込み済みの Python（k3f9a2 は印付き）
 const stored = [
   testQuestion("a1x9k2"),
   testQuestion("b4m7q1", { topic: "Generators" }),
-  testQuestion("k3f9a2"),
+  testQuestion("k3f9a2", { flagged: true }),
 ];
 
 // 取り込み済みに対して、増える1問・置き換わる2問（choice D と解説）・変わらない1問になるファイル
