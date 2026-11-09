@@ -56,7 +56,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 
 - Manage で選んでいる Subject の id・Topic の名前（All topics は null）・ページ・印の付いた問題だけを出すか（`flagged`）は、1つの cookie（`manage`。JSON）に持つ。名前は `src/app/(app)/manage/cookie.ts`
   - 画面（`src/app/(app)/manage/page.tsx`）は、cookie を読んで一覧をサーバーで組み立てる
-  - 選び方を変えるアクションと消すアクション（`src/app/(app)/manage/actions.ts`）が cookie を書く。消すアクションは、消したあとに出す選び方を書く。cookie を書くと、Next.js が同じ画面をサーバーで組み立て直して返すので、一覧を読み直す処理を別に持たない
+  - 選び方を変えるアクション・消すアクション・印を外すアクション（`src/app/(app)/manage/actions.ts`）が cookie を書く。消すアクションは、消したあとに出す選び方を書く。cookie を書くと、Next.js が同じ画面をサーバーで組み立て直して返すので、一覧を読み直す処理を別に持たない
   - 読むときも書くときも `src/server/manage/selection.ts` の `parseSaved` で形を確かめ、なくなった Subject・Topic・ページは `resolveSelection` で今あるものに合わせる
 - 理由：読み込み直したときと、ほかの画面（Home の manage、Import の戻るリンク）から来たときに、同じ選び方のまま開くため。URL に持つと、リンクから来たときに選び方がなくなる
 - 前提（崩れたら見直す）：選び方を、ほかの端末と分け合わない。ブラウザの戻るで、ページを1つずつ戻らなくてよい。cookie はブラウザを閉じるまでのもの（期限を付けない）

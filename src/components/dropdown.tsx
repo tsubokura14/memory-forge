@@ -6,6 +6,8 @@ export type DropdownOption = {
   key: string;
   label: string;
   count: number;
+  // 印の付いた問題の数。0 や省いたときは出さない
+  flagged?: number;
   // 下に区切り線を引く（Topic の「All topics」）
   divider?: boolean;
 };
@@ -98,7 +100,16 @@ export function Dropdown({
                   <span className="min-w-0 flex-1 truncate">
                     {option.label}
                   </span>
-                  <span className="font-mono text-xs text-muted">
+                  {!!option.flagged && (
+                    <span className="flex items-center gap-1 font-mono text-xs text-warning">
+                      <span aria-hidden className="icon text-sm leading-none">
+                        flag
+                      </span>
+                      {option.flagged}
+                    </span>
+                  )}
+                  {/* 桁の違う行でも、印の数の位置をそろえる */}
+                  <span className="min-w-8 text-right font-mono text-xs text-muted">
                     {option.count}
                   </span>
                 </button>

@@ -14,6 +14,7 @@ import {
   parseSaved,
   type Saved,
 } from "@/server/manage/selection";
+import { unflagQuestion } from "@/server/solve/flag";
 import { MANAGE_COOKIE } from "./cookie";
 
 // 選び方を cookie に書く。cookie を書くと、Next.js が Manage をサーバーで組み立て直して返す
@@ -43,9 +44,10 @@ async function saveSelection(saved: Saved | null) {
 // 取り込み直せる大きさの Subject は収まる。超えると書き出せず、帯が出る
 export async function exportAction(
   subjectId: number,
+  flaggedOnly: boolean,
 ): Promise<{ fileName: string; content: string }> {
   await requireSession();
-  const exported = await exportSubject(subjectId, false);
+  const exported = await exportSubject(subjectId, flaggedOnly);
   if (!exported) throw new Error("No subject.");
   return exported;
 }
@@ -77,10 +79,11 @@ export async function deleteSubjectAction(subjectId: number): Promise<void> {
   );
 }
 
-// Topic を消したら、All topics の1ページ目
+// Topic を消したら、All topics の1ページ目。flagged の一覧を見ていたら、flagged のまま
 export async function deleteTopicAction(
   subjectId: number,
   topic: string,
+  flagged: boolean,
 ): Promise<void> {
   await requireSession();
   const result = await deleteTopic(subjectId, topic);
@@ -89,7 +92,7 @@ export async function deleteTopicAction(
       subjectId,
       topic: null,
       page: 1,
-      flagged: false,
+      flagged,
     }),
   );
 }
@@ -103,4 +106,12 @@ export async function deleteQuestionAction(
   await requireSession();
   const result = await deleteQuestion(id);
   await saveSelection(afterDelete(result, current.subjectId, current));
+}
+
+// 印を外したら、今の選び方のまま。flagged の一覧で今のページが空になったら前のページになる
+// （画面を組み立てるときの resolveSelection）
+export async function unflagAction(id: number, current: Saved): Promise<void> {
+  await requireSession();
+  await unflagQuestion(id);
+  await saveSelection(current);
 }
