@@ -67,6 +67,7 @@
 - 絞り込みの枠の中、Topic のプルダウン（と delete）の右に、flagged のボタンを置く。押すと、印の付いた問題だけの一覧になり、もう一度押すと戻る。押すと1ページ目に戻る
   - Topic と組み合わせて絞れる（Decorators の印の付いた問題だけ）
   - Topic を変えても、flagged のまま。Subject を変えると、flagged が外れる
+  - 選んでいた Topic がなくなっても（Topic を消した、最後の1問を消したなど）、All topics の flagged の一覧のまま
   - 読み込み直したときや、ほかの画面から戻ったときは、flagged かどうかも、選んでいた Topic・ページと同じく残る
   - flagged を押したあとの読み込み中と読み込めなかったときは、Subject・Topic を選んだときと同じ（行の形の枠の点滅、「Couldn't load questions.」と retry）
 - flagged の一覧を見ている間は、上の export が「export flagged · Python」になり、Subject の印の付いた問題を全部書き出す（Topic で絞っていても、Subject の全部の印の付いた問題）。ファイルの名前と形は、export <Subject の名前> と同じ
@@ -142,6 +143,8 @@
 - [x] （`/dev-plan` で）Setup の Topic の行の印の数と、身についている具合に印を数えないことは、まだない #9 の線と数の上にある。どうする？ → #9 に回す。#12 では作らず、Issue #9 に書き残す。Setup の画像は #9 の分を除いて合わせる
 - [x] （`/dev-plan` で）unflag できなかったときは？ → 絞り込みの下に danger の帯「Couldn't unflag k3f9a2.」（retry なし）
 - [x] （`/dev-plan` で）flagged を押したあとの読み込み中と読み込めなかったときは？ → Subject・Topic を選んだときと同じ
+- [x] （`/dev-impl` のタスク3で）flagged の一覧で Topic の delete でその Topic を丸ごと消したら、flagged の絞り込みは？ → flagged のまま（All topics の flagged の一覧の1ページ目）
+- [x] （`/dev-impl` のタスク3で）flagged の一覧で、選んでいた Topic がなくなったら（最後の1問を消した、ほかの画面で消えたなど）、flagged の絞り込みは？ → flagged のまま（All topics の flagged の一覧）
 - [x] （`/dev-impl` のタスク2で）答えたあとに flag したとき、上のバーの正解・不正解の数は？ → そのまま残す（減らさない）
 - [x] （`/dev-impl` のタスク2で）解説を開いたまま flag に失敗したときの帯の場所と、帯が出たまま next を押したら？ → 解説の枠の下に出す。次の問題に進むと消える（印は付かないまま）
 - [x] （`/dev-impl` のタスク1で）Result の % を null にすると、今の Result の画面が型エラーになる。どうする？ → タスク1では `result-view.tsx` で null のときに 0 を渡す1行を足す（印を付ける画面がまだないので null にならず、見た目は変わらない）。タスク2で「—」の表示に置き換える
@@ -186,8 +189,8 @@
 | `src/components/solve-bar.tsx`・`src/app/subjects/[id]/study.tsx` | 線の長さを、正解・不正解の数でなく、終えた問題の数（`answered`）で決める。答える前の flag でも線を進めるため |
 | `src/app/subjects/[id]/setup-form.tsx` | 「⚑1 flagged excluded」と、全部に印の案内（`flagged`） |
 | `src/app/subjects/[id]/result-view.tsx` | 数える問題が0問のときの表示（`docs/ui.md` の「解き終わりの結果」）。`src/components/accuracy-ring.tsx` は % が null のとき、円を線だけにして「—」を出す |
-| `src/app/(app)/manage/actions.ts` | `unflagAction(id, current)`：印を外し、今の選び方を cookie に書き直す（今のページが空になったら、`resolveSelection` が最後のページにする）。`exportAction` に `flaggedOnly` を渡す。どれも最初に `requireSession()` を呼ぶ |
-| `src/app/(app)/manage/manage-view.tsx` | flagged のボタン（押すと `selectAction` で `flagged` を反転し、1ページ目。Subject を変えると false）、export の文言と出し分け、unflag の失敗の帯、flagged の一覧の0件（`EmptyState`） |
+| `src/app/(app)/manage/actions.ts` | `unflagAction(id, current)`：印を外し、今の選び方を cookie に書き直す（今のページが空になったら、`resolveSelection` が最後のページにする）。`exportAction` に `flaggedOnly` を渡す。`deleteTopicAction` は今の `flagged` を受け取り、残す。どれも最初に `requireSession()` を呼ぶ |
+| `src/app/(app)/manage/manage-view.tsx` | flagged のボタン（押すと `selectAction` で `flagged` を反転し、1ページ目。Subject を変えると false）、export の文言と出し分け、unflag の失敗の帯、flagged の一覧の0件（`EmptyState`）。Topic を消す確認の問題数は、flagged でも Topic の全部の問題の数を出す |
 | `src/components/dropdown.tsx` | 行に印の数（`flagged`。0なら出さない）を出せるようにする |
 | `src/components/question-row.tsx` | `flagged` の行は warning-soft の地にし、delete の左に unflag（押すと `onUnflag`） |
 | `src/components/button.tsx` | 見た目を足す。<br>・flag（muted の文字だけ。指を乗せると warning の文字と warning-soft の地。押したあとの flagged は warning-soft の地と warning の文字）<br>・unflag（warning の文字だけ）<br>・Manage の flagged（枠だけ。押している間は warning の枠・地・文字） |
@@ -221,7 +224,7 @@
 - [x] 2. Solve で印を付けられ、Setup と Result が印を除いて数えたら完了
   - 合わせるスクリーンショット：solve-question・solve-answered-flagged・solve-flagged・setup-default・setup-none・result-default・result-all-flagged（Setup は、身についている具合の線と数を除いて合わせる）
   - flag が写る次の画像も撮り直す：solve-question・solve-answered・solve-explanation・solve-multiple・solve-answered-multiple・solve-code-choices・solve-answered-code-choices・solve-last・solve-many・solve-error・solve-quit
-- [ ] 3. Manage の一覧で、印の数・印の付いた問題だけ・export flagged を読む決まり（`list.ts`・`selection.ts`・`export.ts` とテスト）ができたら完了。画面は変えない
+- [x] 3. Manage の一覧で、印の数・印の付いた問題だけ・export flagged を読む決まり（`list.ts`・`selection.ts`・`export.ts` とテスト）ができたら完了。画面は変えない
 - [ ] 4. Manage で、flagged の一覧を見て、unflag と export flagged ができたら完了
   - 合わせるスクリーンショット：manage-default・manage-subject-open・manage-topic-open・manage-flagged・manage-flagged-empty
   - flagged のボタンが写る次の画像も撮り直す：manage-default・manage-subject-open・manage-topic-open・manage-topics-many・manage-many・manage-many-mobile・manage-loading・manage-error・manage-export-error・manage-delete-subject・manage-delete-topic・manage-delete-question・manage-delete-error

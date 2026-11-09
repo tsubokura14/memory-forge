@@ -2,17 +2,23 @@
 // データベースは使わない（画面の部品から読む）
 import { lastPage } from "./pages";
 
-// topic が null のときは All topics
-export type Saved = { subjectId: number; topic: string | null; page: number };
+// topic が null のときは All topics。flagged が true のときは、印の付いた問題だけの一覧
+export type Saved = {
+  subjectId: number;
+  topic: string | null;
+  page: number;
+  flagged: boolean;
+};
 
 export type Selection = Saved & { total: number };
 
 export type SubjectTopics = {
   id: number;
-  topics: { name: string; count: number }[];
+  topics: { name: string; count: number; flagged: number }[];
 };
 
-// cookie の値を読む。ない・読めない・形が違うときは、覚えていないのと同じにする
+// cookie の値を読む。ない・読めない・形が違うときは、覚えていないのと同じにする。
+// flagged がないとき（印を足す前に書いた cookie）だけは、選び方を捨てずに flagged でないものとして読む
 export function parseSaved(value: string | undefined): Saved | null {
   if (value === undefined) return null;
   let data: unknown;
@@ -22,17 +28,29 @@ export function parseSaved(value: string | undefined): Saved | null {
     return null;
   }
   if (typeof data !== "object" || data === null) return null;
-  const { subjectId, topic, page } = data as Record<string, unknown>;
+  const {
+    subjectId,
+    topic,
+    page,
+    flagged = false,
+  } = data as Record<string, unknown>;
   if (!Number.isSafeInteger(subjectId) || !Number.isSafeInteger(page)) {
     return null;
   }
   if (topic !== null && typeof topic !== "string") return null;
   if ((page as number) < 1) return null;
-  return { subjectId: subjectId as number, topic, page: page as number };
+  if (typeof flagged !== "boolean") return null;
+  return {
+    subjectId: subjectId as number,
+    topic,
+    page: page as number,
+    flagged,
+  };
 }
 
 // 覚えていた選び方を、今ある Subject・Topic・ページに合わせる。
-// なくなった Subject は最初の Subject と All topics、なくなった Topic は All topics、なくなったページは最後のページにする。
+// なくなった Subject は最初の Subject と All topics（flagged も外す）、なくなった Topic は All topics、なくなったページは最後のページにする。
+// flagged のときは、印の数を全体の数にする。
 // subjects は取り込んだ順。Subject が0件なら null
 export function resolveSelection(
   saved: Saved | null,
@@ -45,12 +63,21 @@ export function resolveSelection(
   const topic = keepTopic
     ? subject.topics.find((t) => t.name === saved?.topic)
     : undefined;
+  const flagged = keepTopic && saved?.flagged === true;
+  const countOf = (t: { count: number; flagged: number }) =>
+    flagged ? t.flagged : t.count;
   const total = topic
-    ? topic.count
-    : subject.topics.reduce((sum, t) => sum + t.count, 0);
+    ? countOf(topic)
+    : subject.topics.reduce((sum, t) => sum + countOf(t), 0);
   const keepPage = keepTopic && (topic !== undefined || saved?.topic === null);
   const page = keepPage ? Math.min(saved?.page ?? 1, lastPage(total)) : 1;
-  return { subjectId: subject.id, topic: topic?.name ?? null, page, total };
+  return {
+    subjectId: subject.id,
+    topic: topic?.name ?? null,
+    page,
+    total,
+    flagged,
+  };
 }
 
 // 消した Subject の次に出す Subject。remaining は残っている Subject の id（取り込んだ順）。

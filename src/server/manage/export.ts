@@ -1,13 +1,14 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "@/server/db/client";
 import { questions, subjects } from "@/server/db/schema";
 import type { QuestionFile } from "@/server/import/validate";
 
-// Subject の全部の問題を、取り込むファイルと同じ形（docs/specs/import.md の「問題のファイル」）の JSON にする。
+// Subject の全部の問題（flaggedOnly なら印の付いた問題だけ）を、取り込むファイルと同じ形（docs/specs/import.md の「問題のファイル」）の JSON にする。
 // 記録は入れない。問題は取り込んだ順（questions.id の順）。問題の数は確かめず、Import の上限を超える Subject も書き出す。
 // ない Subject は null
 export async function exportSubject(
   subjectId: number,
+  flaggedOnly: boolean,
 ): Promise<{ fileName: string; content: string } | null> {
   const [subject] = await db
     .select({ name: subjects.name })
@@ -26,7 +27,12 @@ export async function exportSubject(
       explanation: questions.explanation,
     })
     .from(questions)
-    .where(eq(questions.subjectId, subjectId))
+    .where(
+      and(
+        eq(questions.subjectId, subjectId),
+        flaggedOnly ? eq(questions.flagged, true) : undefined,
+      ),
+    )
     .orderBy(questions.id);
 
   const file: QuestionFile = { subject: subject.name, questions: rows };

@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test } from "vitest";
 import { db } from "@/server/db/client";
 import { answers, questions, subjects } from "@/server/db/schema";
@@ -44,7 +45,7 @@ describe("exportSubject", () => {
     const other = await insertSubject("AWS SAA");
     await insertQuestion(other, "z9", "IAM");
 
-    const exported = await exportSubject(python);
+    const exported = await exportSubject(python, false);
     expect(exported?.fileName).toBe("python.json");
     const file = JSON.parse(exported!.content);
     expect(file.subject).toBe("Python");
@@ -69,7 +70,7 @@ describe("exportSubject", () => {
     await insertQuestion(python, "a1", "Generators");
     await insertQuestion(python, "b2", "Decorators");
 
-    const exported = await exportSubject(python);
+    const exported = await exportSubject(python, false);
     expect(await previewImport(exported!.content)).toMatchObject({
       ok: true,
       isNewSubject: false,
@@ -77,8 +78,32 @@ describe("exportSubject", () => {
     });
   });
 
+  test("印の付いた問題だけのときは、Topic をまたいで同じ名前と形で書き出す", async () => {
+    const python = await insertSubject("Python");
+    const a = await insertQuestion(python, "a1", "Generators");
+    await insertQuestion(python, "b2", "Decorators");
+    const c = await insertQuestion(python, "c3", "Decorators");
+    const other = await insertSubject("AWS SAA");
+    const z = await insertQuestion(other, "z9", "IAM");
+    for (const id of [a, c, z]) {
+      await db
+        .update(questions)
+        .set({ flagged: true })
+        .where(eq(questions.id, id));
+    }
+
+    const exported = await exportSubject(python, true);
+    expect(exported?.fileName).toBe("python.json");
+    const file = JSON.parse(exported!.content);
+    expect(file.subject).toBe("Python");
+    expect(file.questions.map((q: { id: string }) => q.id)).toEqual([
+      "a1",
+      "c3",
+    ]);
+  });
+
   test("ない Subject は null", async () => {
-    expect(await exportSubject(1)).toBeNull();
+    expect(await exportSubject(1, false)).toBeNull();
   });
 });
 

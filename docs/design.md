@@ -54,7 +54,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 
 ## Manage の選び方
 
-- Manage で選んでいる Subject の id・Topic の名前（All topics は null）・ページは、1つの cookie（`manage`。JSON）に持つ。名前は `src/app/(app)/manage/cookie.ts`
+- Manage で選んでいる Subject の id・Topic の名前（All topics は null）・ページ・印の付いた問題だけを出すか（`flagged`）は、1つの cookie（`manage`。JSON）に持つ。名前は `src/app/(app)/manage/cookie.ts`
   - 画面（`src/app/(app)/manage/page.tsx`）は、cookie を読んで一覧をサーバーで組み立てる
   - 選び方を変えるアクションと消すアクション（`src/app/(app)/manage/actions.ts`）が cookie を書く。消すアクションは、消したあとに出す選び方を書く。cookie を書くと、Next.js が同じ画面をサーバーで組み立て直して返すので、一覧を読み直す処理を別に持たない
   - 読むときも書くときも `src/server/manage/selection.ts` の `parseSaved` で形を確かめ、なくなった Subject・Topic・ページは `resolveSelection` で今あるものに合わせる

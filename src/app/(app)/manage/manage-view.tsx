@@ -90,6 +90,7 @@ export function ManageView({
       subjectId: selected.subjectId,
       topic: selected.topic,
       page: selected.page,
+      flagged: selected.flagged,
     };
     setDeleteFailed(false);
     startDelete(async () => {
@@ -135,7 +136,12 @@ export function ManageView({
               }))}
               selected={String(selected.subjectId)}
               onSelect={(key) =>
-                select({ subjectId: Number(key), topic: null, page: 1 })
+                select({
+                  subjectId: Number(key),
+                  topic: null,
+                  page: 1,
+                  flagged: false,
+                })
               }
             />
             <DeleteIcon
@@ -166,6 +172,7 @@ export function ManageView({
                   subjectId: selected.subjectId,
                   topic: key === ALL_TOPICS ? null : key,
                   page: 1,
+                  flagged: selected.flagged,
                 })
               }
             />
@@ -216,6 +223,7 @@ export function ManageView({
                     subjectId: selected.subjectId,
                     topic: selected.topic,
                     page,
+                    flagged: selected.flagged,
                   })
                 }
               />
