@@ -45,7 +45,7 @@ export async function exportAction(
   subjectId: number,
 ): Promise<{ fileName: string; content: string }> {
   await requireSession();
-  const exported = await exportSubject(subjectId);
+  const exported = await exportSubject(subjectId, false);
   if (!exported) throw new Error("No subject.");
   return exported;
 }
@@ -59,14 +59,21 @@ function afterDelete(
 ): Saved | null {
   if (!result.subjectDeleted) return kept;
   const next = nextSubjectAfterDelete(result.remaining, subjectId);
-  return next === null ? null : { subjectId: next, topic: null, page: 1 };
+  return next === null
+    ? null
+    : { subjectId: next, topic: null, page: 1, flagged: false };
 }
 
 export async function deleteSubjectAction(subjectId: number): Promise<void> {
   await requireSession();
   const result = await deleteSubject(subjectId);
   await saveSelection(
-    afterDelete(result, subjectId, { subjectId, topic: null, page: 1 }),
+    afterDelete(result, subjectId, {
+      subjectId,
+      topic: null,
+      page: 1,
+      flagged: false,
+    }),
   );
 }
 
@@ -78,7 +85,12 @@ export async function deleteTopicAction(
   await requireSession();
   const result = await deleteTopic(subjectId, topic);
   await saveSelection(
-    afterDelete(result, subjectId, { subjectId, topic: null, page: 1 }),
+    afterDelete(result, subjectId, {
+      subjectId,
+      topic: null,
+      page: 1,
+      flagged: false,
+    }),
   );
 }
 
