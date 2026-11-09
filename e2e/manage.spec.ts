@@ -553,6 +553,7 @@ test("export flagged で、Topic で絞っていても Subject の印の付い�
   await resetPython();
   await openManage(page);
   await flaggedButton(page).click();
+  await expect(rows(page)).toHaveCount(2);
   await choose(page, "topic", "Decorators");
   await expect(rows(page)).toHaveCount(1);
   const download = page.waitForEvent("download");
@@ -646,6 +647,7 @@ test("flagged の一覧で Topic を消すと、確認に Topic の全部の問�
   await resetPython();
   await openManage(page);
   await flaggedButton(page).click();
+  await expect(rows(page)).toHaveCount(2);
   await choose(page, "topic", "Decorators");
   await expect(rows(page)).toHaveCount(1);
   await page.getByRole("button", { name: "delete topic" }).click();
