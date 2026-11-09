@@ -5,6 +5,7 @@ import { Banner } from "@/components/banner";
 import { Button } from "@/components/button";
 import { Dialog } from "@/components/dialog";
 import { Dropdown } from "@/components/dropdown";
+import { EmptyState } from "@/components/empty-state";
 import { Pagination } from "@/components/pagination";
 import { QuestionRow } from "@/components/question-row";
 import type { Manage, ManageQuestion } from "@/server/manage/list";
@@ -16,6 +17,7 @@ import {
   deleteTopicAction,
   exportAction,
   selectAction,
+  unflagAction,
 } from "./actions";
 import { ManageHeader } from "./manage-header";
 
@@ -42,6 +44,8 @@ export function ManageView({
   const [failed, setFailed] = useState<Saved | null>(null);
   // 書き出せなかった Subject の名前。もう一度書き出せたときと、選び方を変えたときに消す
   const [exportFailed, setExportFailed] = useState<string | null>(null);
+  // 印を外せなかった問題の ID。もう一度外せたときと、選び方を変えたときに消す
+  const [unflagFailed, setUnflagFailed] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<Deleting | null>(null);
   // 消している間（返事が来て、組み立て直した一覧が出るまで）は、cancel と delete を押せず、Esc でも閉じない
   const [deletePending, startDelete] = useTransition();
@@ -50,9 +54,16 @@ export function ManageView({
 
   const subject = subjects.find((s) => s.id === selected.subjectId);
   const subjectName = subject?.name ?? "";
+  const current: Saved = {
+    subjectId: selected.subjectId,
+    topic: selected.topic,
+    page: selected.page,
+    flagged: selected.flagged,
+  };
 
   function select(next: Saved) {
     setExportFailed(null);
+    setUnflagFailed(null);
     startTransition(async () => {
       try {
         await selectAction(next);
@@ -66,11 +77,23 @@ export function ManageView({
   async function exportSubject() {
     const name = subjectName;
     try {
-      const { fileName, content } = await exportAction(selected.subjectId);
+      const { fileName, content } = await exportAction(
+        selected.subjectId,
+        selected.flagged,
+      );
       download(fileName, content);
       setExportFailed(null);
     } catch {
       setExportFailed(name);
+    }
+  }
+
+  async function unflag(question: ManageQuestion) {
+    try {
+      await unflagAction(question.id, current);
+      setUnflagFailed(null);
+    } catch {
+      setUnflagFailed(question.questionId);
     }
   }
 
@@ -86,19 +109,17 @@ export function ManageView({
   function confirmDelete() {
     if (!deleting) return;
     const target = deleting;
-    const current: Saved = {
-      subjectId: selected.subjectId,
-      topic: selected.topic,
-      page: selected.page,
-      flagged: selected.flagged,
-    };
     setDeleteFailed(false);
     startDelete(async () => {
       try {
         if (target.kind === "subject") {
           await deleteSubjectAction(selected.subjectId);
         } else if (target.kind === "topic") {
-          await deleteTopicAction(selected.subjectId, target.topic);
+          await deleteTopicAction(
+            selected.subjectId,
+            target.topic,
+            selected.flagged,
+          );
         } else {
           await deleteQuestionAction(target.question.id, current);
         }
@@ -111,6 +132,7 @@ export function ManageView({
   }
 
   const topicTotal = selected.topics.reduce((sum, t) => sum + t.count, 0);
+  const flaggedTotal = subject?.flagged ?? 0;
   const [first, ...rest] = rangeText(selected.page, selected.total).split(
     " of ",
   );
@@ -118,9 +140,14 @@ export function ManageView({
   return (
     <>
       <ManageHeader>
-        <Button variant="outline" onClick={exportSubject}>
-          export {subjectName}
-        </Button>
+        {/* flagged の一覧で、Subject に印の付いた問題がないときは、書き出すものがないので出さない */}
+        {!(selected.flagged && flaggedTotal === 0) && (
+          <Button variant="outline" onClick={exportSubject}>
+            {selected.flagged
+              ? `export flagged · ${subjectName}`
+              : `export ${subjectName}`}
+          </Button>
+        )}
       </ManageHeader>
       <div className="flex flex-col gap-3">
         {/* スマホの幅では、Subject と Topic を縦に並べる */}
@@ -133,6 +160,7 @@ export function ManageView({
                 key: String(s.id),
                 label: s.name,
                 count: s.count,
+                flagged: s.flagged,
               }))}
               selected={String(selected.subjectId)}
               onSelect={(key) =>
@@ -158,12 +186,14 @@ export function ManageView({
                   key: ALL_TOPICS,
                   label: "All topics",
                   count: topicTotal,
+                  flagged: flaggedTotal,
                   divider: true,
                 },
                 ...selected.topics.map((t) => ({
                   key: t.name,
                   label: t.name,
                   count: t.count,
+                  flagged: t.flagged,
                 })),
               ]}
               selected={selected.topic ?? ALL_TOPICS}
@@ -184,16 +214,42 @@ export function ManageView({
                   openDelete({
                     kind: "topic",
                     topic: selected.topic!,
-                    count: selected.total,
+                    // flagged の一覧では selected.total が印の数になるので、Topic の全部の問題の数を読む
+                    count:
+                      selected.topics.find((t) => t.name === selected.topic)
+                        ?.count ?? 0,
                   })
                 }
               />
             )}
           </Field>
+          {/* 見出しのあるプルダウンと下の端をそろえる。スマホの幅では Topic の下に左寄せ */}
+          <Button
+            variant={selected.flagged ? "filterActive" : "filter"}
+            size="filter"
+            className="self-start sm:self-end"
+            aria-pressed={selected.flagged}
+            onClick={() =>
+              select({
+                subjectId: selected.subjectId,
+                topic: selected.topic,
+                page: 1,
+                flagged: !selected.flagged,
+              })
+            }
+          >
+            <span aria-hidden className="icon text-base leading-none">
+              flag
+            </span>
+            flagged
+          </Button>
         </div>
 
         {exportFailed !== null && (
           <Banner>Couldn&apos;t export {exportFailed}.</Banner>
+        )}
+        {unflagFailed !== null && (
+          <Banner>Couldn&apos;t unflag {unflagFailed}.</Banner>
         )}
 
         {/* retry を押したあとも、返事が来るまでは読み込み中を出す */}
@@ -209,6 +265,11 @@ export function ManageView({
           >
             Couldn&apos;t load questions.
           </Banner>
+        ) : selected.total === 0 ? (
+          // 問題が0問の Subject はないので、0件になるのは flagged の一覧だけ
+          <EmptyState
+            title={`No flagged questions in ${selected.topic ?? subjectName}.`}
+          />
         ) : (
           <>
             <div className="flex min-h-7 items-center justify-between gap-3">
@@ -237,6 +298,7 @@ export function ManageView({
                   key={q.id}
                   question={q}
                   onDelete={() => openDelete({ kind: "question", question: q })}
+                  onUnflag={() => unflag(q)}
                 />
               ))}
             </ul>
