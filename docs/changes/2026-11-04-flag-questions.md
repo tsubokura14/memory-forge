@@ -230,7 +230,7 @@
   - 合わせるスクリーンショット：solve-question・solve-answered-flagged・solve-flagged・setup-default・setup-none・result-default・result-all-flagged（Setup は、身についている具合の線と数を除いて合わせる）
   - flag が写る次の画像も撮り直す：solve-question・solve-answered・solve-explanation・solve-multiple・solve-answered-multiple・solve-code-choices・solve-answered-code-choices・solve-last・solve-many・solve-error・solve-quit
 - [x] 3. Manage の一覧で、印の数・印の付いた問題だけ・export flagged を読む決まり（`list.ts`・`selection.ts`・`export.ts` とテスト）ができたら完了。画面は変えない
-- [ ] 4. Manage で、flagged の一覧を見て、unflag と export flagged ができたら完了
+- [x] 4. Manage で、flagged の一覧を見て、unflag と export flagged ができたら完了
   - 合わせるスクリーンショット：manage-default・manage-subject-open・manage-topic-open・manage-flagged・manage-flagged-empty
   - flagged のボタンが写る次の画像も撮り直す：manage-default・manage-subject-open・manage-topic-open・manage-topics-many・manage-many・manage-many-mobile・manage-loading・manage-error・manage-export-error・manage-delete-subject・manage-delete-topic・manage-delete-question・manage-delete-error
 - [ ] 5. 取り込み直すと、置き換わった印付きの問題の印と記録が消え、取り込む前の確認に出たら完了。`import.ts` の変更とテストも、このタスクで作る
