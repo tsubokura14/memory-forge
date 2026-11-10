@@ -233,6 +233,6 @@
 - [x] 4. Manage で、flagged の一覧を見て、unflag と export flagged ができたら完了
   - 合わせるスクリーンショット：manage-default・manage-subject-open・manage-topic-open・manage-flagged・manage-flagged-empty
   - flagged のボタンが写る次の画像も撮り直す：manage-default・manage-subject-open・manage-topic-open・manage-topics-many・manage-many・manage-many-mobile・manage-loading・manage-error・manage-export-error・manage-delete-subject・manage-delete-topic・manage-delete-question・manage-delete-error
-- [ ] 5. 取り込み直すと、置き換わった印付きの問題の印と記録が消え、取り込む前の確認に出たら完了。`import.ts` の変更とテストも、このタスクで作る
+- [x] 5. 取り込み直すと、置き換わった印付きの問題の印と記録が消え、取り込む前の確認に出たら完了。`import.ts` の変更とテストも、このタスクで作る
   - 合わせるスクリーンショット：import-preview（いちばん下の「How to make question files」を除いて合わせる）
   - 見出しの文言が変わるので、次の画像も撮り直す：import-preview

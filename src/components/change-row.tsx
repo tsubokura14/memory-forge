@@ -1,13 +1,15 @@
-// 置き換わる問題の、開閉する行。行に ID と問題文の1行目、開くと変わった項目ごとに前（danger）と後（success）を並べる。
+// 置き換わる問題の、開閉する行。行に ID と問題文の1行目（印が付いていたら、右に印と記録が消えること）、開くと変わった項目ごとに前（danger）と後（success）を並べる。
 // スマホの幅では、前と後を縦に並べる
 export function ChangeRow({
   id,
   text,
+  flagged,
   changes,
   defaultOpen = false,
 }: {
   id: string;
   text: string;
+  flagged: boolean;
   changes: { item: string; before: string; after: string }[];
   defaultOpen?: boolean;
 }) {
@@ -23,6 +25,14 @@ export function ChangeRow({
         </span>
         <span className="font-mono">{id}</span>
         <span className="truncate">{text.split("\n")[0]}</span>
+        {flagged && (
+          <span className="ml-auto flex shrink-0 items-center gap-1 font-mono text-xs text-warning">
+            <span aria-hidden className="icon text-base leading-none">
+              flag
+            </span>
+            flag and records reset
+          </span>
+        )}
       </summary>
       <div className="flex flex-col gap-4 border-t border-border px-4 py-3">
         {changes.map((change) => (

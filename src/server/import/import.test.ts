@@ -1,7 +1,7 @@
-import { asc, eq } from "drizzle-orm";
+import { asc, count, eq, inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test } from "vitest";
 import { db } from "@/server/db/client";
-import { questions, subjects } from "@/server/db/schema";
+import { answers, questions, subjects } from "@/server/db/schema";
 import { applyImport, previewImport } from "./import";
 import type { FileQuestion } from "./validate";
 
@@ -39,6 +39,37 @@ async function storedQuestions() {
     .innerJoin(subjects, eq(questions.subjectId, subjects.id))
     .orderBy(asc(subjects.name), asc(questions.questionId));
   return rows;
+}
+
+// 取り込み済みの問題に、印を付け、1つずつ記録を足す
+async function flagAndAnswer(flagged: string[], answered: string[]) {
+  if (flagged.length > 0) {
+    await db
+      .update(questions)
+      .set({ flagged: true })
+      .where(inArray(questions.questionId, flagged));
+  }
+  const rows = await db
+    .select({ id: questions.id })
+    .from(questions)
+    .where(inArray(questions.questionId, answered));
+  await db
+    .insert(answers)
+    .values(rows.map((r) => ({ questionId: r.id, correct: true })));
+}
+
+// 問題ごとの印と記録の数を、ID の順に読む
+async function flagsAndRecords() {
+  return db
+    .select({
+      id: questions.questionId,
+      flagged: questions.flagged,
+      records: count(answers.id),
+    })
+    .from(questions)
+    .leftJoin(answers, eq(answers.questionId, questions.id))
+    .groupBy(questions.id)
+    .orderBy(asc(questions.questionId));
 }
 
 const first = [
@@ -80,6 +111,7 @@ describe("previewImport", () => {
         {
           id: "b2",
           text: next[1].text,
+          flagged: false,
           changes: [
             {
               item: "explanation",
@@ -95,6 +127,23 @@ describe("previewImport", () => {
       "デコレータは関数を返す。",
       "デコレータは関数を返す。",
     ]);
+  });
+
+  test("置き換わる問題に、今の印の有無を出す", async () => {
+    await applyImport(file(first));
+    await flagAndAnswer(["a1"], ["a1"]);
+    const preview = await previewImport(
+      file([
+        question({ id: "a1", topic: "Decorators", explanation: "新しい解説" }),
+        question({ id: "b2", topic: "Generators", explanation: "新しい解説" }),
+      ]),
+    );
+    expect(preview).toMatchObject({
+      replaced: [
+        { id: "a1", flagged: true },
+        { id: "b2", flagged: false },
+      ],
+    });
   });
 
   test("誤りがあれば、誤りの一覧を返す", async () => {
@@ -144,6 +193,23 @@ describe("applyImport", () => {
       { subject: "Python", ...first[1] },
       { subject: "Python", ...first[2] },
       { subject: "Python", ...added },
+    ]);
+  });
+
+  test("置き換わる印付きの問題だけ、印と記録を消す。印のない問題の記録と、変わらない印付きの問題はそのまま", async () => {
+    await applyImport(file(first));
+    await flagAndAnswer(["a1", "c3"], ["a1", "b2", "c3"]);
+    await applyImport(
+      file([
+        question({ id: "a1", topic: "Decorators", explanation: "新しい解説" }),
+        question({ id: "b2", topic: "Generators", explanation: "新しい解説" }),
+        question({ id: "c3", topic: "Decorators" }),
+      ]),
+    );
+    expect(await flagsAndRecords()).toEqual([
+      { id: "a1", flagged: false, records: 0 },
+      { id: "b2", flagged: false, records: 1 },
+      { id: "c3", flagged: true, records: 1 },
     ]);
   });
 

@@ -193,12 +193,15 @@ export function ImportFlow() {
           </div>
           {phase.preview.replaced.length > 0 && (
             <section className="mt-4 flex flex-col gap-2">
-              <h2 className="font-mono text-xs text-muted">replaced</h2>
+              <h2 className="font-mono text-xs text-muted">
+                replaced — records are kept, except for flagged questions
+              </h2>
               {phase.preview.replaced.map((question, index) => (
                 <ChangeRow
                   key={question.id}
                   id={question.id}
                   text={question.text}
+                  flagged={question.flagged}
                   changes={question.changes}
                   defaultOpen={index === 0}
                 />
