@@ -72,7 +72,8 @@
 - ボタン
   - 主な操作：primary の地。1画面に1つ
   - ほかの操作（skip など）：枠だけ。下に固定した操作の中では、主な操作より小さい muted の文字にする
-  - 不備の印（flag）：枠のない文字だけのボタン。指を乗せると warning の色
+  - 不備の印（flag）：枠のない文字だけのボタン。指を乗せると warning の色。押したあとは warning-soft の地と warning の文字の「flagged」
+  - 絞り込みの切り替え（Manage の flagged）：枠だけのボタン（muted の等幅の文字と flag の印）。押している間は warning の枠・warning-soft の地・warning の文字
   - 脇の操作（上のバーの sign out、Login の forgot password?）：枠のない muted の文字だけのボタン
   - 帯の中の操作（読み込みや保存のエラーの retry）：帯と同じ色の枠と文字のボタン
 - 選択肢：枠のある行。左に A・B・C… の記号を枠で囲んで付ける。単一選択は丸い枠、複数選択は四角い枠にする。選んでいる行は primary の枠と地
@@ -121,11 +122,12 @@
   - 確認のダイアログ：右下に cancel（枠だけ）と delete（danger の地と on-primary の文字）。1つのものを消すときは、何を消すのか（問題文の1行目など）を説明の上に出す。消せなかったときは、ダイアログを閉じずに、ボタンの上に danger の帯を出す
 - 不備の印が付いているもの：warning の色で flag の印と数を出す。一覧の行は、warning-soft の地にする
   - Manage の問題の行には、flag の印と「unflag」を warning の文字のボタンで出し、押すと印が外れる
+  - Setup の start の上には「⚑1 flagged excluded」（muted の等幅の小さな文字で、印と数だけ warning）
 - 書き出しのボタン（Manage）：「export Python」のように Subject の名前を入れる。印の一覧を見ているときは「export flagged · Python」
   - 書き出しは Subject 単位なので、Topic で絞っていても、その Topic だけを書き出すように見せないため
 - 取り込む前の確認：ファイル名 → Subject の名前を出す。まだない Subject のときは、success の枠で「new subject」と添える
   - 増える・置き換わる・変わらない数は、3つの枠に横に並べ、等幅の数字の下にラベルを置く。増えるは success、置き換わるは warning（0なら muted）、変わらないは muted の数字にする
-  - 置き換わる問題は、1問ずつ開閉する行にする。行には開閉の印と ID と問題文の1行目を出し、開くと、変わった項目ごとに、前（danger の枠と danger-soft の地）と後（success の枠と success-soft の地）を横に並べる（スマホの幅では縦）。最初の1問だけを開いておく
+  - 置き換わる問題は、1問ずつ開閉する行にする。行には開閉の印と ID と問題文の1行目を出し、開くと、変わった項目ごとに、前（danger の枠と danger-soft の地）と後（success の枠と success-soft の地）を横に並べる（スマホの幅では縦）。最初の1問だけを開いておく。印の付いた問題の行は、右に warning の flag の印と文字で「flag and records reset」
 - 中身の幅：ログインとパスワードの再設定は sm の幅のカードにする。ほかの画面は、どれも page の幅で止める
 - コードブロック：code-bg の地に枠を付ける。問題文のコードには行番号を付ける
 - 文の中のコード：code-bg の地で囲む
@@ -140,6 +142,7 @@
   - 押して送る操作（sign in など）のエラーは、retry のボタンを置かない（同じボタンをもう一度押せば済むため）
 - 取り込むファイルの誤り：danger の帯で「何件の誤りがあり、何も取り込んでいないこと」を出し、その下に、問題・項目・内容を1行ずつ並べる
 - 終わったこと（取り込めたなど）：success の帯や枠で出す
+- 知らせ（答える前に flag を押して次に進んだ）：warning の枠と warning-soft の地の帯に、flag の印と等幅の文字
 
 ## 文言
 
