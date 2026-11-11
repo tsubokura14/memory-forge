@@ -14,11 +14,15 @@ Subject の中から Topic・順番・問題数を選び（Setup）、1問ずつ
   - in order：取り込んだ順（最初の取り込みではファイルの順。取り込み直して増えた問題は最後）
   - random：start を押すたびにランダムに並べる
   - lowest accuracy：問題ごとの正答率（全部の回答のうち正解の割合）の低い順。まだ一度も解いていない問題は出さない。正答率が同じ問題は、その中でランダムに並べる
+  - どの順番でも、印の付いた問題（Solve の flag）は出さない
 - 「questions」：all・5・10・20 から選ぶ。出せる問題が選んだ数より少ないときは、ある分だけ出す
 - 開いたときは、All・in order・10 を選んでいる
 - 下に、幅いっぱいの start と、出す問題の数（start · 10 など）。押すと、選んだ問題で Solve が始まる
+- 出せる問題の数（start の数と、下の「has only」の数）は、印の付いた問題を除いて数える
 - 出せる問題が選んだ数より少ないときは、start の上に muted の等幅の小さな文字で「Decorators has only 8 questions to ask.」と出す。All を選んでいるときは、Topic の名前の代わりに Subject の名前（「Python has only 8 questions to ask.」）
-- lowest accuracy で、選んだ Topic に一度でも解いた問題がないときは、warning の文字で「No questions to ask — none in Typing have been answered yet.」と出し、start · 0 を薄くして押せない
+- 選んだ Topic（All なら Subject）に印の付いた問題があり、出せる問題が1問以上あるときは、start の上に「⚑1 flagged excluded」（muted の等幅の小さな文字。flag の印と数は warning）を出す
+- 選んだ Topic（All なら Subject）の問題に全部印が付いていると、どの順番でも、warning の文字で「No questions to ask — all 8 in Typing are flagged.」（問題の数と Topic の名前。All なら Subject の名前）と出し、start · 0 を薄くして押せない
+- lowest accuracy で、全部に印が付いてはいないが、印のない問題に一度でも解いた問題がないときは、warning の文字で「No questions to ask — none in Typing have been answered yet.」と出し、start · 0 を薄くして押せない
 - start を押して問題を読めなかったときは、Setup のまま、start の上に danger の帯「Couldn't load questions.」と retry を出す。retry で、同じ選び方でもう一度始める
 - Solve の quit と Result の try again で戻ったときは、直前に選んでいた Topic・順番・問題数のまま
 - 読み込んでいる間は、Subject の名前の場所と、Topic の行の形の枠を6つ点滅させる
@@ -27,15 +31,16 @@ Subject の中から Topic・順番・問題数を選び（Setup）、1問ずつ
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 通常 | All・in order・10 を選んでいる | ![](screens/setup-default.png) |
+| 通常 | All・in order・10 を選んでいる。印の付いた問題があり、start の上に「⚑1 flagged excluded」 | ![](screens/setup-default.png) |
+| 全部に印 | Typing を選び、warning の案内「No questions to ask — all 8 in Typing are flagged.」と、押せない start · 0 | ![](screens/setup-none.png) |
 | 問題が足りない | 案内と、ある分の数の start | ![](screens/setup-few.png) |
 | 解いた問題がない（lowest accuracy） | warning の案内と、押せない start · 0 | ![](screens/setup-unanswered.png) |
 | Topic が多い | Topic の行が続く | ![](screens/setup-many.png) |
 
 ## Solve
 
-- 上のバー：左に quit（arrow_back の印）、右に、ここまでの正解の数・不正解の数（スキップを含む）・今の問題の番号（4/10 など）。下の端に、答えた割合だけ伸びる線
-- 問題の上の行：枠で囲んだ「single」か「multi」、Topic の名前、問題の ID
+- 上のバー：左に quit（arrow_back の印）、右に、ここまでの正解の数・不正解の数（スキップを含む）・今の問題の番号（4/10 など）。下の端に、終えた問題（答えた・スキップした・答える前に印を付けた）の割合だけ伸びる線
+- 問題の上の行：枠で囲んだ「single」か「multi」、Topic の名前、問題の ID。右に flag（muted の等幅の文字だけのボタン。指を乗せると warning の文字と warning-soft の地）
 - 問題文。コードがあるときは、行番号つきのコードブロックで出す。選択肢の中のコードには行番号を付けない
 - 選択肢は、ファイルの順に A・B・C… の記号を付けて出す。単一選択（「choose one」）は丸い記号で1つだけ選べ、選び直すと前の選択が外れる。複数選択（「select all that apply」）は四角い記号で、いくつでも選べる
 - 下に固定した操作
@@ -52,6 +57,11 @@ Subject の中から Topic・順番・問題数を選び（Setup）、1問ずつ
 - 答えを保存できなかったときは、数を進めずに、選択肢の下に danger の帯「Couldn't save your answer.」と retry を出す
   - retry は、失敗した操作（submit か skip）を同じ中身で送り直す
   - 帯を出している間も、選び直し・submit・skip はでき、どれかが通れば帯は消える
+- flag で、問題に印を付ける。答える前・答えたあとのどちらでも押せる。印を付けた問題は、ほかの解く回でも出題しない。Solve の中では印を外せない（外すのは Manage）
+  - 答える前に押すと、答えずに次の問題に進み、その問題は記録しない。正解・不正解の数は増やさず、問題の番号と線は進める。次の問題の上に、warning の枠と warning-soft の地の帯で「k3f9a2 flagged — moved on without recording.」（flag の印と、印を付けた問題の ID）を出す。帯は、次の操作（選ぶ・submit・skip・flag）まで出す
+  - 最後の問題で答える前に押すと、Result に移る（帯は出さない）
+  - 答えたあとに押すと、その場でボタンが warning-soft の地と warning の文字の「flagged」に変わる。答えた記録は残り、上の正解・不正解の数も減らさない
+  - 印を付けられなかったときは、答えの保存と同じ場所に danger の帯「Couldn't flag this question.」と retry を出す。答える前の flag なら、次の問題に進まない。解説を見ているときは、解説の枠の下に出す。帯が出たまま次の問題に進むと消える（印は付かないまま）
 - quit を押すと、ダイアログ「Quit this session?」「Answers so far are kept.」を出し、後ろの画面を暗くする
   - continue と Esc で閉じて、そのまま続ける。外側を押しても閉じない
   - quit で Setup に戻る
@@ -60,7 +70,9 @@ Subject の中から Topic・順番・問題数を選び（Setup）、1問ずつ
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 答える前（単一選択） | choose one と丸い記号の選択肢 | ![](screens/solve-question.png) |
+| 答える前（単一選択） | choose one と丸い記号の選択肢。問題の上の行の右に flag | ![](screens/solve-question.png) |
+| 答えたあとに印 | flag が flagged に変わる | ![](screens/solve-answered-flagged.png) |
+| 答える前に印 | 次の問題の上に「k3f9a2 flagged — moved on without recording.」 | ![](screens/solve-flagged.png) |
 | 答えたあと（問題） | 答え合わせの色、結果の帯、explanation と next | ![](screens/solve-answered.png) |
 | 答えたあと（解説） | 解説と、question と next | ![](screens/solve-explanation.png) |
 | 答える前（複数選択） | select all that apply と四角い記号の選択肢 | ![](screens/solve-multiple.png) |
@@ -82,7 +94,9 @@ Subject の中から Topic・順番・問題数を選び（Setup）、1問ずつ
   - 正答率は、整数に四捨五入する（6/9 は 67%）
 - 枠の下に、correct（success）・incorrect（danger）・skipped（danger）・flagged · not counted（warning）の数を、小さなカード4枚で出す（PC は横に4枚、スマホの幅では2行2列）
   - incorrect は、答えて間違えた数だけ（スキップは skipped にだけ数える）
-  - flagged は、いつも 0
+  - flagged は、この回で印を付けた問題の数
+- 印を付けた問題は、答える前でも答えたあとでも、得点・正答率・correct / incorrect / skipped・by topic に数えない
+- 数える問題が0問（全部に印を付けた）のときは、円を線だけにし、% と得点を muted の「—」、得点の下を「no questions counted」にする。by topic の一覧は出さない
 - 「by topic」の見出しの下に、Topic ごとの行を区切り線で並べる。行には、Topic の名前、割合の線、得点（3/4）、% を出す
   - 割合の線は、左から、正解（success）、前は正解したのに今回間違えた（warning）、前にも正解したことがない不正解（danger）の順に塗り分ける
   - 「前は正解したのに今回間違えた」は、今回不正解かスキップで、今回より前の記録に一度でも正解がある問題
@@ -100,10 +114,12 @@ Subject の中から Topic・順番・問題数を選び（Setup）、1問ずつ
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 通常 | 正答率の円と得点、4つの数、Topic ごとの行、try again と home | ![](screens/result-default.png) |
+| 通常 | 正答率の円と得点、4つの数（flagged · not counted が 1）、Topic ごとの行、try again と home | ![](screens/result-default.png) |
+| 全部に印 | 線だけの円、「—」と no questions counted。by topic は出さない | ![](screens/result-all-flagged.png) |
 
 ## 記録
 
 - 答えるたびに（submit とスキップ）、その問題の正解・不正解を記録する。スキップは不正解
+- 答える前に印を付けた問題は、記録しない。答えたあとに印を付けても、答えた記録は残る
 - quit・読み込み直し・ページを閉じても、それまでに答えた分の記録は残る
 - 記録は、Setup の lowest accuracy の並びと解いた問題の数、Result の「前は正解したのに今回間違えた」に使う
