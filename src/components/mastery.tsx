@@ -13,7 +13,7 @@ export function MasteryBar({
   // 全部に印が付いて数える問題がないときは塗らず、全部 border の線にする
   const width = (n: number) => `${all === 0 ? 0 : (n / all) * 100}%`;
   return (
-    <span className="flex flex-col gap-1.5">
+    <span className="flex flex-col gap-1">
       <span
         aria-hidden
         className="flex h-1 overflow-hidden rounded-sm bg-border"
