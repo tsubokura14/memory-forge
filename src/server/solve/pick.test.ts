@@ -118,14 +118,15 @@ describe("startNotice", () => {
 
 describe("topicStats", () => {
   const topics = [
-    { name: "Decorators", total: 12, answered: 3, flagged: 1 },
-    { name: "Typing", total: 8, answered: 0, flagged: 2 },
+    { name: "Decorators", total: 12, answered: 3, correct: 2, flagged: 1 },
+    { name: "Typing", total: 8, answered: 0, correct: 0, flagged: 2 },
   ];
 
   test("Topic を選ぶと、その Topic の数", () => {
     expect(topicStats(topics, "Typing")).toEqual({
       total: 8,
       answered: 0,
+      correct: 0,
       flagged: 2,
     });
   });
@@ -134,6 +135,7 @@ describe("topicStats", () => {
     expect(topicStats(topics, null)).toEqual({
       total: 20,
       answered: 3,
+      correct: 2,
       flagged: 3,
     });
   });

@@ -18,18 +18,41 @@ function topicQuestions(topic: string, n: number): TestQuestion[] {
   );
 }
 
-// 使う場面の Python（Basics 3問・Decorators 12問・Generators 8問・Typing 8問・Async 4問）
+// 使う場面の Python（Basics 12問・Decorators 10問・Generators 9問・Typing 8問・Async 9問）
 const python = [
-  ...topicQuestions("Basics", 3),
-  ...topicQuestions("Decorators", 12),
-  ...topicQuestions("Generators", 8),
+  ...topicQuestions("Basics", 12),
+  ...topicQuestions("Decorators", 10),
+  ...topicQuestions("Generators", 9),
   ...topicQuestions("Typing", 8),
-  ...topicQuestions("Async", 4),
+  ...topicQuestions("Async", 9),
 ];
 
-// Subject を入れ直し、その Setup を開いて、読み終えるのを待つ
-async function openSetup(page: Page, questions: TestQuestion[]) {
+// id の頭から順に答えを入れる記録。correct 問を正解、続く wrong 問を不正解にする
+function answersFor(prefix: string, correct: number, wrong: number) {
+  return Array.from({ length: correct + wrong }, (_, i) => ({
+    questionId: `${prefix}${i + 1}`,
+    correct: i < correct,
+  }));
+}
+
+// Python の答えた記録。Decorators は印を付ける dec1 も答えておき、印の付いた問題を数えないことが画像でわかるようにする
+// （dec1 に印を付けると、Basics 10・2・0、Decorators 5・3・1、Generators 5・2・2、Typing 0・0・8、Async 6・1・2）
+const pythonAnswers = [
+  ...answersFor("bas", 10, 2),
+  { questionId: "dec1", correct: true },
+  ...answersFor("dec", 6, 3).slice(1),
+  ...answersFor("gen", 5, 2),
+  ...answersFor("asy", 6, 1),
+];
+
+// Subject を入れ直し、答えた記録を入れ、その Setup を開いて、読み終えるのを待つ
+async function openSetup(
+  page: Page,
+  questions: TestQuestion[],
+  records: { questionId: string; correct: boolean }[] = [],
+) {
   const [id] = await resetQuestions([{ name: "Python", questions }]);
+  if (records.length > 0) await insertAnswers(records);
   await page.goto(`/subjects/${id}`);
   await expect(page.getByTestId("setup-loading")).toHaveCount(0);
 }
@@ -38,15 +61,21 @@ function start(page: Page) {
   return page.getByRole("button", { name: /^start/ });
 }
 
-test("setup-default：印の付いた問題があると、除いたことを start の上に出す", async ({
+test("setup-default：印の付いた問題があると、除いたことを start の上に出す。スマホの幅では数が折り返す", async ({
   page,
 }) => {
   await openSetup(
     page,
     python.map((q) => (q.id === "dec1" ? { ...q, flagged: true } : q)),
+    pythonAnswers,
   );
   await expect(page.getByText("1 flagged excluded")).toBeVisible();
   await expect(page).toHaveScreenshot("setup-default.png", { fullPage: true });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page).toHaveScreenshot("setup-default-mobile.png", {
+    fullPage: true,
+  });
 });
 
 test("setup-none：Topic の問題が全部印付きだと、理由を出し、start を押せない", async ({
@@ -54,7 +83,10 @@ test("setup-none：Topic の問題が全部印付きだと、理由を出し、s
 }) => {
   await openSetup(
     page,
-    python.map((q) => (q.topic === "Typing" ? { ...q, flagged: true } : q)),
+    python.map((q) =>
+      q.topic === "Typing" || q.id === "dec1" ? { ...q, flagged: true } : q,
+    ),
+    pythonAnswers,
   );
   await page.getByRole("radio", { name: "Typing" }).click();
   await expect(
@@ -69,7 +101,7 @@ test("setup-none：Topic の問題が全部印付きだと、理由を出し、s
 test("setup-few：Topic の問題が足りないと、Topic の名前で案内し、ある分の数を添える", async ({
   page,
 }) => {
-  await openSetup(page, python);
+  await openSetup(page, python, pythonAnswers);
   await page.getByRole("radio", { name: "Typing" }).click();
   await expect(
     page.getByText("Typing has only 8 questions to ask."),
@@ -89,7 +121,7 @@ test("All で問題が足りないと、Subject の名前で案内する", async
 test("setup-unanswered：lowest accuracy で解いた問題がないと、理由を出し、start を押せない", async ({
   page,
 }) => {
-  await openSetup(page, python);
+  await openSetup(page, python, pythonAnswers);
   await page.getByRole("radio", { name: "Typing" }).click();
   await page.getByRole("radio", { name: "lowest accuracy" }).click();
   await expect(
@@ -104,15 +136,31 @@ test("setup-unanswered：lowest accuracy で解いた問題がないと、理由
   });
 });
 
+// setup-many の Topic ごとの [correct, wrong, new]。30の Topic でくり返す
+const MANY_COUNTS = [
+  [1, 1, 3],
+  [3, 3, 6],
+  [3, 1, 2],
+  [3, 0, 4],
+  [0, 0, 8],
+  [4, 1, 4],
+];
+
 test("setup-many：Topic が多いと、行が続く", async ({ page }) => {
-  await openSetup(
-    page,
-    Array.from({ length: 30 }, (_, i) =>
-      testQuestion(`m${i + 1}`, {
-        topic: `Topic ${String(i + 1).padStart(2, "0")}`,
-      }),
-    ),
-  );
+  const questions: TestQuestion[] = [];
+  const records: { questionId: string; correct: boolean }[] = [];
+  for (let t = 1; t <= 30; t++) {
+    const [correct, wrong, fresh] = MANY_COUNTS[(t - 1) % MANY_COUNTS.length];
+    for (let i = 1; i <= correct + wrong + fresh; i++) {
+      const id = `m${t}-${i}`;
+      questions.push(
+        testQuestion(id, { topic: `Topic ${String(t).padStart(2, "0")}` }),
+      );
+      if (i <= correct + wrong)
+        records.push({ questionId: id, correct: i <= correct });
+    }
+  }
+  await openSetup(page, questions, records);
   await expect(page.getByRole("radio", { name: "Topic 30" })).toBeVisible();
   await expect(page).toHaveScreenshot("setup-many.png", { fullPage: true });
 });
@@ -366,7 +414,7 @@ test("答えるたびに数と番号が進み、正解・不正解の帯と、�
   });
 });
 
-test("skip で次に進み、不正解として数える。最後の問題は results で Result に移り、try again で選び方の残った Setup に戻る", async ({
+test("skip で次に進み、不正解として数える。最後の問題は results で Result に移り、try again で選び方の残った Setup に戻り、答えた分が具合に入る", async ({
   page,
 }) => {
   await startDecorators(page);
@@ -384,6 +432,9 @@ test("skip で次に進み、不正解として数える。最後の問題は re
   await button(page, "try again").click();
   await expect(page.getByRole("radio", { name: "Decorators" })).toBeChecked();
   await expect(start(page)).toHaveText("start · 10");
+  await expect(page.getByRole("radio", { name: "Decorators" })).toContainText(
+    "1 correct · 9 wrong · 0 new",
+  );
 });
 
 test("最後の問題の skip も、Result に移る", async ({ page }) => {
