@@ -44,25 +44,32 @@ Issue #9 にある「問題ごとの正答率と解いた回数（Manage）」�
 
 ## 画面
 
+見た目は `docs/ui.md` の「今の身についている具合」に従う。そこにない決まり：
+
+- 行の中は、左に名前、その下に細い線、その下に数（muted の等幅の小さな文字。correct の数は success、wrong の数は danger）。% は行の右（Home では chevron_right の印の左）に等幅で、決まった幅で右にそろえる
+- 名前が長いときは、今と同じく行の中で折り返す
+- スマホの幅で数が折り返すときも、「⚑1」の印と数は分けない
+
 ### Home（home）
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 通常 | Subject の行に線・数・% | |
-| まだ解いていない Subject | 線が全部 border、「0 correct · 0 wrong · 12 new」と「—」 | |
-| Subject が多い | 行が続く | |
-| Subject が0件 | 今のまま（点線の枠と import） | 今の home-empty.png |
-| 読み込み中 | 線と数のある行と同じ形の枠を点滅させる | |
+| 通常 | Subject の行に線・数・%。まだ解いていない Linux は、線が全部 border、「0 correct · 0 wrong · 30 new」と「—」 | ![](2026-11-11-show-mastery/home-default.png) |
+| Subject が多い | 行が続く | ![](2026-11-11-show-mastery/home-many.png) |
+| Subject が0件 | 今のまま（点線の枠と import） | `docs/specs/screens/home-empty.png` |
+| 読み込み中 | 線と数のある行と同じ高さの枠を4つ点滅させる | ![](2026-11-11-show-mastery/home-loading.png) |
 | 読み込めない | 今のまま（danger の帯と retry） | |
 
 ### Setup（setup）
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 通常 | Topic の行と All の行に線・数・%。印のある行に「· ⚑1」 | |
-| 全部に印 | その Topic の行が「0 correct · 0 wrong · 0 new · ⚑8」と「—」 | |
-| Topic が多い | 行が続く | |
-| 読み込み中 | 線と数のある行と同じ形の枠を点滅させる | |
+| 通常 | Topic の行と All の行に線・数・%。Decorators と All に「· ⚑1」 | ![](2026-11-11-show-mastery/setup-default.png) |
+| 通常（スマホの幅） | 数が折り返し、「⚑1」は次の行にまとめて出る | ![](2026-11-11-show-mastery/setup-default-mobile.png) |
+| 全部に印 | Typing の行が「0 correct · 0 wrong · 0 new · ⚑8」、線が全部 border、「—」 | ![](2026-11-11-show-mastery/setup-none.png) |
+| 問題が足りない・解いた問題がない | 行は通常と同じ。下の案内と start は今のまま | |
+| Topic が多い | 行が続く | ![](2026-11-11-show-mastery/setup-many.png) |
+| 読み込み中 | 今のまま（Topic の行の形の枠を6つ点滅させる） | |
 | 読み込めない | 今のまま（danger の帯と retry） | |
 
 ## やらないこと
