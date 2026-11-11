@@ -91,3 +91,89 @@ Issue #9 にある「問題ごとの正答率と解いた回数（Manage）」�
 - [x] 1つの機能として、Home と Setup をまとめて1つの仕様でよい？（数え方が同じなので、まとめる案） → まとめる
 
 ## 調べたこと
+
+## 設計
+
+表の形は変えない。今ある `answers`（答えるたびに1行）と `questions.flagged` から数える（`docs/design.md` の「記録」）。
+
+### 数え方
+
+- 問題ごとの「最後の答え」は、`answers` のうち、その問題の `answers.id` がいちばん大きい行にする（`distinct on (question_id) ... order by question_id, id desc` の副問い合わせ）
+  - `answered_at` ではなく `id` で決める。`id` は足した順に増えるので、同じ時刻に2行あっても1つに決まる
+  - 残す場所：コメント（副問い合わせのところ）
+- 集計は SQL で行い、印のない問題について次の3つを返す（Setup は Topic ごと、Home は Subject ごと）
+  - `total`：問題の数（今の `TopicStats.total` と同じ）
+  - `answered`：一度でも答えた問題の数（今の `TopicStats.answered` と同じ）
+  - `correct`：最後の答えが正解の問題の数（新しく足す）
+  - wrong は `answered - correct`、new は `total - answered` になる（スキップは不正解として記録されているので、wrong に入る）
+- `correct`・wrong・new・% を出す計算は、データベースを使わない関数 `mastery()` にまとめ、Home と Setup の両方が使う
+  - `{ total, answered, correct }` から `{ correct, wrong, new, accuracy }` を返す。`accuracy` は `Math.round(correct / answered * 100)`、`answered` が0なら `null`（画面で「—」）
+  - 全部に印が付いた Topic・Subject は、SQL の結果が `total = answered = correct = 0` になるので、特別扱いをしなくても「0 correct · 0 wrong · 0 new」と「—」になる
+- Setup の All の行は、ブラウザで Topic の行を足して数える（今の `topicStats(topics, null)` に `correct` を足す）。Topic は Subject の問題を重ならずに分けるので、足せば Subject 全体と同じになる
+  - 残す場所：今の `topicStats` のコメントに `correct` を足す
+
+### 比べたやり方と、選ばなかった理由
+
+- 数える場所
+  - 選んだ：SQL で Topic（Subject）ごとの数を返し、% だけをデータベースを使わない関数で出す。今の `getSetup` の集計に1つ足すだけで済み、Home で全部の問題を読まずに済む
+  - 選ばなかった：問題ごとの最後の答えを返し、アプリで数える。Home で全部の Subject の全部の問題を読むことになり、今の集計と書き方が分かれる
+- Setup の行の部品
+  - 選んだ：今の `RadioList` に、行ごとに「名前の下に出す中身」と「右に出す中身」を渡せるようにする。丸・選んだ地・押したときの動きが1か所のまま
+  - 選ばなかった：Setup 専用の丸の付いた行を新しく作る。丸の行の見た目と動きが2か所になる
+- タスクの分け方
+  - 選んだ：Home と Setup の2つ（それぞれ、読み出し＋画面）。表の形の変更がなく、それぞれの PR で画面の動きまで確かめられる
+  - 選ばなかった：読み出し・Home・Setup の3つ。最初の PR は画面に何も出ず、確かめにくい
+
+### 変えるファイル
+
+- `src/server/mastery/last-answer.ts`（新規）：問題ごとの最後の答えの副問い合わせ（drizzle の `$with` か `.as()`）。Home と Setup の SQL の両方が使う
+- `src/server/mastery/mastery.ts`（新規）：`mastery()`。データベースを使わない（ブラウザの Setup からも読む。`docs/design.md` の「全体の構成」）
+- `src/server/subjects/subjects.ts`：`listSubjects()` が `{ id, name, total, answered, correct }` を返すようにする。`subjects` に `questions`・`answers`・最後の答えを left join し、`subjects.id` でまとめ、取り込んだ順のまま
+- `src/server/solve/setup.ts`：`TopicStats` に `correct` を足し、`getSetup()` の集計に最後の答えの left join と `correct` を足す
+- `src/server/solve/pick.ts`：`topicStats()` が `correct` も足す（`startNotice()` は使わない）
+- `src/components/mastery.tsx`（新規）：`docs/ui.md` の「今の身についている具合」の部品
+  - 線：border の地に、correct（success）・wrong（danger）を `correct + wrong + new` に対する割合の幅で左から塗る。残りが new（border）。3つの合計が0なら塗らず、全部 border になる
+  - 数：muted の等幅の小さな文字で「30 correct · 10 wrong · 8 new」。数字だけ correct は success、wrong は danger。印の数を渡されたら、終わりに「· ⚑1」（flag の印と数は warning）。数は折り返してよく、flag の印と数は分けない（`whitespace-nowrap`）
+  - %：等幅で、決まった幅に右そろえ（`TopicResultRow` の % と同じ `w-10`）。`null` は「—」
+- `src/app/(app)/page.tsx`：Subject の行を、左に名前・線・数、右に %・chevron_right にする。印の数は渡さない。読み込み中の枠の高さを、線と数のある行の高さに合わせる
+- `src/components/radio-list.tsx`：選ぶものに `description?: ReactNode`（名前の下）と `aside?: ReactNode`（右）を足す。渡さないときは今と同じ見た目
+- `src/app/subjects/[id]/setup-form.tsx`：Topic の行と All の行に、`mastery()` の線・数（印の数つき）と % を渡す
+- Solve の quit と Result の try again で Setup に戻ったときは、今の `router.refresh()`（`src/app/subjects/[id]/study.tsx` の `backToSetup`）で `getSetup()` が読み直されるので、変えない
+- `docs/design.md`：「データ」の印の段落の「印の付いた問題は、出題しない…」に、「Home と Setup の身についている具合に数えない（`src/server/subjects/subjects.ts`・`src/server/solve/setup.ts`）」を足す。複数の場所が同じ列を同じ意味で読む決まりのため。Home のタスクで足し、Setup のタスクで当てはまる場所を確かめる
+
+### 画面のテストのデータ
+
+- `e2e/home.spec.ts` と `e2e/solve.spec.ts` で、`e2e/questions.ts` の `insertAnswers` を使って記録を入れ、合わせるスクリーンショットに近い数にする
+- Home のデータには印の付いた問題を1問入れ、Home に「⚑」が出ないことも画像でわかるようにする
+
+## 確かめ方
+
+| 受け入れ条件 | 確かめ方 |
+| --- | --- |
+| 最後の答えで correct・wrong・new に数える（正解→不正解は wrong、不正解→正解は correct、記録がなければ new） | テスト：`src/server/subjects/subjects.test.ts`（最後の答えの副問い合わせは Home と Setup で同じなので、ここで1回だけ） |
+| 不正解とスキップは wrong | コードを見て確かめる：スキップは `answers.correct = false` で記録される（`src/server/solve/answer.ts`）ので、不正解と同じ行になる |
+| 印の付いた問題は数えない | テスト：`subjects.test.ts` と `src/server/solve/setup.test.ts`（それぞれの SQL に条件があるので両方） |
+| % は四捨五入、correct + wrong が0なら「—」 | テスト：`src/server/mastery/mastery.test.ts`（2 ÷ 3 が 67。answered が0なら null、1なら値がある） |
+| いつも3つの数を並べる | 触って確かめる：Linux（home-default）・Typing（setup-default）の「0 correct」 |
+| 全部に印の Topic・Subject は「0 correct · 0 wrong · 0 new」「—」、線は全部 border | テスト：`setup.test.ts` で、全部に印の Topic が `total = answered = correct = 0` になる。見た目は触って確かめる（setup-none の画像） |
+| スマホの幅で数が折り返す。「⚑1」は分けない | 触って確かめる（setup-default-mobile の画像） |
+| Home：Subject の行に線・数・%、chevron_right は今のまま。印の数は出さない | 触って確かめる（home-default・home-many の画像） |
+| Home：線の塗り分け（success・danger・border の割合） | 触って確かめる（home-default の画像） |
+| Home：読み込み中の枠が、線と数のある行と同じ高さ | コードを見て確かめる：`src/app/(app)/page.tsx` の読み込み中の枠の高さ（撮らない。`docs/design.md` の「画面の画像を撮る・比べる仕組み」）。見本は home-loading.png |
+| Setup：Topic の行と All の行に線・数・% | テスト：`src/server/solve/pick.test.ts` の `topicStats` で、All が `correct` も足す。見た目は触って確かめる（setup-default の画像） |
+| Setup：印があれば「· ⚑1」 | 触って確かめる（setup-default で、Decorators・All にあり、ほかの行にない） |
+| Setup：選んでいる行でも線と数の色は同じ | 触って確かめる（setup-default の All、setup-none の Typing） |
+| Setup：quit と try again で戻ると、答えた分を入れた具合を出す | テスト：`e2e/solve.spec.ts` の今ある try again のテストに、戻った Setup の行の数が答えた分で変わったことを足す |
+
+## タスク
+
+- [ ] 1. Home の Subject の行に身についている具合を出す
+  - 完了：Home の Subject の行に、最後の答えで数えた線・数・% が出たら完了
+  - 変えるもの：`src/server/mastery/last-answer.ts`・`src/server/mastery/mastery.ts`（とテスト）、`src/server/subjects/subjects.ts`（とテスト）、`src/components/mastery.tsx`、`src/app/(app)/page.tsx`、`e2e/home.spec.ts`、`docs/design.md` の印の段落
+  - 合わせるスクリーンショット：`home-default.png`、`home-many.png`、`home-loading.png`（読み込み中は撮らず、コードで合わせる）
+  - 撮り直す画像：`docs/specs/screens/home-default.png`、`docs/specs/screens/home-many.png`
+- [ ] 2. Setup の Topic の行に身についている具合と印の数を出す
+  - 完了：Setup の Topic の行と All の行に、線・数・%・印の数が出て、quit・try again で戻ると答えた分が入ったら完了
+  - 変えるもの：`src/server/solve/setup.ts`（とテスト）、`src/server/solve/pick.ts`（とテスト）、`src/components/radio-list.tsx`、`src/app/subjects/[id]/setup-form.tsx`、`e2e/solve.spec.ts`（setup-default-mobile を撮るテストを足す）
+  - 合わせるスクリーンショット：`setup-default.png`、`setup-default-mobile.png`、`setup-none.png`、`setup-many.png`
+  - 撮り直す画像：`docs/specs/screens/setup-default.png`、`docs/specs/screens/setup-default-mobile.png`（新しく撮る）、`docs/specs/screens/setup-none.png`、`docs/specs/screens/setup-many.png`、`docs/specs/screens/setup-few.png`、`docs/specs/screens/setup-unanswered.png`（行に線と数が増えるため）
