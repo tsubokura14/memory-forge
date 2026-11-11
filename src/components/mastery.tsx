@@ -32,7 +32,8 @@ export function MasteryBar({
           <>
             {" "}
             · {/* 折り返しても、flag の印と数は分けない */}
-            <span className="inline-flex items-center gap-0.5 whitespace-nowrap text-warning">
+            {/* 印は文字より大きいので、下にそろえて行の高さを増やさない */}
+            <span className="inline-flex items-center gap-0.5 align-bottom whitespace-nowrap text-warning">
               <span aria-hidden className="icon text-sm leading-none">
                 flag
               </span>
