@@ -167,7 +167,7 @@ Issue #9 にある「問題ごとの正答率と解いた回数（Manage）」�
 
 ## タスク
 
-- [ ] 1. Home の Subject の行に身についている具合を出す
+- [x] 1. Home の Subject の行に身についている具合を出す
   - 完了：Home の Subject の行に、最後の答えで数えた線・数・% が出たら完了
   - 変えるもの：`src/server/mastery/last-answer.ts`・`src/server/mastery/mastery.ts`（とテスト）、`src/server/subjects/subjects.ts`（とテスト）、`src/components/mastery.tsx`、`src/app/(app)/page.tsx`、`e2e/home.spec.ts`、`docs/design.md` の印の段落
   - 合わせるスクリーンショット：`home-default.png`、`home-many.png`、`home-loading.png`（読み込み中は撮らず、コードで合わせる）
