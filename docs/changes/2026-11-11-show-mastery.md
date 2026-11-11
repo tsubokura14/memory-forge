@@ -24,18 +24,22 @@ Issue #9 にある「問題ごとの正答率と解いた回数（Manage）」�
 - 問題ごとに、最後の答えで「correct」「wrong」「new」のどれかに数える
   - 最後の答えが正解：correct。不正解かスキップ：wrong。答えた記録がない：new
 - 印の付いた問題は、どれにも数えない
-- % は「correct ÷（correct + wrong）」。correct + wrong が0のときは「—」
-- 全部の問題に印が付いた Topic は「0 correct · 0 wrong · 0 new」と「—」
+- % は「correct ÷（correct + wrong）」を整数に四捨五入したもの（例：2 ÷ 3 は 67%）。correct + wrong が0のときは「—」
+- 数は、0の項目も含めて、いつも correct・wrong・new の3つを並べる
+- 全部の問題に印が付いた Topic（Home では Subject）は「0 correct · 0 wrong · 0 new」と「—」にし、線は全部 border にする
+- スマホの幅で数が1行に収まらないときは、折り返す
 
 ### Home
 
 - Subject の行に、名前の下に、その Subject の全部の問題で数えた線と「30 correct · 10 wrong · 8 new」を出し、右に % を出す（右の chevron_right の印は今のまま）
 - 線は、左から correct（success）・wrong（danger）・new（border）の割合で塗り分ける
+- 印の数は出さない
 
 ### Setup
 
 - Topic の行と All の行に、名前の下に、その Topic（All なら Subject の全部）の線と数を出し、右に % を出す
 - 印の付いた問題があれば、数の並びの終わりに「· ⚑1」（flag の印と数は warning）を出す
+- 選んでいる行（primary-soft の地）でも、線と数の色はほかの行と同じ
 - Solve の quit と Result の try again で Setup に戻ったときは、それまでに答えた分を入れた具合を出す
 
 ## 画面
@@ -66,16 +70,17 @@ Issue #9 にある「問題ごとの正答率と解いた回数（Manage）」�
 - 線や行を押して、その Topic の問題の一覧や苦手な問題を出すこと（画面の移動はない）
 - 具合の移り変わり（日ごとのグラフなど）
 - Manage の問題ごとの正答率と、Setup の lowest accuracy を変えること（もうある）
+- Home の Subject の行に、印の数を出すこと
 
 ## 決まっていないこと
 
-- [ ] Home の Subject の行にも、印の数「· ⚑1」を出す？（#12 で決まったのは Setup の Topic の行だけ）
-- [ ] % は整数に四捨五入する？（Manage と Result は四捨五入。0.5% のような端は、1 correct · 199 wrong で 1%、199 correct · 1 wrong で 100% になる。100% は「全部 correct」のときだけにする？）
-- [ ] 数が0の項目も出す？（「0 correct · 0 wrong · 12 new」のように、いつも3つ並べる理解）
-- [ ] 全部に印が付いた Topic の線は、全部 border の線にする？線を出さない？
-- [ ] Home で、全部の問題に印が付いた Subject も、Topic と同じく「0 correct · 0 wrong · 0 new」と「—」にする？
-- [ ] スマホの幅で、数（と「· ⚑1」）が1行に収まらないときは、折り返す？
-- [ ] Setup の選んでいる行（primary-soft の地）でも、線と数の色は同じでよい？
-- [ ] 1つの機能として、Home と Setup をまとめて1つの仕様でよい？（数え方が同じなので、まとめる案）
+- [x] Home の Subject の行にも、印の数「· ⚑1」を出す？（#12 で決まったのは Setup の Topic の行だけ） → 出さない（印は Setup と Manage で見る）
+- [x] % は整数に四捨五入する？（Manage と Result は四捨五入。199 correct · 1 wrong も 100% になる） → 四捨五入する。Manage・Result とそろえ、100% の特別扱いはしない
+- [x] 数が0の項目も出す？（「0 correct · 0 wrong · 12 new」のように、いつも3つ並べる理解） → 出す。いつも3つ並べる
+- [x] 全部に印が付いた Topic の線は、全部 border の線にする？線を出さない？ → 全部 border の線にする（行の形をほかとそろえる）
+- [x] Home で、全部の問題に印が付いた Subject も、Topic と同じく「0 correct · 0 wrong · 0 new」と「—」にする？ → する
+- [x] スマホの幅で、数（と「· ⚑1」）が1行に収まらないときは、折り返す？ → 折り返す
+- [x] Setup の選んでいる行（primary-soft の地）でも、線と数の色は同じでよい？ → 同じにする
+- [x] 1つの機能として、Home と Setup をまとめて1つの仕様でよい？（数え方が同じなので、まとめる案） → まとめる
 
 ## 調べたこと
