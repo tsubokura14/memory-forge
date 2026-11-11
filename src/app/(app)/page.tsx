@@ -4,7 +4,9 @@ import { Suspense } from "react";
 import { Banner } from "@/components/banner";
 import { buttonClass } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
+import { MasteryAccuracy, MasteryBar } from "@/components/mastery";
 import { RetryButton } from "@/components/retry-button";
+import { mastery } from "@/server/mastery/mastery";
 import { listSubjects } from "@/server/subjects/subjects";
 
 // Home。上に menu、下に subjects
@@ -66,29 +68,37 @@ async function Subjects() {
       aria-label="subjects"
       className="flex flex-col divide-y divide-border overflow-hidden rounded-md border border-border bg-surface"
     >
-      {subjects.map((subject) => (
-        <li key={subject.id}>
-          {/* 長い名前は折り返し、印は縦の真ん中のまま */}
-          <Link
-            href={`/subjects/${subject.id}`}
-            className="flex items-center justify-between gap-4 px-4 py-3 text-base hover:bg-surface-raised"
-          >
-            <span className="min-w-0 break-words">{subject.name}</span>
-            {/* 印の行の高さで行が高くならないように、行の高さを文字の大きさにそろえる */}
-            <span
-              aria-hidden
-              className="icon shrink-0 text-lg leading-none text-muted"
+      {subjects.map((subject) => {
+        const m = mastery(subject);
+        return (
+          <li key={subject.id}>
+            {/* 長い名前は折り返し、% と印は縦の真ん中のまま */}
+            <Link
+              href={`/subjects/${subject.id}`}
+              className="flex items-center gap-4 px-4 py-3 text-base hover:bg-surface-raised"
             >
-              chevron_right
-            </span>
-          </Link>
-        </li>
-      ))}
+              <span className="flex min-w-0 flex-1 flex-col gap-1.5">
+                <span className="break-words">{subject.name}</span>
+                {/* Home では印の数を出さない（印は Setup と Manage で見る） */}
+                <MasteryBar mastery={m} />
+              </span>
+              <MasteryAccuracy accuracy={m.accuracy} />
+              {/* 印の行の高さで行が高くならないように、行の高さを文字の大きさにそろえる */}
+              <span
+                aria-hidden
+                className="icon shrink-0 text-lg leading-none text-muted"
+              >
+                chevron_right
+              </span>
+            </Link>
+          </li>
+        );
+      })}
     </ul>
   );
 }
 
-// docs/ui.md の「読み込み中」。Subject の行の形の枠を4つ点滅させる
+// docs/ui.md の「読み込み中」。Subject の行（名前・線・数）と同じ高さの枠を4つ点滅させる
 function SubjectsSkeleton() {
   return (
     <div
@@ -98,7 +108,7 @@ function SubjectsSkeleton() {
       {Array.from({ length: 4 }, (_, i) => (
         <div
           key={i}
-          className="h-16 rounded-md border border-border bg-surface-raised"
+          className="h-20 rounded-md border border-border bg-surface-raised"
         />
       ))}
     </div>
