@@ -10,6 +10,9 @@ Subject の中から Topic・順番・問題数を選び（Setup）、1問ずつ
 - いちばん上に上のバーが出る（`docs/specs/app-bar.md`）
 - 上から、戻るリンク（back。Home へ）、primary の等幅の小さな「study setup」、Subject の名前（見出し）
 - 「topic」：丸の付いた行で、Topic の名前を、その Topic の問題が最初に出てくる順に並べ、最後に太字の「All」（全部の Topic）。選んでいる行は primary-soft の地
+  - 各行の名前の下に、その Topic（All なら Subject の全部）の身についている具合の線と数を出し、行の右に % を出す（数え方と見せ方は `docs/specs/home.md` の「身についている具合」）
+  - 印の付いた問題があれば、数の並びの終わりに「· ⚑1」（flag の印と数は warning）を出す。スマホの幅で数が折り返すときも、「⚑1」の印と数は分けない
+  - 選んでいる行でも、線と数の色はほかの行と同じ
 - 「order」：in order・random・lowest accuracy から選ぶ
   - in order：取り込んだ順（最初の取り込みではファイルの順。取り込み直して増えた問題は最後）
   - random：start を押すたびにランダムに並べる
@@ -24,15 +27,16 @@ Subject の中から Topic・順番・問題数を選び（Setup）、1問ずつ
 - 選んだ Topic（All なら Subject）の問題に全部印が付いていると、どの順番でも、warning の文字で「No questions to ask — all 8 in Typing are flagged.」（問題の数と Topic の名前。All なら Subject の名前）と出し、start · 0 を薄くして押せない
 - lowest accuracy で、全部に印が付いてはいないが、印のない問題に一度でも解いた問題がないときは、warning の文字で「No questions to ask — none in Typing have been answered yet.」と出し、start · 0 を薄くして押せない
 - start を押して問題を読めなかったときは、Setup のまま、start の上に danger の帯「Couldn't load questions.」と retry を出す。retry で、同じ選び方でもう一度始める
-- Solve の quit と Result の try again で戻ったときは、直前に選んでいた Topic・順番・問題数のまま
+- Solve の quit と Result の try again で戻ったときは、直前に選んでいた Topic・順番・問題数のまま。身についている具合は、それまでに答えた分を入れて出す
 - 読み込んでいる間は、Subject の名前の場所と、Topic の行の形の枠を6つ点滅させる
 - 読み込めなかったときは、Subject の名前（見出し）を出さず、danger の帯「Couldn't load this subject.」と retry を出す
 - ない Subject の Setup を開くと、見つからない画面（This page could not be found.）を出す
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 通常 | All・in order・10 を選んでいる。印の付いた問題があり、start の上に「⚑1 flagged excluded」 | ![](screens/setup-default.png) |
-| 全部に印 | Typing を選び、warning の案内「No questions to ask — all 8 in Typing are flagged.」と、押せない start · 0 | ![](screens/setup-none.png) |
+| 通常 | All・in order・10 を選んでいる。Topic の行と All の行に線・数・%。印の付いた問題があり、Decorators と All に「· ⚑1」、start の上に「⚑1 flagged excluded」 | ![](screens/setup-default.png) |
+| 通常（スマホの幅） | 数が折り返し、「⚑1」は次の行にまとめて出る | ![](screens/setup-default-mobile.png) |
+| 全部に印 | Typing を選び、Typing の行が「0 correct · 0 wrong · 0 new · ⚑8」、線が全部 border、「—」。warning の案内「No questions to ask — all 8 in Typing are flagged.」と、押せない start · 0 | ![](screens/setup-none.png) |
 | 問題が足りない | 案内と、ある分の数の start | ![](screens/setup-few.png) |
 | 解いた問題がない（lowest accuracy） | warning の案内と、押せない start · 0 | ![](screens/setup-unanswered.png) |
 | Topic が多い | Topic の行が続く | ![](screens/setup-many.png) |
