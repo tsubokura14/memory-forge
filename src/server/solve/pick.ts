@@ -69,7 +69,7 @@ function shuffle<T>(items: T[], random: () => number): T[] {
 // start に添える数と、案内の種類。stats は、選んだ Topic（All なら全部）の印のない問題の数・解いた問題の数と、印の付いた問題の数。
 // 文言（Topic の名前か Subject の名前か）は画面で決める
 export function startNotice(
-  stats: TopicTotals,
+  stats: Omit<TopicTotals, "correct">,
   order: Order,
   count: Count,
 ): { count: number; notice: Notice } {
@@ -87,9 +87,15 @@ export function startNotice(
   return { count: available, notice: "few" };
 }
 
-type TopicTotals = { total: number; answered: number; flagged: number };
+type TopicTotals = {
+  total: number;
+  answered: number;
+  correct: number;
+  flagged: number;
+};
 
-// 選んだ Topic（null は All で、全部の Topic を足す）の、問題の数・解いた問題の数・印の付いた問題の数
+// 選んだ Topic（null は All で、全部の Topic を足す）の、問題の数・解いた問題の数・最後の答えが正解の問題の数・印の付いた問題の数。
+// Topic は Subject の問題を重ならずに分けるので、全部の Topic を足せば Subject 全体の数になる
 export function topicStats(
   topics: ({ name: string } & TopicTotals)[],
   topic: string | null,
@@ -99,6 +105,7 @@ export function topicStats(
   return {
     total: chosen.reduce((sum, t) => sum + t.total, 0),
     answered: chosen.reduce((sum, t) => sum + t.answered, 0),
+    correct: chosen.reduce((sum, t) => sum + t.correct, 0),
     flagged: chosen.reduce((sum, t) => sum + t.flagged, 0),
   };
 }

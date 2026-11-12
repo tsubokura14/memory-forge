@@ -1,4 +1,7 @@
-// 一覧から1つ選ぶもの（docs/ui.md の「選ぶもの」の、丸の付いた行）。Setup の Topic で使う
+import type { ReactNode } from "react";
+
+// 一覧から1つ選ぶもの（docs/ui.md の「選ぶもの」の、丸の付いた行）。Setup の Topic で使う。
+// description は名前の下に、aside は行の右に出す
 export function RadioList<T>({
   label,
   options,
@@ -6,7 +9,13 @@ export function RadioList<T>({
   onChange,
 }: {
   label: string;
-  options: { value: T; label: string; strong?: boolean }[];
+  options: {
+    value: T;
+    label: string;
+    strong?: boolean;
+    description?: ReactNode;
+    aside?: ReactNode;
+  }[];
   value: T;
   onChange: (value: T) => void;
 }) {
@@ -31,9 +40,15 @@ export function RadioList<T>({
               aria-hidden
               className={`size-4 shrink-0 rounded-full border-2 ${checked ? "border-primary bg-primary" : "border-muted"}`}
             />
-            <span className={option.strong ? "font-semibold" : ""}>
-              {option.label}
+            <span className="flex min-w-0 flex-1 flex-col gap-1.5">
+              <span
+                className={`break-words ${option.strong ? "font-semibold" : ""}`}
+              >
+                {option.label}
+              </span>
+              {option.description}
             </span>
+            {option.aside}
           </button>
         );
       })}

@@ -172,7 +172,7 @@ Issue #9 にある「問題ごとの正答率と解いた回数（Manage）」�
   - 変えるもの：`src/server/mastery/last-answer.ts`・`src/server/mastery/mastery.ts`（とテスト）、`src/server/subjects/subjects.ts`（とテスト）、`src/components/mastery.tsx`、`src/app/(app)/page.tsx`、`e2e/home.spec.ts`、`docs/design.md` の印の段落
   - 合わせるスクリーンショット：`home-default.png`、`home-many.png`、`home-loading.png`（読み込み中は撮らず、コードで合わせる）
   - 撮り直す画像：`docs/specs/screens/home-default.png`、`docs/specs/screens/home-many.png`
-- [ ] 2. Setup の Topic の行に身についている具合と印の数を出す
+- [x] 2. Setup の Topic の行に身についている具合と印の数を出す
   - 完了：Setup の Topic の行と All の行に、線・数・%・印の数が出て、quit・try again で戻ると答えた分が入ったら完了
   - 変えるもの：`src/server/solve/setup.ts`（とテスト）、`src/server/solve/pick.ts`（とテスト）、`src/components/radio-list.tsx`、`src/app/subjects/[id]/setup-form.tsx`、`e2e/solve.spec.ts`（setup-default-mobile を撮るテストを足す）
   - 合わせるスクリーンショット：`setup-default.png`、`setup-default-mobile.png`、`setup-none.png`、`setup-many.png`

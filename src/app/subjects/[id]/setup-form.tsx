@@ -2,6 +2,7 @@
 
 import { Banner } from "@/components/banner";
 import { Button } from "@/components/button";
+import { MasteryAccuracy, MasteryBar } from "@/components/mastery";
 import { RadioList } from "@/components/radio-list";
 import { Segmented } from "@/components/segmented";
 import {
@@ -10,6 +11,7 @@ import {
   startNotice,
   topicStats,
 } from "@/server/solve/pick";
+import { mastery } from "@/server/mastery/mastery";
 import type { Setup } from "@/server/solve/setup";
 
 const ORDERS: { value: Order; label: string }[] = [
@@ -54,8 +56,17 @@ export function SetupForm({
         <RadioList
           label="topic"
           options={[
-            ...setup.topics.map((t) => ({ value: t.name, label: t.name })),
-            { value: null, label: "All", strong: true },
+            ...setup.topics.map((t) => ({
+              value: t.name,
+              label: t.name,
+              ...masteryParts(t),
+            })),
+            {
+              value: null,
+              label: "All",
+              strong: true,
+              ...masteryParts(topicStats(setup.topics, null)),
+            },
           ]}
           value={topic}
           onChange={(value) => onChange({ ...choices, topic: value })}
@@ -121,6 +132,20 @@ export function SetupForm({
       </div>
     </div>
   );
+}
+
+// 行の名前の下の線と数（印の数つき）と、右の %
+function masteryParts(stats: {
+  total: number;
+  answered: number;
+  correct: number;
+  flagged: number;
+}) {
+  const m = mastery(stats);
+  return {
+    description: <MasteryBar mastery={m} flagged={stats.flagged} />,
+    aside: <MasteryAccuracy accuracy={m.accuracy} />,
+  };
 }
 
 function Field({
