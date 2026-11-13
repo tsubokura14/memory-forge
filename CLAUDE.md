@@ -70,6 +70,7 @@
 
 - Next.js 16（App Router、TypeScript、Cache Components を有効）、React 19
 - Tailwind CSS 4（トークンは `src/styles/tokens.css`）
+- Prism（`prismjs`。コードブロックの色分け。`src/server/questions/highlight.ts`）
 - Neon（PostgreSQL）と Drizzle ORM（drizzle-kit で形の変更を管理）
 - Better Auth（メールアドレスとパスワードでのログイン。`src/server/auth/`）
 - Vitest（中の決まりのテスト）、Playwright（画面を通したテストと、Docker の中での画像の比べ）
