@@ -144,7 +144,7 @@ Issue #7 にある「問題文のコードには行番号を付ける」は、�
   - 画面のテストのデータ（`e2e/solve.spec.ts`）：選択肢がコードの問題（m2v7c4）の選択肢のコードを ```` ```python ```` にする。言語の名前のないコードの問題で、solve-no-language を撮るテストを足す（4問目と同じ問題で、```` ``` ```` だけのもの）
   - 合わせるスクリーンショット：`solve-question.png`・`solve-code-choices.png`・`solve-answered-code-choices.png`・`solve-explanation.png`・`solve-no-language.png`（`docs/changes/2026-11-13-highlight-code/`）
   - 撮り直す画像（`docs/specs/screens/`）：`solve-question.png`・`solve-answered.png`・`solve-explanation.png`・`solve-code-choices.png`・`solve-answered-code-choices.png`・`solve-many.png`・`solve-error.png`・`solve-quit.png`・`solve-answered-flagged.png`（色の付いたコードが写るもの）。新しく `solve-no-language.png`
-- [ ] 2. Import の取り込む前の確認で、置き換わる問題の前と後の文とコードが、Solve の選択肢と同じ見せ方（色の付いたコードブロック）で出たら完了
+- [x] 2. Import の取り込む前の確認で、置き換わる問題の前と後の文とコードが、Solve の選択肢と同じ見せ方（色の付いたコードブロック）で出たら完了
   - `change-row.tsx` を変える
   - 画面のテストのデータ（`e2e/import.spec.ts`）：最初に開いている置き換わる問題（k3f9a2）の問題文を、前と後で最後の行だけが違う ```` ```python ```` のコードのある文にする
   - 合わせるスクリーンショット：`import-preview.png`（`docs/changes/2026-11-13-highlight-code/`）

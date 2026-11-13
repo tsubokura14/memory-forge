@@ -10,21 +10,50 @@ import { SIGNED_IN_STATE } from "./test-user";
 
 test.use({ storageState: SIGNED_IN_STATE });
 
+// k3f9a2 の問題文。前と後で、コードの最後の行だけが違う
+const fence = "```";
+function decoratorText(lastLine: string) {
+  return [
+    "次のコードを実行したとき、出力されるものはどれか。",
+    "",
+    `${fence}python`,
+    "def logger(func):",
+    "    def wrapper(*args, **kwargs):",
+    '        print(f"call {func.__name__}")',
+    "        return func(*args, **kwargs)",
+    "    return wrapper",
+    "",
+    "@logger",
+    "def add(a, b):",
+    "    return a + b",
+    "",
+    lastLine,
+    fence,
+  ].join("\n");
+}
+
 // 取り込み済みの Python（k3f9a2 は印付き）
 const stored = [
   testQuestion("a1x9k2"),
   testQuestion("b4m7q1", { topic: "Generators" }),
-  testQuestion("k3f9a2", { flagged: true }),
+  testQuestion("k3f9a2", {
+    text: decoratorText("print(add(1, 2))"),
+    flagged: true,
+  }),
 ];
 
-// 取り込み済みに対して、増える1問・置き換わる2問（choice D と解説）・変わらない1問になるファイル
+// 取り込み済みに対して、増える1問・置き換わる2問（問題文と choice D・解説）・変わらない1問になるファイル。
+// 取り込む前の確認では、ファイルの順番で最初の置き換わる問題（k3f9a2）が開く
 const next = [
+  testQuestion("k3f9a2", {
+    text: decoratorText("print(add.__name__)"),
+    choices: ["call add", "add", "None", "None"],
+  }),
   testQuestion("a1x9k2"),
   testQuestion("b4m7q1", {
     topic: "Generators",
     explanation: "ジェネレータは yield で値を1つずつ返す。",
   }),
-  testQuestion("k3f9a2", { choices: ["call add", "add", "None", "None"] }),
   testQuestion("n5p2r8", { topic: "Generators" }),
 ];
 
