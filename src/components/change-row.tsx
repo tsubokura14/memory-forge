@@ -1,3 +1,5 @@
+import { RichText } from "./rich-text";
+
 // 置き換わる問題の、開閉する行。行に ID と問題文の1行目（印が付いていたら、右に印と記録が消えること）、開くと変わった項目ごとに前（danger）と後（success）を並べる。
 // スマホの幅では、前と後を縦に並べる
 export function ChangeRow({
@@ -39,8 +41,18 @@ export function ChangeRow({
           <div key={change.item} className="flex flex-col gap-1.5">
             <span className="font-mono text-xs text-muted">{change.item}</span>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <Side label="before" value={change.before} tone="danger" />
-              <Side label="after" value={change.after} tone="success" />
+              <Side
+                label="before"
+                value={change.before}
+                rich={isRich(change.item)}
+                tone="danger"
+              />
+              <Side
+                label="after"
+                value={change.after}
+                rich={isRich(change.item)}
+                tone="success"
+              />
             </div>
           </div>
         ))}
@@ -49,13 +61,23 @@ export function ChangeRow({
   );
 }
 
+// 問題文・選択肢・解説は Solve と同じ見せ方（RichText）にする。topic・type・correct は文字のまま出す。
+// Topic の名前に ` があっても、文の中のコードにしないため
+function isRich(item: string) {
+  return (
+    item === "text" || item === "explanation" || item.startsWith("choice ")
+  );
+}
+
 function Side({
   label,
   value,
+  rich,
   tone,
 }: {
   label: string;
   value: string;
+  rich: boolean;
   tone: "danger" | "success";
 }) {
   const colors = {
@@ -67,9 +89,15 @@ function Side({
       className={`flex flex-col gap-1 rounded-md border px-3 py-2 ${colors.box}`}
     >
       <span className={`font-mono text-xs ${colors.label}`}>{label}</span>
-      <span className="font-mono text-sm break-words whitespace-pre-wrap">
-        {value}
-      </span>
+      {rich ? (
+        <div className="text-sm">
+          <RichText text={value} />
+        </div>
+      ) : (
+        <span className="font-mono text-sm break-words whitespace-pre-wrap">
+          {value}
+        </span>
+      )}
     </div>
   );
 }
