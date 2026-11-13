@@ -14,7 +14,7 @@ const python = [
   "@functools.wraps",
   "def logger(func):",
   "    # 呼んだことを出す",
-  '    print("call")',
+  '    print(len("call"))',
   "    return 42",
 ].join("\n");
 
@@ -25,7 +25,7 @@ describe("highlight", () => {
     expect(kindOf(segments, "def")).toBe("keyword");
     expect(kindOf(segments, '"call"')).toBe("string");
     expect(kindOf(segments, "logger")).toBe("function");
-    expect(kindOf(segments, "print")).toBe("builtin");
+    expect(kindOf(segments, "len")).toBe("builtin");
     expect(kindOf(segments, "# 呼んだことを出す")).toBe("comment");
     expect(kindOf(segments, "42")).toBeNull();
   });
