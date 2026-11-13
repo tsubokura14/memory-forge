@@ -44,13 +44,13 @@ export function ChangeRow({
               <Side
                 label="before"
                 value={change.before}
-                rich={isRich(change.item)}
+                look={lookOf(change.item)}
                 tone="danger"
               />
               <Side
                 label="after"
                 value={change.after}
-                rich={isRich(change.item)}
+                look={lookOf(change.item)}
                 tone="success"
               />
             </div>
@@ -61,23 +61,25 @@ export function ChangeRow({
   );
 }
 
-// 問題文・選択肢・解説は Solve と同じ見せ方（RichText）にする。topic・type・correct は文字のまま出す。
-// Topic の名前に ` があっても、文の中のコードにしないため
-function isRich(item: string) {
-  return (
-    item === "text" || item === "explanation" || item.startsWith("choice ")
-  );
+type Look = "plain" | "prose" | "choice";
+
+// 問題文・選択肢・解説は Solve と同じ見せ方（RichText。選択肢は Solve の選択肢と同じ等幅の文字）にする。
+// topic・type・correct は文字のまま出す。Topic の名前に ` があっても、文の中のコードにしないため
+function lookOf(item: string): Look {
+  if (item.startsWith("choice ")) return "choice";
+  if (item === "text" || item === "explanation") return "prose";
+  return "plain";
 }
 
 function Side({
   label,
   value,
-  rich,
+  look,
   tone,
 }: {
   label: string;
   value: string;
-  rich: boolean;
+  look: Look;
   tone: "danger" | "success";
 }) {
   const colors = {
@@ -89,8 +91,8 @@ function Side({
       className={`flex flex-col gap-1 rounded-md border px-3 py-2 ${colors.box}`}
     >
       <span className={`font-mono text-xs ${colors.label}`}>{label}</span>
-      {rich ? (
-        <div className="text-sm">
+      {look !== "plain" ? (
+        <div className={`text-sm ${look === "choice" ? "font-mono" : ""}`}>
           <RichText text={value} />
         </div>
       ) : (
