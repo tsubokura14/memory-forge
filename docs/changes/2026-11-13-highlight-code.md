@@ -139,7 +139,7 @@ Issue #7 にある「問題文のコードには行番号を付ける」は、�
 
 ## タスク
 
-- [ ] 1. Solve の問題文・選択肢・解説のコードブロックに、言語に合わせて色が付いたら完了
+- [x] 1. Solve の問題文・選択肢・解説のコードブロックに、言語に合わせて色が付いたら完了
   - Prism を入れ、`markup.ts`・`highlight.ts`（とそのテスト）・`code-block.tsx`・`rich-text.tsx` を変える。`docs/libraries/prismjs.md` の下書きを書く
   - 画面のテストのデータ（`e2e/solve.spec.ts`）：選択肢がコードの問題（m2v7c4）の選択肢のコードを ```` ```python ```` にする。言語の名前のないコードの問題で、solve-no-language を撮るテストを足す（4問目と同じ問題で、```` ``` ```` だけのもの）
   - 合わせるスクリーンショット：`solve-question.png`・`solve-code-choices.png`・`solve-answered-code-choices.png`・`solve-explanation.png`・`solve-no-language.png`（`docs/changes/2026-11-13-highlight-code/`）
