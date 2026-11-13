@@ -29,7 +29,7 @@ describe("parseMarkup", () => {
     ]);
   });
 
-  test("``` で囲んだところをコードブロックにし、字下げを残す。言語の名前は読み捨てる", () => {
+  test("``` で囲んだところをコードブロックにし、字下げを残す。``` のあとの語を言語の名前にする", () => {
     const text = [
       "次のコードを実行したとき、出力されるものはどれか。",
       "```python",
@@ -48,14 +48,24 @@ describe("parseMarkup", () => {
           },
         ],
       },
-      { kind: "code", code: "def add(a, b):\n    return a + b" },
+      {
+        kind: "code",
+        code: "def add(a, b):\n    return a + b",
+        language: "python",
+      },
       { kind: "paragraph", inlines: [{ kind: "text", text: "どれか。" }] },
     ]);
   });
 
-  test("コードブロックだけの文は、コードブロック1つ", () => {
+  test("コードブロックだけの文は、コードブロック1つ。言語の名前がなければ空の文字", () => {
     expect(parseMarkup("```\nreturn wrapper\n```")).toEqual([
-      { kind: "code", code: "return wrapper" },
+      { kind: "code", code: "return wrapper", language: "" },
+    ]);
+  });
+
+  test("``` のあとの最初の語だけを言語の名前にする", () => {
+    expect(parseMarkup("  ```python title\nx = 1\n```")).toEqual([
+      { kind: "code", code: "x = 1", language: "python" },
     ]);
   });
 });
