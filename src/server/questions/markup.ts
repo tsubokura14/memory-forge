@@ -3,18 +3,20 @@
 export type Inline = { kind: "text" | "code"; text: string };
 
 export type Block =
-  { kind: "paragraph"; inlines: Inline[] } | { kind: "code"; code: string };
+  | { kind: "paragraph"; inlines: Inline[] }
+  | { kind: "code"; code: string; language: string };
 
 // 行の始め（前の空白は除く）が ``` の行で、コードブロックを開け閉めする（取り込みの確かめと同じ数え方。validate.ts）。
-// ``` のあとの言語の名前は、コードの色付け（#7）で使うまで読み捨てる。閉じていないものは取り込みで止めているので来ない
+// 開ける ``` のあとの最初の語（空白で区切る）を、言語の名前にする。閉じていないものは取り込みで止めているので来ない
 export function parseMarkup(text: string): Block[] {
   const blocks: Block[] = [];
   let lines: string[] = [];
   let inCode = false;
+  let language = "";
 
   function flush() {
     if (inCode) {
-      blocks.push({ kind: "code", code: lines.join("\n") });
+      blocks.push({ kind: "code", code: lines.join("\n"), language });
     } else {
       const paragraph = lines.join("\n").trim();
       if (paragraph !== "") {
@@ -28,6 +30,7 @@ export function parseMarkup(text: string): Block[] {
     if (/^\s*```/.test(line)) {
       flush();
       inCode = !inCode;
+      if (inCode) language = line.trim().slice(3).trim().split(/\s+/)[0];
     } else {
       lines.push(line);
     }

@@ -1,10 +1,23 @@
+import { highlight, type CodeKind } from "@/server/questions/highlight";
+
+const KIND_CLASS: Record<CodeKind, string> = {
+  keyword: "text-code-keyword",
+  string: "text-code-string",
+  function: "text-code-function",
+  builtin: "text-code-builtin",
+  decorator: "text-code-decorator",
+  comment: "text-code-comment",
+};
+
 // コードブロック（docs/ui.md の「コードブロック」）。問題文のコードには行番号を付け、選択肢と解説のコードには付けない。
-// 色分けは #7 で足す
+// 色は language に合わせて付ける。色の切れ目は行をまたぐことがあるので、行番号はコードを改行で分けた数で出す
 export function CodeBlock({
   code,
+  language,
   lineNumbers = false,
 }: {
   code: string;
+  language: string;
   lineNumbers?: boolean;
 }) {
   const lines = code.split("\n");
@@ -21,7 +34,17 @@ export function CodeBlock({
         </div>
       )}
       <pre className="min-w-0 flex-1 overflow-x-auto px-4 py-3">
-        <code>{code}</code>
+        <code>
+          {highlight(code, language).map((segment, i) =>
+            segment.kind ? (
+              <span key={i} className={KIND_CLASS[segment.kind]}>
+                {segment.text}
+              </span>
+            ) : (
+              segment.text
+            ),
+          )}
+        </code>
       </pre>
     </div>
   );
