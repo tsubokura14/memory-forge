@@ -70,14 +70,64 @@
 docs/design.md と食い違う設計になるなら、そのことも書く
 -->
 
+### やり方
+
+Manage で消すときに、消える問題の記録のうち、印のない問題の答えた日時を新しい表 `deleted_answers` に写してから消す。連続日数の答えた日は、`answers`（印のない問題）と `deleted_answers` の両方から数える。
+
+### データの変更
+
+- 表を1つ足す（`src/server/db/schema.ts`、`npm run db:generate` で `drizzle/` に形の変更を作る）
+  - `deleted_answers`：消した問題の答え1つにつき1行。列は `id`（自動で増える数）と `answered_at`（日時、タイムゾーンつき）だけ
+  - 問題とのつながり（外部キー）・正解かどうか・Subject などは持たない。連続日数に要るのは答えた日時だけで、ほかの数（正答率・解いた回数・身についている具合）には使わないため
+  - 日付（"YYYY-MM-DD"）ではなく日時で持つ。日本時間で区切る決まりを `src/server/streak/answered-days.ts` の1か所に置いたままにするため
+- 今ある表・列は変えない（`docs/design.md` の「データベースの形の変更は『足す』ものにする」に合う）
+
+### 変えるファイル
+
+- `src/server/db/schema.ts`、`drizzle/`：上の表を足す
+- `src/server/manage/delete.ts`：`deleteSubject`・`deleteTopic`・`deleteQuestion` のトランザクションの中で、問題を消す前に、消える問題のうち `flagged = false` の問題の `answers.answered_at` を `deleted_answers` に写す（`insert ... select` の1つの SQL）。写す範囲は、Subject ならその Subject の問題、Topic ならその Subject とTopic の問題、1問ならその問題
+  - 写してから消すまでを同じトランザクションにするので、写したのに消えない・消えたのに写っていない、ということは起きない
+  - 印の付いた問題の答えは写さないので、消したあとも数えない（受け入れ条件の「印の付いた問題への答えは、消したあとも数えない」）
+- `src/server/streak/answered-days.ts`：`listAnsweredDays` の日付を、今の `answers`（印のない問題）に、`deleted_answers` の `answered_at` を `union` で足して数える。重ねずに古い順に返すのは今のまま
+- `e2e/questions.ts`：`resetQuestions` で `deleted_answers` も空にする（画面のテストで Manage の削除をしたあと、ほかのテストの Home の連続日数に残らないように）
+- 中の決まりのテストで `db.delete(subjects)` で空にしているもののうち、連続日数を数えるテスト（`src/server/streak/answered-days.test.ts`）と、削除のテスト（`src/server/manage/delete.test.ts`）は、`deleted_answers` も空にする
+- `docs/design.md` の「データ」の「記録」：`deleted_answers` の持ち方と理由・前提を書き、「問題を消すと、その記録も消える」を直す。「誤りがありそうだと付けた印」の連続日数の行に、消したときに印の付いていた問題の答えは写さないことを足す
+
+### 変えないもの
+
+- 取り込みで、印の付いた問題が置き換わるときに記録を消す処理（`src/server/import/import.ts`）。仕様の「やらないこと」のとおり、今のまま `deleted_answers` には写さない（印の付いた問題の答えは、もともと連続日数に数えないので、写しても数は変わらない）
+- 記録を読むほかのところ（`src/server/manage/list.ts`・`src/server/mastery/last-answer.ts`・`src/server/solve/start.ts`・`src/server/solve/setup.ts`・`src/server/subjects/subjects.ts`）。今までどおり `answers` だけを読むので、消した問題の記録は、一覧・身についている具合・正答率・解いた回数に出ない。同じ ID で取り込み直した問題は新しい `questions.id` になり、`answers` に記録がないので、まだ解いていない問題になる
+- 画面（Home・Manage の確認のダイアログ）
+
+### 理由と前提（仕上げたあとに残す場所）
+
+- 消した問題の答えた日時を別の表に持つ理由と前提は、表の定義・削除・連続日数の3か所に関わるので、`docs/design.md` の「データ」の「記録」に書く
+  - 理由：記録を読むほかのところ（一覧・身についている具合・出題）を変えずに、連続日数だけに消した問題の答えを残せるため
+  - 前提（崩れたら見直す）：消した問題の答えを使うのは連続日数だけ。消した問題の正答率などを見せるなら、持ち方を見直す。問題を消す操作は Manage の削除だけ（`docs/design.md` の「データ」の「問題」と同じ前提）。問題を消すほかの操作を足すときは、同じように写す
+  - 前提（崩れたら見直す）：行は答えの数だけ増える。今の `answers` と同じく、使う人はひとりで数万行ほどまで
+- `deleted_answers` の列が `answered_at` だけである理由は、表の定義のコメントに書く（その表だけに関わるため）
+
+### 比べたやり方（選ばなかった理由）
+
+- 記録の行を残す（`answers.question_id` を null にできるようにし、消すときは null にする）：表は増えないが、今ある列の決まりを変える変更になり（「足す」変更ではない）、記録を読むところすべてが、問題のない記録を読み飛ばしているか確かめる必要があるため選ばなかった
+- 問題を消さずに、消した日時の印を付ける（論理削除）：問題を読むところすべてに「消していない」の条件が要り、同じ ID の取り込み直しが、Subject と ID の組み合わせが重ならない決まりとぶつかるため選ばなかった
+
 ## 確かめ方
 
 <!-- 受け入れ条件ごとに「テスト」「触って確かめる」「コードを見て確かめる」のどれか。選び方は docs/process/testing.md -->
 
--
+- Subject・Topic・1問のどれを消しても、連続日数と今週の7日の答えた日が変わらない：テスト（`src/server/streak/answered-days.test.ts`。答えのある問題を `deleteSubject`・`deleteTopic`・`deleteQuestion` で消したあと、`listAnsweredDays` が消す前と同じ日を返す。3つの消し方はそれぞれ写す範囲が違うので、1つずつ）
+  - 今日の様子が「done today」のまま：答えた日から連続日数と今日の様子を数えるところ（`src/server/streak/day-streak.ts`）は変えず、今あるテストで確かめ済み。日が残ることを上のテストで確かめるので、ほかにはテストを書かない
+  - Subject が0件でも連続日数の枠が出る：触って確かめる（Manage で全部の Subject を消して Home を開く）
+- 消した問題が一覧・Home・Setup・Solve・身についている具合・正答率・解いた回数に出ない：コードを見て確かめる（記録を読むところが `answers` だけを読み、変わっていないこと。「変えないもの」に書いたファイル）。今までどおりの動きで、今あるテストで確かめ済み
+- 消したあとに答えていない日は、答えなかった日になる：テスト（上と同じテストで、消した問題に答えていない日が返らないこと）
+- 印の付いた問題の答えは、消したあとも数えない：テスト（`src/server/streak/answered-days.test.ts`。印の付いた問題を消したあと、その答えの日が返らない）
+- 同じ ID で取り込み直すと、まだ解いていない新しい問題になり、連続日数は変わらない：触って確かめる（使う場面の3。Manage で Subject を消し、同じファイルを取り込み直して、Home の Subject が「0 correct · 0 wrong · 30 new」で、連続日数が消す前と同じこと）。記録を読むところは変えないので、テストは足さない
+- 確認のダイアログの文言は今のまま：画面の画像を比べるテスト（`npm run screens:test`）で、Manage の画像が変わらないこと
+- すでに消して減った日数は戻らない：コードを見て確かめる（形の変更のファイルに、今までの記録を `deleted_answers` に入れる処理がないこと）
 
 ## タスク
 
 <!-- 1タスク = 1ブランチ = 1PR。「〜ができたら完了」と1文で言える大きさ。データと画面は分ける。画面のタスクには合わせるスクリーンショットを書く -->
 
-- [ ]
+- [ ] 1. Manage で問題を消すときに印のない問題の答えた日時を `deleted_answers` に写し、連続日数をその表からも数えるようにできたら完了（表の追加、`delete.ts`・`answered-days.ts`・`e2e/questions.ts` の変更、`docs/design.md` の「データ」の更新。画面は変えないので、撮り直す画像はない）
