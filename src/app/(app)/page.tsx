@@ -62,7 +62,7 @@ async function DayStreakSection() {
   return <DayStreakCard streak={streak} />;
 }
 
-// docs/ui.md の「読み込み中」。連続日数の枠と同じ高さの枠を1つ点滅させる
+// docs/ui.md の「読み込み中」。連続日数の枠と同じ高さの枠を1つ点滅させる。高さは、撮った画像で測った枠の高さ（スマホの幅 130px、PC 140px）。枠の中身を変えたら測り直す
 function DayStreakSkeleton() {
   return (
     <div

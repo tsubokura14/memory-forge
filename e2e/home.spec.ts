@@ -110,6 +110,7 @@ test.describe("ログインした状態を保存したもので開く", () => {
     await expect(page).toHaveScreenshot("home-default-mobile.png", {
       fullPage: true,
     });
+    await page.setViewportSize({ width: 1280, height: 720 });
 
     await subjects.getByRole("link", { name: "Python" }).click();
     await expect(page).toHaveURL(`/subjects/${ids[1]}`);
