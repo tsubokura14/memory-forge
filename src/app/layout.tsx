@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans_JP, Unbounded } from "next/font/google";
 import localFont from "next/font/local";
+import { themeScript } from "@/components/theme";
 import "@/styles/globals.css";
 
 // 書体の CSS 変数（--font-geist など）は、tokens.css の --font-* から使う
@@ -34,7 +35,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className={`${geist.variable} ${geistMono.variable} ${notoSansJp.variable} ${unbounded.variable} ${materialSymbols.variable}`}
+      // data-theme は、下のスクリプトが React より先に付けるので、サーバーの HTML と食い違う
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="bg-bg font-sans text-text">{children}</body>
     </html>
   );
