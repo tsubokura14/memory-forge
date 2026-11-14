@@ -65,7 +65,7 @@
   - Topic：「Delete “Typing”?」「12 questions and their records will be deleted. This can't be undone.」（flagged の一覧でも、Topic の全部の問題の数）
   - 1問：「Delete this question?」、その下に問題文の1行目（長いときは折り返して全部出す）、「Its records will be deleted too. This can't be undone.」
   - 数が1のときは単数にする（「1 topic, 1 question and its records will be deleted.」）
-- 消した問題の記録も一緒に消える
+- 消した問題の記録も一緒に消える。ただし、Home の連続日数には、消した問題に答えた日も数え続ける（消したときに印の付いていた問題は数えない）
 - 消したものは、一覧・Home・Setup から消える。問題が1つもなくなった Topic と Subject も消える
 - 消したあと（消したことの知らせは出さない）
   - Subject を消したら、次の Subject の All topics、1ページ目を出す。最後の Subject を消したら前の Subject。Subject が1つもなくなったら0件の表示
