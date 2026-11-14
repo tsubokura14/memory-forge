@@ -19,8 +19,9 @@
 ## 受け入れ条件
 
 - Home の menu に、manage の隣に枠「settings」と「Theme」が出て、押すと Settings に移る
-- Settings の左上に戻るリンク「home」、その下にパンくず「settings」と見出し「Settings」が出る。戻るリンクを押すと Home に移る
-- Settings の「theme」の見出しの下に「system」「light」「dark」が横に並び、1つを選べる。最初は system が選ばれている
+- Settings の左上に戻るリンク「home」、その下に見出し「Settings」が出る（パンくずは出さない）。戻るリンクを押すと Home に移る
+- Settings の「appearance」の見出しの下の枠に、ラベル「theme」と「system」「light」「dark」が横に並び、1つを選べる。最初は system が選ばれている
+- 枠の下の行に「Saved on this device. System follows your OS setting.」と出る
 - 開いた瞬間から、選んだ明るさで出る（一度ほかの明るさで出てから切り替わることはない）
 - Login にはテーマを選ぶ手段を置かない。解く画面から Settings へ行く手段も置かない
 - 選ぶと、その場で画面の明るさが切り替わる（保存のボタンは押さない）
@@ -38,9 +39,11 @@
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 通常（system） | 上のバー、戻るリンク「home」、パンくずと見出し、テーマの3つの選ぶもので system が選ばれている | |
-| light を選んだ | light が選ばれ、明るい画面 | |
-| dark を選んだ | dark が選ばれ、暗い画面 | |
+| 通常（system） | 上のバー、戻るリンク「home」、見出し「Settings」、appearance の枠で system が選ばれている | ![](2026-11-15-switch-theme/settings-default.png) |
+| dark を選んだ | dark が選ばれ、暗い画面 | ![](2026-11-15-switch-theme/settings-dark.png) |
+
+- テーマの3つ：docs/ui.md の「少しの中から1つ選ぶもの」と同じく、横に並べたボタンで、選んでいるものだけを surface の地にする。3つは surface-raised の地の中に並べる
+- light を選んだときは、通常（system）と同じ明るい画面で、light が選ばれる（画像は撮らない）
 
 - 0件・大量・読み込み中・エラー・権限なしは起こらない（読み込むデータがなく、覚えるのは端末の中だけのため。ログインしていないときは Login に移る）
 
@@ -48,7 +51,7 @@
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 通常 | menu に manage と settings の2枚の枠 | |
+| 通常 | menu に manage と settings の2枚の枠 | ![](2026-11-15-switch-theme/home-default.png) |
 
 ## やらないこと
 
@@ -58,10 +61,11 @@
 
 ## 決まっていないこと
 
-- [x] Settings の見出し・パンくずの文言は「settings」「settings」でよいか（ほかの画面に合わせると、パンくず「settings」、見出し「Settings」になる） → パンくず「settings」、見出し「Settings」
-- [x] テーマの選ぶものの見出しと、3つの書き方（「theme」の見出しの下に「system」「light」「dark」でよいか） → それでよい
+- [x] Settings の見出し・パンくずの文言は「settings」「settings」でよいか（ほかの画面に合わせると、パンくず「settings」、見出し「Settings」になる） → パンくず「settings」、見出し「Settings」 → プロトタイプに合わせて、パンくずは出さず見出し「Settings」だけ
+- [x] テーマの選ぶものの見出しと、3つの書き方（「theme」の見出しの下に「system」「light」「dark」でよいか） → それでよい → プロトタイプに合わせて、見出し「appearance」の枠にラベル「theme」と3つ
 - [x] 3つの見せ方：docs/ui.md の「少しの中から1つ選ぶもの」（横に並べたボタンで、選んでいるものだけ surface の地）でよいか → それでよい
-- [x] 3つに、説明（system に「match your OS」など）やアイコン（light_mode / dark_mode など）を添えるか → 添えない
+- [x] 3つに、説明（system に「match your OS」など）やアイコン（light_mode / dark_mode など）を添えるか → 添えない。枠の下に「Saved on this device. System follows your OS setting.」を1行出す（プロトタイプに合わせる）
+- [x] 合意済みのプロトタイプの Settings にある account の欄（email、Google の紐づけ）はどうするか → 今回は出さない（#14 で足す）。Home の menu の settings の枠の説明文も、#14 で「Google account, theme」にする
 - [x] Home の menu の settings の枠に出す説明文（manage の「Import, export, delete, flagged」にあたるもの。例：「Theme」） → 「Theme」
 - [x] Login 画面にテーマを選ぶ手段を置くか（置かない場合、Login は覚えている値か system で出るだけ） → 置かない
 - [x] 解く画面（Solve）から Settings へ行く手段は要らない、でよいか（今の決まりでは Home の menu からだけ） → 要らない
