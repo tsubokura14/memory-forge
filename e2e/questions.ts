@@ -2,6 +2,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { withVerifyFull } from "../src/server/db/connection-url";
 import * as schema from "../src/server/db/schema";
+import { FIXED_NOW } from "./fixtures";
 
 // 画面のテストで、test（CI では ci）のデータベースの Subject と問題を入れ直す。
 // 状態は、テストの前に決まったデータを入れて作る（docs/design.md の「画面の画像を撮る・比べる仕組み」）
@@ -88,9 +89,10 @@ export async function countAnswers(): Promise<number> {
   }
 }
 
-// 答えた記録を入れる。questionId はファイルの ID（resetQuestions で入れた問題の中から探す）
+// 答えた記録を入れる。questionId はファイルの ID（resetQuestions で入れた問題の中から探す）。
+// answeredAt を指定しないときは固定した日時にする（今の日時で入れると、固定した今日より後の日になるため）
 export async function insertAnswers(
-  records: { questionId: string; correct: boolean }[],
+  records: { questionId: string; correct: boolean; answeredAt?: Date }[],
 ): Promise<void> {
   const pool = new Pool({
     connectionString: withVerifyFull(process.env.DATABASE_URL),
@@ -108,7 +110,11 @@ export async function insertAnswers(
       records.map((r) => {
         const id = idOf.get(r.questionId);
         if (id === undefined) throw new Error(`No question ${r.questionId}.`);
-        return { questionId: id, correct: r.correct };
+        return {
+          questionId: id,
+          correct: r.correct,
+          answeredAt: r.answeredAt ?? new Date(FIXED_NOW),
+        };
       }),
     );
   } finally {

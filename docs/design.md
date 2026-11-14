@@ -114,8 +114,11 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 - 撮るたびに変わるものを止める
   - 日時：ブラウザの日時を `page.clock` で固定する（`e2e/fixtures.ts`）。画像を撮るテストは、ここの `test` を使う
   - 書体：`next/font` でアプリから配り（`src/app/layout.tsx`）、イメージに入っている書体に頼らない
+  - サーバーの日時：サーバーで「今」を使うところ（Home の連続日数）は `src/server/clock.ts` の `now()` を呼ぶ。`now()` は環境変数 `FIXED_NOW` があればその日時を返す。`FIXED_NOW` は `playwright.config.ts` の `webServer.env` にだけ置き、値はブラウザの日時と同じ `e2e/fixtures.ts` の定数にする（ほかの環境変数のファイル・GitHub の Secret・Vercel には置かない）
+    - 理由：サーバーで組み立てる画面の日付（今日・今週）を、撮るたびに同じにするため
+    - 答えを記録するとき（`src/server/solve/answer.ts`）は、今のままデータベースの `now()` で答えた日時を入れる。画面のテストで答えの日時を決めたいときは、`e2e/questions.ts` の `insertAnswers` で日時を指定して入れる
+    - 前提（崩れたら見直す）：画面のテストの中で、Solve で答えてから Home の連続日数を見ることはしない（答えは今の日時、Home は固定した日時で数えるため合わない）
   - アニメーション：`toHaveScreenshot` の既定で止まる
-  - 前提（崩れたら見直す）：サーバー側の日時は固定していない。サーバーで日付を使う画面（連続日数など）を撮るときは、固定する方法を足す
 - 状態（0件など）は、テストの前に `test` のデータベースに決まったデータを入れて作る（`docs/process/screenshots.md`）
   - Subject と問題は、テストごとに `e2e/questions.ts` の `resetQuestions` で入れ直す
   - 画面のテストは、ファイルを並べずに1つずつ動かす（`playwright.config.ts` の `workers: 1`）。並べると、ほかのファイルのテストが入れ直したデータで、撮っている画面が変わるため

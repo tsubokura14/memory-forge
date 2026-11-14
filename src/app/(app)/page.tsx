@@ -3,16 +3,26 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { Banner } from "@/components/banner";
 import { buttonClass } from "@/components/button";
+import { DayStreakCard } from "@/components/day-streak";
 import { EmptyState } from "@/components/empty-state";
 import { MasteryAccuracy, MasteryBar } from "@/components/mastery";
 import { RetryButton } from "@/components/retry-button";
+import { now } from "@/server/clock";
 import { mastery } from "@/server/mastery/mastery";
+import { getDayStreak } from "@/server/streak/streak";
 import { listSubjects } from "@/server/subjects/subjects";
 
-// Home。上に menu、下に subjects
+// Home。上から day streak、menu、subjects
 export default function Home() {
   return (
     <main className="mx-auto flex max-w-page flex-col gap-6 px-4 pt-6 pb-10">
+      <section className="flex flex-col gap-2">
+        <h2 className="font-mono text-xs text-muted">day streak</h2>
+        {/* Subject の一覧とは別に読み込み、別に失敗を出す */}
+        <Suspense fallback={<DayStreakSkeleton />}>
+          <DayStreakSection />
+        </Suspense>
+      </section>
       <section className="flex flex-col gap-2">
         <h2 className="font-mono text-xs text-muted">menu</h2>
         {/* manage は、2列の枠の左の1枚の大きさにする */}
@@ -35,6 +45,30 @@ export default function Home() {
         </Suspense>
       </section>
     </main>
+  );
+}
+
+// 開いたときにサーバーで1回だけ組み立てる。開いたまま日付が変わっても変えない
+async function DayStreakSection() {
+  await connection();
+  let streak: Awaited<ReturnType<typeof getDayStreak>>;
+  try {
+    streak = await getDayStreak(now());
+  } catch {
+    return (
+      <Banner action={<RetryButton />}>Couldn&apos;t load day streak.</Banner>
+    );
+  }
+  return <DayStreakCard streak={streak} />;
+}
+
+// docs/ui.md の「読み込み中」。連続日数の枠と同じ高さの枠を1つ点滅させる。高さは、撮った画像で測った枠の高さ（スマホの幅 130px、PC 140px）。枠の中身を変えたら測り直す
+function DayStreakSkeleton() {
+  return (
+    <div
+      data-testid="day-streak-loading"
+      className="h-32.5 animate-pulse rounded-md border border-border bg-surface-raised sm:h-35"
+    />
   );
 }
 

@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
+import { FIXED_NOW } from "./e2e/fixtures";
 
 // webServer で立ち上げるアプリを、test のデータベースにつなぐ。すでにある環境変数は Next.js が .env.local より先に使う。
 // CI には .env.test がなく、接続先は環境変数で渡す
@@ -27,5 +28,7 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: false,
     timeout: 300_000,
+    // サーバーの「今」（src/server/clock.ts）を、ブラウザの日時と同じにする
+    env: { FIXED_NOW },
   },
 });

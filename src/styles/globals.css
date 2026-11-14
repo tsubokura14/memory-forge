@@ -19,3 +19,11 @@
   -webkit-font-smoothing: antialiased;
   font-feature-settings: "liga";
 }
+
+/*
+  塗りつぶしのアイコン（連続日数の灯った炎）。icon と一緒に使う。
+  material-symbols-outlined.woff2 は FILL の軸を持つ可変の書体で、軸の既定は FILL 0（線だけ）
+*/
+@utility icon-fill {
+  font-variation-settings: "FILL" 1;
+}

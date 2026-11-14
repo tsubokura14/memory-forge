@@ -181,7 +181,7 @@
 ## タスク
 
 - [x] 1. 連続日数をサーバーで数えられる（`src/server/streak/` の `answered-days.ts`・`day-streak.ts`・`streak.ts` と、その Vitest のテスト）。画面は変えない
-- [ ] 2. Home のいちばん上に連続日数を出す（`src/server/clock.ts`、`src/app/(app)/page.tsx`、`src/components/day-streak.tsx`、`src/styles/globals.css`、`playwright.config.ts`、`e2e/fixtures.ts`・`e2e/questions.ts`・`e2e/home.spec.ts`、`docs/design.md` の日時の固定）
+- [x] 2. Home のいちばん上に連続日数を出す（`src/server/clock.ts`、`src/app/(app)/page.tsx`、`src/components/day-streak.tsx`、`src/styles/globals.css`、`playwright.config.ts`、`e2e/fixtures.ts`・`e2e/questions.ts`・`e2e/home.spec.ts`、`docs/design.md` の日時の固定）
   - 合わせるスクリーンショット：`home-default.png`、`home-streak-pending.png`、`home-no-streak.png`、`home-long.png`、`home-long-mobile.png`、`home-default-mobile.png`（見本だけ：`home-streak-loading.png`、`home-streak-error.png`）
   - 撮り直す画像（`docs/specs/screens/`）：`home-default.png`、`home-empty.png`、`home-many.png`
   - 足す画像（`docs/specs/screens/`）：`home-default-mobile.png`、`home-streak-pending.png`、`home-no-streak.png`、`home-long.png`、`home-long-mobile.png`
