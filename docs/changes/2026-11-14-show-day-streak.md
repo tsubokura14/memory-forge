@@ -36,7 +36,7 @@
 - 今日答えたかどうかで、炎と日数の色と、今日の様子の文言が変わる
   - 答えた：炎が灯り、「done today」
   - まだ：炎は線だけで、「answer today to keep the flame」
-  - 0日のとき：炎は線だけで、「answer today to start a streak」
+  - 0日のとき：炎は線だけで、「answer a question to light the flame」
 - 日数は数字だけを出し、単位は添えない（見出しが「day streak」のため）
 - 日数が4桁（9999）までは、PC でもスマホの幅でも、炎・日数・今週の7日が1行に収まる
 - 今週（月〜日）の7日を並べ、日ごとに、答えた日・答えなかった日・今日まだ・これからの日を見分けられるようにする。今日の曜日がわかる
@@ -54,13 +54,13 @@
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 今日答えた | 灯った炎と日数（flame）、今週の答えた日の炎、「done today」 | |
-| 今日まだ（昨日まで続いている） | 線だけの炎と日数、今日の炎が点滅、「answer today to keep the flame」 | |
-| 0日 | 線だけの炎と「0」（muted）、muted の「answer today to start a streak」 | |
-| 日数が大きい | 4桁の日数でも、炎・日数・今週の7日が1行に収まる | |
-| スマホの幅 | 炎を小さくし、7日を詰めて右に寄せる。曜日は1文字 | |
-| 読み込み中 | 連続日数の枠と同じ高さの枠が点滅する | |
-| 読み込めなかった | danger の帯「Couldn't load day streak.」と retry | |
+| 今日答えた | 灯った炎と日数（flame）、今週の答えた日の炎、「done today」 | [home-default.png](2026-11-14-show-day-streak/home-default.png) |
+| 今日まだ（昨日まで続いている） | 線だけの炎と日数、今日の炎が点滅、「answer today to keep the flame」 | [home-streak-pending.png](2026-11-14-show-day-streak/home-streak-pending.png) |
+| 0日 | 線だけの炎と「0」（muted）、muted の「answer a question to light the flame」 | [home-no-streak.png](2026-11-14-show-day-streak/home-no-streak.png) |
+| 日数が大きい | 4桁の日数でも、炎・日数・今週の7日が1行に収まる | [home-long.png](2026-11-14-show-day-streak/home-long.png)、[home-long-mobile.png](2026-11-14-show-day-streak/home-long-mobile.png) |
+| スマホの幅 | 炎を小さくし、7日の間を詰めて右に寄せる。曜日は1文字 | [home-default-mobile.png](2026-11-14-show-day-streak/home-default-mobile.png) |
+| 読み込み中 | 連続日数の枠と同じ高さの枠が点滅する | [home-streak-loading.png](2026-11-14-show-day-streak/home-streak-loading.png) |
+| 読み込めなかった | danger の帯「Couldn't load day streak.」と retry | [home-streak-error.png](2026-11-14-show-day-streak/home-streak-error.png) |
 
 ## やらないこと
 
@@ -74,8 +74,8 @@
 - [x] スキップした問題も「答えた」に数える？（スキップも不正解として記録に残る） → 数える
 - [x] 問題を消して（Manage の削除、印の付いた問題の取り込み直し）その日の記録がなくなったら、連続日数が減ってよい？ → 今は減ってよい。あとで、問題を消しても減らないようにするアーカイブの機能を作る
 - [x] 答えたあとに不備の印を付けた問題の答えも、数える？（身についている具合では数えていない） → 数えない
-- [x] 日数の文言は数字だけ？「days」などの単位を添える？（1のときの書き分けも） → お任せ → 数字だけ（見出しが「day streak」のため）。/dev-proto でプロトタイプと合わせて確かめる
-- [x] 0日のときの今日の様子の文言は？（`docs/ui.md` には色（muted）だけが書かれている） → お任せ → 「answer today to start a streak」。/dev-proto でプロトタイプと合わせて確かめる
+- [x] 日数の文言は数字だけ？「days」などの単位を添える？（1のときの書き分けも） → お任せ → 数字だけ（見出しが「day streak」のため。/dev-proto で、合意済みのプロトタイプと同じと確かめた）
+- [x] 0日のときの今日の様子の文言は？（`docs/ui.md` には色（muted）だけが書かれている） → お任せ → 「answer a question to light the flame」（/dev-proto で、合意済みのプロトタイプの文言に合わせた）
 - [x] 連続日数を読み込んでいる間と、読み込めなかったときの表示は？（Subject の一覧とは別に出す？まとめて出す？） → お任せ → Subject の一覧とは別に出す。読み込み中は枠の点滅、読み込めなかったら「Couldn't load day streak.」と retry（`docs/ui.md` の「状態の見せ方」に従う）
 - [x] 日数が大きいとき（3桁・4桁）の見え方の決まりは要る？ → 想定しておく → 4桁まで1行に収める
 - [x] 「Home を開いたまま日付が変わっても表示を変えない」を、やらないことにしてよい？ → よい。読み直しなどで変われば足りる
