@@ -50,6 +50,8 @@ export async function resetQuestions(
     const db = drizzle({ client: pool, schema });
     // questions は subjects を消すと一緒に消える
     await db.delete(schema.subjects);
+    // Manage で消した問題の答えた日時も、ほかのテストの連続日数に残らないように消す
+    await db.delete(schema.deletedAnswers);
     for (const subject of subjects) {
       const [row] = await db
         .insert(schema.subjects)
