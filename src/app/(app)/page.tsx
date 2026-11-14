@@ -67,7 +67,7 @@ function DayStreakSkeleton() {
   return (
     <div
       data-testid="day-streak-loading"
-      className="h-36 animate-pulse rounded-md border border-border bg-surface-raised"
+      className="h-32.5 animate-pulse rounded-md border border-border bg-surface-raised sm:h-35"
     />
   );
 }

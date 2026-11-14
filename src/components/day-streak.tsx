@@ -25,7 +25,7 @@ export function DayStreakCard({ streak }: { streak: DayStreak }) {
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <span
             aria-hidden
-            className={`icon text-lg sm:text-display ${lit ? "icon-fill text-flame" : "text-muted"}`}
+            className={`icon text-lg leading-none sm:text-display sm:leading-none ${lit ? "icon-fill text-flame" : "text-muted"}`}
           >
             local_fire_department
           </span>
@@ -80,7 +80,7 @@ function DayMark({ day }: { day: WeekDay }) {
     missed: "text-border",
   }[day];
   return (
-    <span aria-hidden className={`icon text-lg ${style}`}>
+    <span aria-hidden className={`icon text-lg leading-none ${style}`}>
       local_fire_department
     </span>
   );
@@ -90,7 +90,7 @@ function TodayStatus({ today }: { today: DayStreak["today"] }) {
   if (today === "done") {
     return (
       <p className="flex items-center gap-1 text-success">
-        <span aria-hidden className="icon text-sm">
+        <span aria-hidden className="icon text-sm leading-none">
           check
         </span>
         done today
