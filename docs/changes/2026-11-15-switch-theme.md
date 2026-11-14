@@ -18,9 +18,11 @@
 
 ## 受け入れ条件
 
-- Home の menu に「settings」の枠が出て、押すと Settings に移る
-- Settings の左上に戻るリンク「home」が出て、押すと Home に移る
-- Settings で system / light / dark の3つから1つを選べる。最初は system が選ばれている
+- Home の menu に、manage の隣に枠「settings」と「Theme」が出て、押すと Settings に移る
+- Settings の左上に戻るリンク「home」、その下にパンくず「settings」と見出し「Settings」が出る。戻るリンクを押すと Home に移る
+- Settings の「theme」の見出しの下に「system」「light」「dark」が横に並び、1つを選べる。最初は system が選ばれている
+- 開いた瞬間から、選んだ明るさで出る（一度ほかの明るさで出てから切り替わることはない）
+- Login にはテーマを選ぶ手段を置かない。解く画面から Settings へ行く手段も置かない
 - 選ぶと、その場で画面の明るさが切り替わる（保存のボタンは押さない）
   - system：OS の設定に合わせる
   - light：いつも明るい
@@ -56,15 +58,15 @@
 
 ## 決まっていないこと
 
-- [ ] Settings の見出し・パンくずの文言は「settings」「settings」でよいか（ほかの画面に合わせると、パンくず「settings」、見出し「Settings」になる）
-- [ ] テーマの選ぶものの見出しと、3つの書き方（「theme」の見出しの下に「system」「light」「dark」でよいか）
-- [ ] 3つの見せ方：docs/ui.md の「少しの中から1つ選ぶもの」（横に並べたボタンで、選んでいるものだけ surface の地）でよいか
-- [ ] 3つに、説明（system に「match your OS」など）やアイコン（light_mode / dark_mode など）を添えるか
-- [ ] Home の menu の settings の枠に出す説明文（manage の「Import, export, delete, flagged」にあたるもの。例：「Theme」）
-- [ ] Login 画面にテーマを選ぶ手段を置くか（置かない場合、Login は覚えている値か system で出るだけ）
-- [ ] 解く画面（Solve）から Settings へ行く手段は要らない、でよいか（今の決まりでは Home の menu からだけ）
-- [ ] 画像を比べるテストに、ダークの画面を入れるか。入れるならどの画面か（Settings の dark だけ、全画面のダーク、など）
-- [ ] 画面を開いた瞬間に、一度明るい画面が出てから暗くなる（ちらつく）ことを許すか
+- [x] Settings の見出し・パンくずの文言は「settings」「settings」でよいか（ほかの画面に合わせると、パンくず「settings」、見出し「Settings」になる） → パンくず「settings」、見出し「Settings」
+- [x] テーマの選ぶものの見出しと、3つの書き方（「theme」の見出しの下に「system」「light」「dark」でよいか） → それでよい
+- [x] 3つの見せ方：docs/ui.md の「少しの中から1つ選ぶもの」（横に並べたボタンで、選んでいるものだけ surface の地）でよいか → それでよい
+- [x] 3つに、説明（system に「match your OS」など）やアイコン（light_mode / dark_mode など）を添えるか → 添えない
+- [x] Home の menu の settings の枠に出す説明文（manage の「Import, export, delete, flagged」にあたるもの。例：「Theme」） → 「Theme」
+- [x] Login 画面にテーマを選ぶ手段を置くか（置かない場合、Login は覚えている値か system で出るだけ） → 置かない
+- [x] 解く画面（Solve）から Settings へ行く手段は要らない、でよいか（今の決まりでは Home の menu からだけ） → 要らない
+- [x] 画像を比べるテストに、ダークの画面を入れるか。入れるならどの画面か（Settings の dark だけ、全画面のダーク、など） → Settings の dark だけ入れる
+- [x] 画面を開いた瞬間に、一度明るい画面が出てから暗くなる（ちらつく）ことを許すか → 許さない（開いた瞬間から選んだ明るさで出る）
 
 ## 調べたこと
 
