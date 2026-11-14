@@ -2,8 +2,6 @@
 
 export const THEME_KEY = "theme";
 
-export type Theme = "system" | "light" | "dark";
-
 // 選んだ値と OS の設定から、data-theme を付ける。
 // layout.tsx の <head> のスクリプトに toString() で文字列にして埋めるので、この関数の外のもの（import や THEME_KEY）を中で使わない
 function applyTheme(key: string) {
