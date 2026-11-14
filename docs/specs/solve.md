@@ -46,6 +46,12 @@ Subject の中から Topic・順番・問題数を選び（Setup）、1問ずつ
 - 上のバー：左に quit（arrow_back の印）、右に、ここまでの正解の数・不正解の数（スキップを含む）・今の問題の番号（4/10 など）。下の端に、終えた問題（答えた・スキップした・答える前に印を付けた）の割合だけ伸びる線
 - 問題の上の行：枠で囲んだ「single」か「multi」、Topic の名前、問題の ID。右に flag（muted の等幅の文字だけのボタン。指を乗せると warning の文字と warning-soft の地）
 - 問題文。コードがあるときは、行番号つきのコードブロックで出す。選択肢の中のコードには行番号を付けない
+- 問題文・選択肢・解説のコードブロックには、```` ``` ```` の後ろに書かれた言語に合わせて色を付ける
+  - 色を付ける言語は、Python・TypeScript・JavaScript・SQL・シェル・JSON。言語の名前は大文字・小文字を区別せず、短い名前（`py`・`ts`・`js`・`sh`・`bash`・`shell`）も同じ言語として扱う
+  - 色を付けるのは、キーワード・文字列・関数の名前・組み込みの名前・デコレーター・コメント。それ以外（変数の名前、数、記号など）は、コードブロックの文字の色のまま
+  - 言語の名前がないときと、知らない言語の名前のときは、1色で出す
+  - 問題を開いたときから色が付いている。答え合わせのあと（正解・不正解の色の付いた選択肢）でも、コードの色は変わらない。ライトモードとダークモードで、それぞれのモードの色で出す
+  - 言語の名前は画面に出さない。文の中の短いコード（`` `x` ``）には色を付けない
 - 選択肢は、ファイルの順に A・B・C… の記号を付けて出す。単一選択（「choose one」）は丸い記号で1つだけ選べ、選び直すと前の選択が外れる。複数選択（「select all that apply」）は四角い記号で、いくつでも選べる
 - 下に固定した操作
   - 答える前：skip と submit。何も選んでいない間は、上に「select an option to proceed」を出し、submit を薄くして押せない
@@ -82,7 +88,8 @@ Subject の中から Topic・順番・問題数を選び（Setup）、1問ずつ
 | 答える前（複数選択） | select all that apply と四角い記号の選択肢 | ![](screens/solve-multiple.png) |
 | 答えたあと（複数選択） | 選ばなかった正解に missed | ![](screens/solve-answered-multiple.png) |
 | 答える前（選択肢がコード） | 選択肢の中にコードブロック | ![](screens/solve-code-choices.png) |
-| 答えたあと（選択肢がコード） | 答え合わせの色 | ![](screens/solve-answered-code-choices.png) |
+| 答えたあと（選択肢がコード） | 答え合わせの色。選択肢の中のコードの色はそのまま | ![](screens/solve-answered-code-choices.png) |
+| 色を付けられない言語 | 問題文のコードブロックが1色。行番号は付く | ![](screens/solve-no-language.png) |
 | 最後の問題 | next の代わりに results | ![](screens/solve-last.png) |
 | 問題が多い | 37/100 など | ![](screens/solve-many.png) |
 | 読み込み中 | 点滅する枠と、押せない quit | ![](screens/solve-loading.png) |

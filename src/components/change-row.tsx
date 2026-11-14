@@ -1,3 +1,5 @@
+import { RichText } from "./rich-text";
+
 // 置き換わる問題の、開閉する行。行に ID と問題文の1行目（印が付いていたら、右に印と記録が消えること）、開くと変わった項目ごとに前（danger）と後（success）を並べる。
 // スマホの幅では、前と後を縦に並べる
 export function ChangeRow({
@@ -39,8 +41,18 @@ export function ChangeRow({
           <div key={change.item} className="flex flex-col gap-1.5">
             <span className="font-mono text-xs text-muted">{change.item}</span>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <Side label="before" value={change.before} tone="danger" />
-              <Side label="after" value={change.after} tone="success" />
+              <Side
+                label="before"
+                value={change.before}
+                look={lookOf(change.item)}
+                tone="danger"
+              />
+              <Side
+                label="after"
+                value={change.after}
+                look={lookOf(change.item)}
+                tone="success"
+              />
             </div>
           </div>
         ))}
@@ -49,13 +61,25 @@ export function ChangeRow({
   );
 }
 
+type Look = "plain" | "prose" | "choice";
+
+// 問題文・選択肢・解説は Solve と同じ見せ方（RichText。選択肢は Solve の選択肢と同じ等幅の文字）にする。
+// topic・type・correct は文字のまま出す。Topic の名前に ` があっても、文の中のコードにしないため
+function lookOf(item: string): Look {
+  if (item.startsWith("choice ")) return "choice";
+  if (item === "text" || item === "explanation") return "prose";
+  return "plain";
+}
+
 function Side({
   label,
   value,
+  look,
   tone,
 }: {
   label: string;
   value: string;
+  look: Look;
   tone: "danger" | "success";
 }) {
   const colors = {
@@ -67,9 +91,15 @@ function Side({
       className={`flex flex-col gap-1 rounded-md border px-3 py-2 ${colors.box}`}
     >
       <span className={`font-mono text-xs ${colors.label}`}>{label}</span>
-      <span className="font-mono text-sm break-words whitespace-pre-wrap">
-        {value}
-      </span>
+      {look !== "plain" ? (
+        <div className={`text-sm ${look === "choice" ? "font-mono" : ""}`}>
+          <RichText text={value} />
+        </div>
+      ) : (
+        <span className="font-mono text-sm break-words whitespace-pre-wrap">
+          {value}
+        </span>
+      )}
     </div>
   );
 }

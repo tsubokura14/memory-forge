@@ -251,7 +251,7 @@ const decorators: TestQuestion[] = [
     text: 'デコレータを付けたあとも `add.__name__` が `"add"` のままになる `logger` はどれか。',
     choices: [
       [
-        fence,
+        `${fence}python`,
         "def logger(func):",
         "    def wrapper(*args, **kwargs):",
         "        return func(*args, **kwargs)",
@@ -259,7 +259,7 @@ const decorators: TestQuestion[] = [
         fence,
       ].join("\n"),
       [
-        fence,
+        `${fence}python`,
         "from functools import wraps",
         "",
         "def logger(func):",
@@ -270,7 +270,7 @@ const decorators: TestQuestion[] = [
         fence,
       ].join("\n"),
       [
-        fence,
+        `${fence}python`,
         "def logger(func):",
         "    wrapper = lambda *a, **k: func(*a, **k)",
         "    return wrapper",
@@ -278,7 +278,7 @@ const decorators: TestQuestion[] = [
       ].join("\n"),
       [
         "ラッパーの名前を手で付け直す：",
-        fence,
+        `${fence}python`,
         "def logger(func):",
         "    def wrapper(*args, **kwargs):",
         "        return func(*args, **kwargs)",
@@ -504,8 +504,8 @@ test("solve-loading：問題を受け取るまで、点滅する枠を出す", a
 });
 
 // 3問を答えて（2問正解・1問不正解）、4問目で B を選んだところまで進める（solve-error と solve-quit の画像の状態）
-async function toFourth(page: Page) {
-  await startDecorators(page);
+async function toFourth(page: Page, questions = decorators) {
+  await startDecorators(page, questions);
   await answer(page, "A");
   await next(page);
   await answer(page, "A");
@@ -514,6 +514,20 @@ async function toFourth(page: Page) {
   await next(page);
   await choice(page, "B").click();
 }
+
+test("solve-no-language：言語の名前のないコードは、色を付けずに行番号だけ付ける", async ({
+  page,
+}) => {
+  const questions = decorators.map((q) =>
+    q.id === "k3f9a2"
+      ? { ...q, text: q.text.replace(`${fence}python`, fence) }
+      : q,
+  );
+  await toFourth(page, questions);
+  await expect(page).toHaveScreenshot("solve-no-language.png", {
+    fullPage: true,
+  });
+});
 
 function failActions(page: Page) {
   return page.route(/\/subjects\/\d+$/, (route) =>

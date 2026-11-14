@@ -80,6 +80,8 @@
   - 変わらない：同じ ID の問題があり、中身がすべて同じ
 - 置き換わる問題の見出しは「replaced — records are kept, except for flagged questions」。印の付いた問題が置き換わるときは、その問題の行の右に、warning の flag の印と文字で「flag and records reset」と出す
 - 置き換わる問題ごとに、変わった項目（topic・type・text・choice A〜H・correct・explanation）の前と後を出す。正解は「A, C」のように出す。選択肢の数が変わったときは、ない側を空にする
+  - text・choice A〜H・explanation の前と後は、Solve の選択肢と同じ見せ方で出す。文の中の短いコードは code-bg の地で囲み、```` ``` ```` のところは行番号のないコードブロックにして、Solve と同じ決まり（`docs/specs/solve.md` の「Solve」）で色を付ける。```` ``` ```` の記号は出さない。選択肢は等幅の文字で出す
+  - topic・type・correct は、書かれた文字のまま等幅の文字で出す
 - import all を押すと、全部を取り込み、取り込んだという知らせを出す。知らせの open in manage で Manage に移る
 - cancel を押すと、ファイルを選ぶところに戻る。何も変わらない
 
@@ -108,7 +110,7 @@
 | ファイルを選ぶ | 点線の枠の中に「Drop a question file here」「.json」と choose file | ![](screens/import-select.png) |
 | 確かめ中 | 点線の枠の中に、ファイル名と、点滅する「checking…」。choose file は出さない | ![](screens/import-checking.png) |
 | 誤り | danger の帯「4 problems found in python-decorators.json. Nothing was imported.」、誤りの一覧（ID・項目・内容）、choose another file | ![](screens/import-errors.png) |
-| 取り込む前の確認 | 「python-decorators.json → Python」、new・replaced・unchanged の数、「replaced — records are kept, except for flagged questions」の見出しと置き換わる問題（印付きの行の右に「flag and records reset」）、cancel と import all | ![](screens/import-preview.png) |
+| 取り込む前の確認 | 「python-decorators.json → Python」、new・replaced・unchanged の数、「replaced — records are kept, except for flagged questions」の見出しと置き換わる問題（印付きの行の右に「flag and records reset」）。最初の置き換わる問題を開き、前（danger の枠）と後（success の枠）の中に文と色の付いたコードブロック。cancel と import all | ![](screens/import-preview.png) |
 | 取り込む前の確認（まだない Subject） | Subject の名前の右に、success の枠の「new subject」。置き換わる問題がなければ、一覧は出さない | ![](screens/import-preview-new.png) |
 | 取り込み中 | import all の文字が「importing…」になって押せない。cancel も押せない | |
 | 取り込んだ | success の枠に「imported into Python」と数（1 new · 2 replaced · 1 unchanged など）、open in manage | ![](screens/import-done.png) |

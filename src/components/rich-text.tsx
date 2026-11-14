@@ -13,7 +13,12 @@ export function RichText({
     <div className="flex min-w-0 flex-col gap-3">
       {parseMarkup(text).map((block, i) =>
         block.kind === "code" ? (
-          <CodeBlock key={i} code={block.code} lineNumbers={lineNumbers} />
+          <CodeBlock
+            key={i}
+            code={block.code}
+            language={block.language}
+            lineNumbers={lineNumbers}
+          />
         ) : (
           <p key={i} className="whitespace-pre-wrap">
             {block.inlines.map((inline, j) =>

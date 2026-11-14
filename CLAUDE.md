@@ -70,6 +70,7 @@
 
 - Next.js 16（App Router、TypeScript、Cache Components を有効）、React 19
 - Tailwind CSS 4（トークンは `src/styles/tokens.css`）
+- Prism（`prismjs`。コードブロックの色分け。`src/server/questions/highlight.ts`）
 - Neon（PostgreSQL）と Drizzle ORM（drizzle-kit で形の変更を管理）
 - Better Auth（メールアドレスとパスワードでのログイン。`src/server/auth/`）
 - Vitest（中の決まりのテスト）、Playwright（画面を通したテストと、Docker の中での画像の比べ）
@@ -102,3 +103,4 @@
 - 2026-09-17: 日付の比較は、時刻を切り捨ててから行う
 -->
 - 2026-11-01: 境界や空のとき、文言の出し分けなど、仕様にない細かい場合に気づいたら、実装する前に一覧にして聞く（実装の中で決めない）
+- 2026-11-14: `npm test` と `npm run screens:test` は同じテスト用のデータベースを使うので、同時に実行せず、順番に実行する（同時だと両方とも失敗する）
