@@ -1,7 +1,12 @@
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test } from "vitest";
 import { db } from "@/server/db/client";
-import { answers, questions, subjects } from "@/server/db/schema";
+import {
+  answers,
+  deletedAnswers,
+  questions,
+  subjects,
+} from "@/server/db/schema";
 import { deleteQuestion, deleteSubject, deleteTopic } from "./delete";
 
 async function insertSubject(name: string) {
@@ -66,6 +71,7 @@ let pythonQuestions: number[];
 beforeEach(async () => {
   // questions と answers は subjects を消すと一緒に消える
   await db.delete(subjects);
+  await db.delete(deletedAnswers);
   python = await insertSubject("Python");
   pythonQuestions = await insertQuestions(python, [
     ["p1", "Decorators"],
