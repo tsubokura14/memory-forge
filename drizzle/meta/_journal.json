@@ -29,6 +29,13 @@
       "when": 1794019947553,
       "tag": "0003_red_hellion",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794656636078,
+      "tag": "0004_flat_vindicator",
+      "breakpoints": true
     }
   ]
 }

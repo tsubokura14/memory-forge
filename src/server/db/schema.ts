@@ -170,3 +170,10 @@ export const answers = pgTable(
   },
   (table) => [index("answers_question_id_idx").on(table.questionId)],
 );
+
+// Manage で消した問題の答えた日時。消すときに、印のない問題の answers から写す（docs/design.md の「データ」）。
+// 答えた日時だけを持ち、問題とのつながりや正解かどうかは持たない。連続日数にしか使わないため
+export const deletedAnswers = pgTable("deleted_answers", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  answeredAt: timestamp("answered_at", { withTimezone: true }).notNull(),
+});
