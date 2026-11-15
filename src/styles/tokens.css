@@ -55,6 +55,8 @@
   --text-base--line-height: 1.5rem;
   --text-lg: 1.125rem;
   --text-lg--line-height: 1.625rem;
+  --text-xl: 1.75rem;
+  --text-xl--line-height: 1;
   --text-display: 2.5rem;
   --text-display--line-height: 1;
 
