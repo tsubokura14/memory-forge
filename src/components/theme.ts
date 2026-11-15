@@ -21,7 +21,8 @@ function applyTheme(key: string) {
 
 export type Theme = "system" | "light" | "dark";
 
-// 何も入っていない・知らない値のときは system とみなす
+// 何も入っていない・知らない値のときは system とみなす。
+// applyTheme にも同じ読み方があるが、あちらは文字列にして埋めるので、この関数を呼べない
 export function readTheme(): Theme {
   try {
     const saved = localStorage.getItem(THEME_KEY);
