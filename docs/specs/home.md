@@ -15,7 +15,7 @@
   - Home を開いたときの日付で出す。開いたまま日付が変わっても変わらず、開き直すと（読み直しを含む）今の日付で出る
 - 連続日数を読み込んでいる間は、「day streak」の見出しの下に、連続日数の枠と同じ高さの枠を点滅させる。Subject の一覧とは別に出す
 - 連続日数を読み込めなかったときは、「day streak」の見出しの下に、danger の帯「Couldn't load day streak.」と retry を出す。retry で読み直す。Subject の一覧はふつうに出す
-- 「menu」の見出しの下に、枠「manage」と「Import, export, delete, flagged」を出す。PC の幅では、2列の枠の左の1枚の大きさ。押すと Manage（`docs/specs/manage.md`）に移る
+- 「menu」の見出しの下に、枠「manage」と「Import, export, delete, flagged」、その右（スマホの幅では下）に枠「settings」と「Theme」を出す。manage を押すと Manage（`docs/specs/manage.md`）、settings を押すと Settings（`docs/specs/settings.md`）に移る
 - 「subjects」の見出しの下に、Subject を取り込んだ順に、枠で囲んだ行を区切り線で並べる
   - 行には、左に名前と、その下にその Subject の全部の問題の身についている具合（下の「身についている具合」の線と数）を出し、右に %、その右に chevron_right の印を出す。名前が長いときは、行の中で折り返す
   - 印の数は出さない
@@ -26,13 +26,13 @@
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 通常（Subject が1つ以上、今日答えた） | day streak の灯った炎と日数、今週の答えた日の炎、「done today」。menu の manage、subjects の Subject の行に線・数・%。まだ解いていない Linux は、線が全部 border、「0 correct · 0 wrong · 30 new」と「—」 | ![](screens/home-default.png) |
+| 通常（Subject が1つ以上、今日答えた） | day streak の灯った炎と日数、今週の答えた日の炎、「done today」。menu の manage と settings、subjects の Subject の行に線・数・%。まだ解いていない Linux は、線が全部 border、「0 correct · 0 wrong · 30 new」と「—」 | ![](screens/home-default.png) |
 | 通常（スマホの幅） | 炎が小さく、7日の間を詰めて右に寄せ、曜日は1文字 | ![](screens/home-default-mobile.png) |
 | 今日まだ（昨日まで続いている） | 線だけの炎と日数、今日の炎が点滅、「answer today to keep the flame」 | ![](screens/home-streak-pending.png) |
 | 連続日数が0日 | 線だけの炎と「0」（muted）、muted の「answer a question to light the flame」 | ![](screens/home-no-streak.png) |
 | 連続日数が大きい | 4桁の日数でも、炎・日数・今週の7日が1行に収まる | ![](screens/home-long.png) ![](screens/home-long-mobile.png) |
 | Subject が多い | Subject の行が続く | ![](screens/home-many.png) |
-| Subject が0件 | menu の manage、subjects の点線の枠と import | ![](screens/home-empty.png) |
+| Subject が0件 | menu の manage と settings、subjects の点線の枠と import | ![](screens/home-empty.png) |
 
 ## 連続日数
 
