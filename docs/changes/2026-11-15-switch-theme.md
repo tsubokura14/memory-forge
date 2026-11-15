@@ -141,7 +141,7 @@
   - `src/components/theme.ts`、`src/app/layout.tsx` のスクリプト
   - テスト：OS の設定に合わせる（何も選んでいない状態で、OS をダーク・明るいに切り替える）、`localStorage` に dark を入れて Login を開くと dark
   - 画面の見た目は変わらない（Playwright の既定の OS は明るく、何も選んでいないので、今の画像はそのまま通る）
-- [ ] 2. Home の menu から Settings を開いて、テーマを選べるようになったら完了
+- [x] 2. Home の menu から Settings を開いて、テーマを選べるようになったら完了
   - `src/app/(app)/settings/page.tsx`・`theme-picker.tsx`、`src/app/(app)/page.tsx` の menu、`docs/specs/settings.md`（新規）・`docs/specs/home.md`・`docs/specs/app-bar.md`
   - 合わせるスクリーンショット：`settings-default.png`、`settings-dark.png`、`home-default.png`
   - 撮り直す画像（menu に settings の枠が写るもの）：`home-default.png`、`home-default-mobile.png`、`home-empty.png`、`home-streak-pending.png`、`home-no-streak.png`、`home-long.png`、`home-long-mobile.png`、`home-many.png`

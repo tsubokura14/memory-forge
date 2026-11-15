@@ -25,7 +25,6 @@ export default function Home() {
       </section>
       <section className="flex flex-col gap-2">
         <h2 className="font-mono text-xs text-muted">menu</h2>
-        {/* manage は、2列の枠の左の1枚の大きさにする */}
         <div className="grid gap-2 sm:grid-cols-2">
           <Link
             href="/manage"
@@ -35,6 +34,13 @@ export default function Home() {
             <span className="text-xs text-muted">
               Import, export, delete, flagged
             </span>
+          </Link>
+          <Link
+            href="/settings"
+            className="flex flex-col gap-0.5 rounded-md border border-border bg-surface px-3 py-3 hover:bg-surface-raised"
+          >
+            <span className="font-mono text-sm">settings</span>
+            <span className="text-xs text-muted">Theme</span>
           </Link>
         </div>
       </section>
