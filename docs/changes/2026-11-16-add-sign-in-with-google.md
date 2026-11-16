@@ -33,6 +33,7 @@
   - 外せなかったときは、行を残し、google の行の中に danger の帯で「Couldn't unlink your Google account. Try again.」を出す（retry のボタンは出さない）
   - 最後の1つを外しても、パスワードで入れるので外せる
 - 外したあとは、その Google アカウントでは入れない
+- 開いたときに紐づけた Google アカウントを読み込めなかったときは、google の行の中に、danger の帯「Couldn't load Google accounts.」と retry を出す。retry で読み直す。link google account のボタンは出さない
 
 ### ログイン（Login）
 
@@ -61,6 +62,7 @@
 
 - 大量：紐づける数は自分の Google アカウントの数なので、数個まで。行が増えるだけで、ページやスクロールは設けない
 - 読み込み中：画面を開いた時点で一覧を出すので、別の表示はない
+- 読み込みのエラー：google の行の中に danger の帯「Couldn't load Google accounts.」と retry（スクリーンショットはない。Home の「Couldn't load subjects.」と同じ見せ方）
 - 権限なし：ログインしていないと見られない（今までどおり）
 
 ### Login（`/login`）
@@ -158,6 +160,7 @@ Better Auth 1.7.10 の Google の機能（`socialProviders.google`、`signInSoci
 | account の枠・email と google の行・説明文・Not linked | 触って確かめる（本番の画面の画像） |
 | 紐づけた Google アカウントを並べる（自分のものだけ、メールアドレスを取り出す） | テスト（Vitest：`listGoogleAccounts` が自分の google の行だけを返し、`id_token` からメールアドレスを出す） |
 | link を押すと Google に移り、戻ると行が足される・すでに紐づけたものは変わらない・違うメールアドレスも紐づけられる | 触って確かめる（手元で本物の Google を使う）。設定値（`allowDifferentEmails`）はコードを見て確かめる |
+| 一覧を読み込めなかったときの帯と retry | コードを見て確かめる（Home の読み込みのエラーと同じ作り。データベースにつながらない状態を画面のテストで作れないため） |
 | 「linking…」「unlinking…」「signing in…」で薄く押せない | 触って確かめる（本番の画面の画像） |
 | キャンセルは何も出さない・そのほかの失敗は帯（Login・Settings の文言の出し分け） | テスト（Vitest：エラーのコードから文言への関数。`access_denied`・紐づけていない・そのほか） |
 | unlink で行が消える・外したあとはその Google で入れない・最後の1つも外せる | テスト（Playwright：表に google の行を入れた状態で unlink を押すと行が消え、Not linked になる）。入れないことは触って確かめる |
