@@ -201,7 +201,7 @@ test("sign out すると Login に移り、戻っても中身は見えない", a
   await page.goto("/login");
   await page.getByLabel("email").fill(TEST_USER.email);
   await page.getByLabel("password").fill(TEST_USER.password);
-  await page.getByRole("button", { name: "sign in" }).click();
+  await page.getByRole("button", { name: "sign in", exact: true }).click();
   await expect(page).toHaveURL("/");
 
   await page.getByRole("button", { name: "sign out" }).click();
@@ -209,5 +209,5 @@ test("sign out すると Login に移り、戻っても中身は見えない", a
 
   await page.goBack();
   await expect(page).toHaveURL(/^[^?]*\/login\?next=%2F$/);
-  await expect(page.getByRole("button", { name: "sign in" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "sign in", exact: true })).toBeVisible();
 });

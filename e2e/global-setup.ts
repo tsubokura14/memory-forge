@@ -33,7 +33,7 @@ export default async function globalSetup(config: FullConfig) {
   await page.goto("/login");
   await page.getByLabel("email").fill(TEST_USER.email);
   await page.getByLabel("password").fill(TEST_USER.password);
-  await page.getByRole("button", { name: "sign in" }).click();
+  await page.getByRole("button", { name: "sign in", exact: true }).click();
   await page.waitForURL("/");
   await page.context().storageState({ path: SIGNED_IN_STATE });
   await browser.close();

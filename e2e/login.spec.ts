@@ -5,7 +5,7 @@ import { SIGNED_IN_STATE, TEST_USER } from "./test-user";
 async function signIn(page: Page, email: string, password: string) {
   await page.getByLabel("email").fill(email);
   await page.getByLabel("password").fill(password);
-  await page.getByRole("button", { name: "sign in" }).click();
+  await page.getByRole("button", { name: "sign in", exact: true }).click();
 }
 
 // 帯。Next.js が画面の移動を読み上げるために置く role="alert" の部品は、main の外にあるので含めない
