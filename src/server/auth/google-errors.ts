@@ -1,4 +1,10 @@
-// Google から戻ってきたとき、Better Auth が errorCallbackURL に付ける error のコードから、Login に出す帯を決める
+// Google から戻ってきたとき、Better Auth が errorCallbackURL に付ける error のコードから、Settings に紐づけの失敗を出すかを決める
+export function linkErrorFromGoogle(code: string | undefined): boolean {
+  // Google の画面でキャンセルした。自分でやめたので、エラーにしない
+  return !!code && code !== "access_denied";
+}
+
+// 同じく、Login に出す帯を決める
 export function signInErrorFromGoogle(
   code: string | undefined,
 ): "notLinked" | "error" | null {
