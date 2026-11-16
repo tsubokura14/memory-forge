@@ -99,7 +99,7 @@
 
 ## 設計
 
-Better Auth 1.7.10 の Google の機能（`socialProviders.google`、`signInSocial`、`linkSocial`、`unlinkAccount`）を使う。動きは `node_modules/better-auth/dist/api/routes/callback.mjs`・`account.mjs`・`oauth2/link-account.mjs` で確かめた。
+Better Auth 1.7.10 の Google の機能（`socialProviders.google`、`signInSocial`、`linkSocialAccount`、`unlinkAccount`）を使う。動きは `node_modules/better-auth/dist/api/routes/callback.mjs`・`account.mjs`・`oauth2/link-account.mjs` で確かめた。
 
 ### データ
 
@@ -147,7 +147,7 @@ Better Auth 1.7.10 の Google の機能（`socialProviders.google`、`signInSoci
 - `src/app/(app)/settings/page.tsx`：appearance の上に「account」の枠。email の行はセッションのユーザーのメールアドレス、google の行は `listGoogleAccounts(userId)` の結果
 - `src/server/auth/google-accounts.ts`：`listGoogleAccounts(userId)` が、その人の `provider_id = 'google'` の行を、`{ id, email }` の一覧で返す（紐づけた順）
 - `src/app/(app)/settings/actions.ts`
-  - `linkGoogleAction`：`requireSession()` のあと、`auth.api.linkSocial({ headers, body: { provider: "google", callbackURL: "/settings", errorCallbackURL: "/settings", disableRedirect: true } })` で Google の URL を受け取り、`redirect` する
+  - `linkGoogleAction`：`requireSession()` のあと、`auth.api.linkSocialAccount({ headers, body: { provider: "google", callbackURL: "/settings", errorCallbackURL: "/settings", disableRedirect: true } })` で Google の URL を受け取り、`redirect` する
   - `unlinkGoogleAction(accountId)`：`requireSession()` のあと `auth.api.unlinkAccount`。失敗したら `{ result: "error" }` を返す。成功したら `/settings` を再検証して行を消す
 - 戻ってきたときのエラー：`access_denied` は何も出さない。そのほかは google の行の中に「Couldn't link your Google account. Try again.」。すでに自分に紐づけた Google アカウントは、Better Auth がエラーにせず戻すので、何も変わらない
 - link・unlink のボタンは、押した間だけ「linking…」「unlinking…」で薄く押せない（`useActionState` の `pending`。unlink は行ごとに別のフォーム）
