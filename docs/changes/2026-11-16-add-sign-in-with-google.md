@@ -150,7 +150,8 @@ Better Auth 1.7.10 の Google の機能（`socialProviders.google`、`signInSoci
   - `linkGoogleAction`：`requireSession()` のあと、`auth.api.linkSocialAccount({ headers, body: { provider: "google", callbackURL: "/settings", errorCallbackURL: "/settings", disableRedirect: true } })` で Google の URL を受け取り、`redirect` する
   - `unlinkGoogleAction(accountId)`：`requireSession()` のあと `auth.api.unlinkAccount`。失敗したら `{ result: "error" }` を返す。成功したら `/settings` を再検証して行を消す
 - 戻ってきたときのエラー：`access_denied` は何も出さない。そのほかは google の行の中に「Couldn't link your Google account. Try again.」。すでに自分に紐づけた Google アカウントは、Better Auth がエラーにせず戻すので、何も変わらない
-- link・unlink のボタンは、押した間だけ「linking…」「unlinking…」で薄く押せない（`useActionState` の `pending`。unlink は行ごとに別のフォーム）
+- link・unlink のボタンは、押した間だけ「linking…」「unlinking…」で薄く押せない（`useTransition` の `isPending`。unlink の失敗の帯は行をまたいで1つなので、行ごとのフォームにせず、1つの transition と押した行の id で見分ける）
+- `unlinkGoogleAction` は、渡された id が自分の Google の行（`listGoogleAccounts` の結果）にあるときだけ外す。Better Auth の `unlinkAccount` は、自分の行ならパスワードの行も外してしまうため
 - 新しい部品は作らない。帯は `Banner`、ボタンは `Button`、check の印は Material Symbols
 
 ## 確かめ方
