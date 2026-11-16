@@ -1,11 +1,38 @@
+import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures";
+import { resetGoogleAccounts } from "./google-accounts";
 import { SIGNED_IN_STATE } from "./test-user";
 
 test.use({ storageState: SIGNED_IN_STATE });
 
+test.beforeEach(async () => {
+  await resetGoogleAccounts();
+});
+
+// 帯。Next.js が画面の移動を読み上げるために置く role="alert" の部品は、main の外にあるので含めない
+function banner(page: Page) {
+  return page.getByRole("main").getByRole("alert");
+}
+
+// /settings へのサーバーアクションの通信（next-action の付いた POST）を、返事を返さずに止める（abort なら失敗させる）
+async function holdServerActions(page: Page, mode: "hold" | "abort") {
+  await page.route(
+    (url) => url.pathname === "/settings",
+    async (route) => {
+      const request = route.request();
+      const isAction =
+        request.method() === "POST" && "next-action" in request.headers();
+      if (!isAction) return route.continue();
+      if (mode === "abort") return route.abort();
+      // hold：返事を返さない
+    },
+  );
+}
+
 test("settings-default", async ({ page }) => {
   await page.goto("/settings");
   await expect(page.getByRole("radio", { name: "system" })).toBeChecked();
+  await expect(page.getByText("Not linked")).toBeVisible();
   await expect(page).toHaveScreenshot("settings-default.png", {
     fullPage: true,
   });
@@ -34,4 +61,84 @@ test("選んだ値を覚えていて、読み直しても暗く、dark が選ば
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect(page.getByRole("radio", { name: "dark" })).toBeChecked();
+});
+
+test("settings-linked：unlink を押すとその行が消え、最後の1つも外せる", async ({
+  page,
+}) => {
+  await resetGoogleAccounts(["me@gmail.com", "me.work@gmail.com"]);
+  await page.goto("/settings");
+  await expect(page).toHaveScreenshot("settings-linked.png", {
+    fullPage: true,
+  });
+
+  const unlinks = page.getByRole("button", { name: "unlink" });
+  await unlinks.first().click();
+  await expect(page.getByText("me@gmail.com", { exact: true })).toBeHidden();
+  await expect(page.getByText("me.work@gmail.com")).toBeVisible();
+
+  await unlinks.first().click();
+  await expect(page.getByText("Not linked")).toBeVisible();
+
+  // 読み直しても戻らない（データベースから消えている）
+  await page.reload();
+  await expect(page.getByText("Not linked")).toBeVisible();
+});
+
+test("settings-unlinking：外している間は、押した行のボタンが unlinking… になって押せない", async ({
+  page,
+}) => {
+  await resetGoogleAccounts(["me@gmail.com", "me.work@gmail.com"]);
+  await holdServerActions(page, "hold");
+  await page.goto("/settings");
+  await page.getByRole("button", { name: "unlink" }).first().click();
+
+  await expect(page.getByRole("button", { name: "unlinking…" })).toBeDisabled();
+  await expect(page).toHaveScreenshot("settings-unlinking.png", {
+    fullPage: true,
+  });
+});
+
+test("settings-unlink-error：外せなかったら、行を残して帯を出す", async ({
+  page,
+}) => {
+  await resetGoogleAccounts(["me@gmail.com", "me.work@gmail.com"]);
+  await holdServerActions(page, "abort");
+  await page.goto("/settings");
+  await page.getByRole("button", { name: "unlink" }).first().click();
+
+  await expect(banner(page)).toHaveText(
+    "Couldn't unlink your Google account. Try again.",
+  );
+  await expect(page.getByText("me@gmail.com", { exact: true })).toBeVisible();
+  await expect(page).toHaveScreenshot("settings-unlink-error.png", {
+    fullPage: true,
+  });
+});
+
+test("settings-linking：Google に移るまでの間は、link google account が linking… になって押せない", async ({
+  page,
+}) => {
+  await holdServerActions(page, "hold");
+  await page.goto("/settings");
+  await page.getByRole("button", { name: "link google account" }).click();
+
+  await expect(page.getByRole("button", { name: "linking…" })).toBeDisabled();
+  await expect(page).toHaveScreenshot("settings-linking.png", {
+    fullPage: true,
+  });
+});
+
+test("settings-link-error：紐づけに失敗して戻ってくると、帯を出す", async ({
+  page,
+}) => {
+  // Google から戻ってきたときの URL（Better Auth が error を付ける）を直接開く
+  await page.goto("/settings?error=invalid_code");
+
+  await expect(banner(page)).toHaveText(
+    "Couldn't link your Google account. Try again.",
+  );
+  await expect(page).toHaveScreenshot("settings-link-error.png", {
+    fullPage: true,
+  });
 });
