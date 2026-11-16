@@ -5,7 +5,7 @@ import { SIGNED_IN_STATE, TEST_USER } from "./test-user";
 async function signIn(page: Page, email: string, password: string) {
   await page.getByLabel("email").fill(email);
   await page.getByLabel("password").fill(password);
-  await page.getByRole("button", { name: "sign in" }).click();
+  await page.getByRole("button", { name: "sign in", exact: true }).click();
 }
 
 // 帯。Next.js が画面の移動を読み上げるために置く role="alert" の部品は、main の外にあるので含めない
@@ -95,6 +95,20 @@ test("サーバーにつながらないと、エラーの帯が出る", async ({
 
   await expect(banner(page)).toHaveText("Couldn't sign in. Please try again.");
   await expect(page).toHaveScreenshot("login-server-error.png", {
+    fullPage: true,
+  });
+});
+
+test("紐づけていない Google アカウントで戻ってくると、帯が出る", async ({
+  page,
+}) => {
+  // Google から戻ってきたときの URL（Better Auth が error を付ける）を直接開く
+  await page.goto("/login?error=signup_disabled");
+
+  await expect(banner(page)).toHaveText(
+    "This Google account isn't linked. Sign in with your email, then link it in settings.",
+  );
+  await expect(page).toHaveScreenshot("login-google-error.png", {
     fullPage: true,
   });
 });

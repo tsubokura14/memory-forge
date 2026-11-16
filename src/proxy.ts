@@ -32,6 +32,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Next.js が配るファイル（JavaScript、CSS、書体）には動かさない
-  matcher: ["/((?!_next/|favicon.ico).*)"],
+  // Next.js が配るファイル（JavaScript、CSS、書体）と、Google からの戻り先（/api/auth/）には動かさない
+  matcher: ["/((?!_next/|favicon.ico|api/auth/).*)"],
 };

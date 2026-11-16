@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Card } from "@/components/card";
 import { Logo } from "@/components/logo";
+import { signInErrorFromGoogle } from "@/server/auth/google-errors";
 import { SignInForm } from "./sign-in-form";
 
 export default function LoginPage({ searchParams }: PageProps<"/login">) {
@@ -25,8 +26,16 @@ export default function LoginPage({ searchParams }: PageProps<"/login">) {
 async function SignInFormWithNext({
   searchParams,
 }: Pick<PageProps<"/login">, "searchParams">) {
-  const { next } = await searchParams;
-  return <SignInForm next={typeof next === "string" ? next : null} />;
+  const { next, error } = await searchParams;
+  return (
+    <SignInForm
+      next={typeof next === "string" ? next : null}
+      initialResult={
+        signInErrorFromGoogle(typeof error === "string" ? error : undefined) ??
+        "idle"
+      }
+    />
+  );
 }
 
 // docs/ui.md の「読み込み中」。フォームと同じ形の枠を点滅させる
@@ -36,6 +45,8 @@ function SignInFormSkeleton() {
       <div className="h-14 rounded-md bg-surface-raised" />
       <div className="h-14 rounded-md bg-surface-raised" />
       <div className="mt-1 h-9 rounded-md bg-surface-raised" />
+      <div className="h-4" />
+      <div className="h-9 rounded-md bg-surface-raised" />
     </div>
   );
 }
