@@ -97,10 +97,91 @@
 
 ## 設計
 
+Better Auth 1.7.10 の Google の機能（`socialProviders.google`、`signInSocial`、`linkSocial`、`unlinkAccount`）を使う。動きは `node_modules/better-auth/dist/api/routes/callback.mjs`・`account.mjs`・`oauth2/link-account.mjs` で確かめた。
+
+### データ
+
+- 表の形は変えない。紐づけた Google アカウントは、Better Auth の `account` の表に `provider_id = 'google'` の行として入る（1つの Google アカウントで1行。複数紐づけると行が増える）
+- Settings に出すメールアドレスは、その行の `id_token`（Google の ID トークン。Better Auth が紐づけ・ログインのたびに保存し直す）の中の `email` を、読むときに取り出す
+  - 比べた案：`account` に `email` の列を `additionalFields` で足す。素直に読めるが、表の形の変更と、入れるための hook が要るので選ばなかった
+  - 前提（崩れたら見直す）：Better Auth が Google の行に `id_token` を保存し続ける。版を上げて変わったら直す。→ 仕上げで `src/server/auth/google-accounts.ts` のコメントに残す
+  - ID トークンの署名は確かめない（Google からサーバーが直接受け取ったものを、自分の表から読むだけのため）。同じくコメントに残す
+
+### Better Auth の設定（`src/server/auth/auth.ts`）
+
+- `socialProviders.google`：`clientId`・`clientSecret` を環境変数 `GOOGLE_CLIENT_ID`・`GOOGLE_CLIENT_SECRET` から。`disableSignUp: true`（紐づけていない Google アカウントで、新しいアカウントを作らない）
+- `account.accountLinking`
+  - `disableImplicitLinking: true`：自分のアカウントと同じメールアドレスの Google アカウントでも、Login からは勝手に紐づけない（紐づけは Settings からだけ）
+  - `allowDifferentEmails: true`：メールアドレスが違う Google アカウントも紐づけられる
+- `session.freshAge: 0`：`unlinkAccount` は、既定ではログインしてから1日たったセッションを断る。30日ログインしたままの仕様と合わないので外す
+  - 比べた案：unlink だけ Better Auth を使わず、Drizzle で自分の行を消す。既定を変えずに済むが、持ち主の確かめなどを自分で書くので選ばなかった
+  - 前提（崩れたら見直す）：この制限がかかる機能（パスワードの変更など）を画面から使っていない。足すときに決め直す。→ 仕上げで `auth.ts` のコメントに残す
+- パスワードでの止め（`sign_in_attempts`）は、Google のログインでは見ず、書きもしない（`src/server/auth/sign-in.ts` を通らないため。何も足さなくてよい）
+
+### HTTP の入口（Google からの戻り先）
+
+- `src/app/api/auth/callback/google/route.ts` だけを置き、GET を `auth.handler` に渡す。`/api/auth/[...all]` は置かない
+  - 比べた案：`/api/auth/[...all]` を置き、`/sign-in/email` などを `disabledPaths` で塞ぐ。Better Auth の標準の形だが、塞ぎ忘れた機能をブラウザから直接呼べるので選ばなかった
+  - → 仕上げで `docs/design.md` の「Better Auth の HTTP の入口を置かない」を「戻り先の1本だけを置く」に直す（理由・前提・当てはまる場所）
+- `src/proxy.ts` の matcher から `/api/auth/` を外す。紐づけのときはログインしたまま戻ってくるので、`/login` と同じ扱い（ログインしていたら Home に移す）にはできないため。戻り先は、Better Auth が state の cookie で確かめる
+  - → 仕上げで `docs/design.md` の「ログインの確かめ」に足す
+- Google に登録する戻り先は、本番と `http://localhost:3000` だけ。Preview では Google のログイン・紐づけは使えない（押すと戻ってきてエラーの帯になる。パスワードでは入れる）
+  - 比べた案：Preview 用の決まった URL を用意して登録する。Preview で確かめられるが、Vercel と Google の設定が増えるので選ばなかった
+  - → 仕上げで `docs/design.md` の環境変数のところ（`BETTER_AUTH_URL` の前提）を直し、`GOOGLE_CLIENT_ID`・`GOOGLE_CLIENT_SECRET` を足す。`.env.example` にも名前を足す
+- Google Cloud でのクライアントの作成と、`.env.local`・Vercel（本番）への値の設定は、人間が行う
+
+### Login
+
+- `src/app/login/sign-in-form.tsx`：sign in のボタンの下に、「or」の区切りと、枠だけのボタン（今ある `Button` の枠だけの見た目）「sign in with google」を足す。同じ `fieldset` の中に置き、`formAction` で別のサーバーアクションを呼ぶ。こうすると、どちらを押しても同じ `pending` で sign in が「signing in…」になり、全部押せなくなる
+- `src/app/login/actions.ts` に `signInWithGoogleAction`：`auth.api.signInSocial({ body: { provider: "google", callbackURL: <next のパス>, errorCallbackURL: "/login?next=…", disableRedirect: true } })` で Google の URL を受け取り、`redirect` する（state の cookie は `nextCookies` が付ける）
+- 戻ってきたときのエラーは、Better Auth が `errorCallbackURL` に `?error=<コード>` を付ける。`src/app/login/page.tsx` がそれを読み、帯を出す
+  - `access_denied`（Google の画面でキャンセル）：何も出さない
+  - `signup_disabled`（どのアカウントにもない）・`account_not_linked`（自分のメールアドレスと同じだが紐づけていない）：「This Google account isn't linked. …」
+  - そのほか：「Couldn't sign in. Please try again.」
+  - コードから文言への出し分けは `src/server/auth/google-errors.ts` の関数にまとめ、Settings と一緒に使う
+
+### Settings
+
+- `src/app/(app)/settings/page.tsx`：appearance の上に「account」の枠。email の行はセッションのユーザーのメールアドレス、google の行は `listGoogleAccounts(userId)` の結果
+- `src/server/auth/google-accounts.ts`：`listGoogleAccounts(userId)` が、その人の `provider_id = 'google'` の行を、`{ id, email }` の一覧で返す（紐づけた順）
+- `src/app/(app)/settings/actions.ts`
+  - `linkGoogleAction`：`requireSession()` のあと、`auth.api.linkSocial({ headers, body: { provider: "google", callbackURL: "/settings", errorCallbackURL: "/settings", disableRedirect: true } })` で Google の URL を受け取り、`redirect` する
+  - `unlinkGoogleAction(accountId)`：`requireSession()` のあと `auth.api.unlinkAccount`。失敗したら `{ result: "error" }` を返す。成功したら `/settings` を再検証して行を消す
+- 戻ってきたときのエラー：`access_denied` は何も出さない。そのほかは google の行の中に「Couldn't link your Google account. Try again.」。すでに自分に紐づけた Google アカウントは、Better Auth がエラーにせず戻すので、何も変わらない
+- link・unlink のボタンは、押した間だけ「linking…」「unlinking…」で薄く押せない（`useActionState` の `pending`。unlink は行ごとに別のフォーム）
+- 新しい部品は作らない。帯は `Banner`、ボタンは `Button`、check の印は Material Symbols
+
 ## 確かめ方
 
--
+| 受け入れ条件 | 確かめ方 |
+| --- | --- |
+| account の枠・email と google の行・説明文・Not linked | 触って確かめる（本番の画面の画像） |
+| 紐づけた Google アカウントを並べる（自分のものだけ、メールアドレスを取り出す） | テスト（Vitest：`listGoogleAccounts` が自分の google の行だけを返し、`id_token` からメールアドレスを出す） |
+| link を押すと Google に移り、戻ると行が足される・すでに紐づけたものは変わらない・違うメールアドレスも紐づけられる | 触って確かめる（手元で本物の Google を使う）。設定値（`allowDifferentEmails`）はコードを見て確かめる |
+| 「linking…」「unlinking…」「signing in…」で薄く押せない | 触って確かめる（本番の画面の画像） |
+| キャンセルは何も出さない・そのほかの失敗は帯（Login・Settings の文言の出し分け） | テスト（Vitest：エラーのコードから文言への関数。`access_denied`・紐づけていない・そのほか） |
+| unlink で行が消える・外したあとはその Google で入れない・最後の1つも外せる | テスト（Playwright：表に google の行を入れた状態で unlink を押すと行が消え、Not linked になる）。入れないことは触って確かめる |
+| unlink の失敗で行が残り帯が出る | 触って確かめる（本番の画面の画像。失敗の起こし方はテストのときだけの差し替え） |
+| Login の「or」の区切りと sign in with google のボタン | 触って確かめる（本番の画面の画像） |
+| 紐づけた Google で Home（または開こうとしていた画面）に移る | 触って確かめる（手元で本物の Google） |
+| 紐づけていない Google で帯が出る・新しいアカウントはできない | テスト（Playwright：`/login?error=signup_disabled` で文言が出る）。アカウントができないことは `disableSignUp` をコードを見て確かめ、手元で一度触る |
+| 止めている15分の間も Google で入れる・Google の失敗を数えない | コードを見て確かめる（Google のログインが `sign-in.ts` を通らない） |
+| ログインしたままの期間と sign out が同じ | コードを見て確かめる（セッションの設定を共有） |
+| パスワードでのログインは今までどおり | テスト（今ある Login のテストがそのまま通る） |
+
+- 本物の Google の画面は、テストからは通さない（Google の画面を自動で操作できないため）
 
 ## タスク
 
-- [ ]
+- [ ] 1. Login から Google でログインできたら完了
+  - Better Auth の設定（Google、`accountLinking`、`freshAge`）、戻り先のルート、proxy の matcher、`.env.example`、Login のボタンとエラーの帯、`google-errors.ts`
+  - 合わせるスクリーンショット：`login-default.png`・`login-loading.png`・`login-google-error.png`
+  - 撮り直す画像（ボタンが足されるため全部）：`docs/specs/screens/login-default.png`・`login-loading.png`・`login-error.png`・`login-locked.png`・`login-server-error.png`、新しく `login-google-error.png`
+  - 仕上げ：`docs/specs/sign-in.md` に Google でのログインを足す。`docs/design.md` の HTTP の入口・ログインの確かめ・環境変数を直す
+  - 手元での確かめの前に、人間が Google Cloud でクライアントを作り、`.env.local` に値を入れる
+- [ ] 2. Settings で Google アカウントを紐づけ・外せたら完了（1のあと）
+  - `google-accounts.ts`、Settings の account の枠、link・unlink のアクション
+  - 合わせるスクリーンショット：`settings-default.png`・`settings-linking.png`・`settings-linked.png`・`settings-unlinking.png`・`settings-link-error.png`・`settings-unlink-error.png`
+  - 撮り直す画像：`docs/specs/screens/settings-default.png`・`settings-dark.png`、新しく上の状態の画像
+  - 仕上げ：`docs/specs/settings.md` に account の枠を足す（「0件・エラーは起こらない」の書きぶりも直す）
+  - 1を取り込んだあとでも、2がないうちは紐づける手段がないだけで、壊れない（Google で押すと「isn't linked」の帯になる）
