@@ -173,7 +173,7 @@ Better Auth 1.7.10 の Google の機能（`socialProviders.google`、`signInSoci
 
 ## タスク
 
-- [ ] 1. Login から Google でログインできたら完了
+- [x] 1. Login から Google でログインできたら完了
   - Better Auth の設定（Google、`accountLinking`、`freshAge`）、戻り先のルート、proxy の matcher、`.env.example`、Login のボタンとエラーの帯、`google-errors.ts`
   - 合わせるスクリーンショット：`login-default.png`・`login-loading.png`・`login-google-error.png`
   - 撮り直す画像（ボタンが足されるため全部）：`docs/specs/screens/login-default.png`・`login-loading.png`・`login-error.png`・`login-locked.png`・`login-server-error.png`、新しく `login-google-error.png`
