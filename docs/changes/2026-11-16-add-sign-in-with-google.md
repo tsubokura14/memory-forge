@@ -132,7 +132,7 @@ Better Auth 1.7.10 の Google の機能（`socialProviders.google`、`signInSoci
 
 ### Login
 
-- `src/app/login/sign-in-form.tsx`：sign in のボタンの下に、「or」の区切りと、枠だけのボタン（今ある `Button` の枠だけの見た目）「sign in with google」を足す。同じ `fieldset` の中に置き、`formAction` で別のサーバーアクションを呼ぶ。こうすると、どちらを押しても同じ `pending` で sign in が「signing in…」になり、全部押せなくなる
+- `src/app/login/sign-in-form.tsx`：sign in のボタンの下に、「or」の区切りと、枠だけのボタン（今ある `Button` の枠だけの見た目）「sign in with google」を足す。同じフォーム・同じ `fieldset` の中に置き、ボタンの `name="intent" value="google"` で、1つの `useActionState` の中から別のサーバーアクションを呼び分ける（`formAction` で別のアクションにすると、`pending` が2つに分かれるため）。こうすると、どちらを押しても同じ `pending` で sign in が「signing in…」になり、全部押せなくなる
 - `src/app/login/actions.ts` に `signInWithGoogleAction`：`auth.api.signInSocial({ body: { provider: "google", callbackURL: <next のパス>, errorCallbackURL: "/login?next=…", disableRedirect: true } })` で Google の URL を受け取り、`redirect` する（state の cookie は `nextCookies` が付ける）
 - 戻ってきたときのエラーは、Better Auth が `errorCallbackURL` に `?error=<コード>` を付ける。`src/app/login/page.tsx` がそれを読み、帯を出す
   - `access_denied`（Google の画面でキャンセル）：何も出さない
