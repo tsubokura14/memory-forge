@@ -1,5 +1,19 @@
 import { describe, expect, test } from "vitest";
-import { signInErrorFromGoogle } from "./google-errors";
+import { linkErrorFromGoogle, signInErrorFromGoogle } from "./google-errors";
+
+describe("linkErrorFromGoogle", () => {
+  test("Google の画面でキャンセルしたときは、何も出さない", () => {
+    expect(linkErrorFromGoogle("access_denied")).toBe(false);
+  });
+
+  test("そのほかのエラーは、紐づけの失敗を出す", () => {
+    expect(linkErrorFromGoogle("invalid_code")).toBe(true);
+  });
+
+  test("エラーがなければ、何も出さない", () => {
+    expect(linkErrorFromGoogle(undefined)).toBe(false);
+  });
+});
 
 describe("signInErrorFromGoogle", () => {
   test("Google の画面でキャンセルしたときは、何も出さない", () => {

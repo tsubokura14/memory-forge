@@ -33,6 +33,7 @@
   - 外せなかったときは、行を残し、google の行の中に danger の帯で「Couldn't unlink your Google account. Try again.」を出す（retry のボタンは出さない）
   - 最後の1つを外しても、パスワードで入れるので外せる
 - 外したあとは、その Google アカウントでは入れない
+- 開いたときに紐づけた Google アカウントを読み込めなかったときは、google の行の中に、danger の帯「Couldn't load Google accounts.」と retry を出す。retry で読み直す。link google account のボタンは出さない
 
 ### ログイン（Login）
 
@@ -61,6 +62,7 @@
 
 - 大量：紐づける数は自分の Google アカウントの数なので、数個まで。行が増えるだけで、ページやスクロールは設けない
 - 読み込み中：画面を開いた時点で一覧を出すので、別の表示はない
+- 読み込みのエラー：google の行の中に danger の帯「Couldn't load Google accounts.」と retry（スクリーンショットはない。Home の「Couldn't load subjects.」と同じ見せ方）
 - 権限なし：ログインしていないと見られない（今までどおり）
 
 ### Login（`/login`）
@@ -97,7 +99,7 @@
 
 ## 設計
 
-Better Auth 1.7.10 の Google の機能（`socialProviders.google`、`signInSocial`、`linkSocial`、`unlinkAccount`）を使う。動きは `node_modules/better-auth/dist/api/routes/callback.mjs`・`account.mjs`・`oauth2/link-account.mjs` で確かめた。
+Better Auth 1.7.10 の Google の機能（`socialProviders.google`、`signInSocial`、`linkSocialAccount`、`unlinkAccount`）を使う。動きは `node_modules/better-auth/dist/api/routes/callback.mjs`・`account.mjs`・`oauth2/link-account.mjs` で確かめた。
 
 ### データ
 
@@ -145,10 +147,11 @@ Better Auth 1.7.10 の Google の機能（`socialProviders.google`、`signInSoci
 - `src/app/(app)/settings/page.tsx`：appearance の上に「account」の枠。email の行はセッションのユーザーのメールアドレス、google の行は `listGoogleAccounts(userId)` の結果
 - `src/server/auth/google-accounts.ts`：`listGoogleAccounts(userId)` が、その人の `provider_id = 'google'` の行を、`{ id, email }` の一覧で返す（紐づけた順）
 - `src/app/(app)/settings/actions.ts`
-  - `linkGoogleAction`：`requireSession()` のあと、`auth.api.linkSocial({ headers, body: { provider: "google", callbackURL: "/settings", errorCallbackURL: "/settings", disableRedirect: true } })` で Google の URL を受け取り、`redirect` する
+  - `linkGoogleAction`：`requireSession()` のあと、`auth.api.linkSocialAccount({ headers, body: { provider: "google", callbackURL: "/settings", errorCallbackURL: "/settings", disableRedirect: true } })` で Google の URL を受け取り、`redirect` する
   - `unlinkGoogleAction(accountId)`：`requireSession()` のあと `auth.api.unlinkAccount`。失敗したら `{ result: "error" }` を返す。成功したら `/settings` を再検証して行を消す
 - 戻ってきたときのエラー：`access_denied` は何も出さない。そのほかは google の行の中に「Couldn't link your Google account. Try again.」。すでに自分に紐づけた Google アカウントは、Better Auth がエラーにせず戻すので、何も変わらない
-- link・unlink のボタンは、押した間だけ「linking…」「unlinking…」で薄く押せない（`useActionState` の `pending`。unlink は行ごとに別のフォーム）
+- link・unlink のボタンは、押した間だけ「linking…」「unlinking…」で薄く押せない（`useTransition` の `isPending`。unlink の失敗の帯は行をまたいで1つなので、行ごとのフォームにせず、1つの transition と押した行の id で見分ける）
+- `unlinkGoogleAction` は、渡された id が自分の Google の行（`listGoogleAccounts` の結果）にあるときだけ外す。Better Auth の `unlinkAccount` は、自分の行ならパスワードの行も外してしまうため
 - 新しい部品は作らない。帯は `Banner`、ボタンは `Button`、check の印は Material Symbols
 
 ## 確かめ方
@@ -158,6 +161,7 @@ Better Auth 1.7.10 の Google の機能（`socialProviders.google`、`signInSoci
 | account の枠・email と google の行・説明文・Not linked | 触って確かめる（本番の画面の画像） |
 | 紐づけた Google アカウントを並べる（自分のものだけ、メールアドレスを取り出す） | テスト（Vitest：`listGoogleAccounts` が自分の google の行だけを返し、`id_token` からメールアドレスを出す） |
 | link を押すと Google に移り、戻ると行が足される・すでに紐づけたものは変わらない・違うメールアドレスも紐づけられる | 触って確かめる（手元で本物の Google を使う）。設定値（`allowDifferentEmails`）はコードを見て確かめる |
+| 一覧を読み込めなかったときの帯と retry | コードを見て確かめる（Home の読み込みのエラーと同じ作り。データベースにつながらない状態を画面のテストで作れないため） |
 | 「linking…」「unlinking…」「signing in…」で薄く押せない | 触って確かめる（本番の画面の画像） |
 | キャンセルは何も出さない・そのほかの失敗は帯（Login・Settings の文言の出し分け） | テスト（Vitest：エラーのコードから文言への関数。`access_denied`・紐づけていない・そのほか） |
 | unlink で行が消える・外したあとはその Google で入れない・最後の1つも外せる | テスト（Playwright：表に google の行を入れた状態で unlink を押すと行が消え、Not linked になる）。入れないことは触って確かめる |
@@ -179,7 +183,7 @@ Better Auth 1.7.10 の Google の機能（`socialProviders.google`、`signInSoci
   - 撮り直す画像（ボタンが足されるため全部）：`docs/specs/screens/login-default.png`・`login-loading.png`・`login-error.png`・`login-locked.png`・`login-server-error.png`、新しく `login-google-error.png`
   - 仕上げ：`docs/specs/sign-in.md` に Google でのログインを足す。`docs/design.md` の HTTP の入口・ログインの確かめ・環境変数を直す
   - 手元での確かめの前に、人間が Google Cloud でクライアントを作り、`.env.local` に値を入れる
-- [ ] 2. Settings で Google アカウントを紐づけ・外せたら完了（1のあと）
+- [x] 2. Settings で Google アカウントを紐づけ・外せたら完了（1のあと）
   - `google-accounts.ts`、Settings の account の枠、link・unlink のアクション
   - 合わせるスクリーンショット：`settings-default.png`・`settings-linking.png`・`settings-linked.png`・`settings-unlinking.png`・`settings-link-error.png`・`settings-unlink-error.png`
   - 撮り直す画像：`docs/specs/screens/settings-default.png`・`settings-dark.png`、新しく上の状態の画像
