@@ -182,7 +182,7 @@ Better Auth 1.7.10 の Google の機能（`socialProviders.google`、`signInSoci
   - 撮り直す画像（ボタンが足されるため全部）：`docs/specs/screens/login-default.png`・`login-loading.png`・`login-error.png`・`login-locked.png`・`login-server-error.png`、新しく `login-google-error.png`
   - 仕上げ：`docs/specs/sign-in.md` に Google でのログインを足す。`docs/design.md` の HTTP の入口・ログインの確かめ・環境変数を直す
   - 手元での確かめの前に、人間が Google Cloud でクライアントを作り、`.env.local` に値を入れる
-- [ ] 2. Settings で Google アカウントを紐づけ・外せたら完了（1のあと）
+- [x] 2. Settings で Google アカウントを紐づけ・外せたら完了（1のあと）
   - `google-accounts.ts`、Settings の account の枠、link・unlink のアクション
   - 合わせるスクリーンショット：`settings-default.png`・`settings-linking.png`・`settings-linked.png`・`settings-unlinking.png`・`settings-link-error.png`・`settings-unlink-error.png`
   - 撮り直す画像：`docs/specs/screens/settings-default.png`・`settings-dark.png`、新しく上の状態の画像
