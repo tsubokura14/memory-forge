@@ -25,7 +25,7 @@ export function DayStreakCard({ streak }: { streak: DayStreak }) {
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <span
             aria-hidden
-            className={`icon text-lg leading-none sm:text-display sm:leading-none ${lit ? "icon-fill text-flame" : "text-muted"}`}
+            className={`icon text-xl leading-none sm:text-display sm:leading-none ${lit ? "icon-fill text-flame" : "text-muted"}`}
           >
             local_fire_department
           </span>
@@ -69,7 +69,10 @@ function DayMark({ day }: { day: WeekDay }) {
   // これからの日は、炎と同じ高さの中に小さな点を置く
   if (day === "upcoming") {
     return (
-      <span aria-hidden className="flex size-4.5 items-center justify-center">
+      <span
+        aria-hidden
+        className="flex size-4.5 items-center justify-center sm:size-7"
+      >
         <span className="size-1.5 rounded-full bg-border" />
       </span>
     );
@@ -80,7 +83,10 @@ function DayMark({ day }: { day: WeekDay }) {
     missed: "text-border",
   }[day];
   return (
-    <span aria-hidden className={`icon text-lg leading-none ${style}`}>
+    <span
+      aria-hidden
+      className={`icon text-lg leading-none sm:text-xl sm:leading-none ${style}`}
+    >
       local_fire_department
     </span>
   );
