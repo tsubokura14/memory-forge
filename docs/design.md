@@ -144,7 +144,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 <!-- 保存するものの持ち方（テーブルなど）と、その理由・前提 -->
 
 - ログイン
-  - `user`・`session`・`account`・`verification`：Better Auth の表。形は Better Auth が決める（`src/server/db/schema.ts`）。`session` は、ログインしている端末ごとの行で、期限を持つ。`account` にパスワードのハッシュが入る
+  - `user`・`session`・`account`・`verification`：Better Auth の表。形は Better Auth が決める（`src/server/db/schema.ts`）。`session` は、ログインしている端末ごとの行で、期限を持つ。`account` には、パスワードのハッシュを持つ行（`provider_id = 'credential'`）と、紐づけた Google アカウントごとの行（`provider_id = 'google'`）が入る
   - アカウントの行は、`scripts/insert-user.ts` で入れる。`npm run user:create` と、画面のテストの global setup の両方がこれを使う
     - 前提（崩れたら見直す）：Better Auth の sign up と同じ形の行を、手で入れている（ハッシュは `better-auth/crypto` の `hashPassword`）。Better Auth の版を上げて行の形が変わったら、ここを直す。sign in の画面のテストが、global setup で作ったアカウントで通ることで気づける
   - `sign_in_attempts`：入れたメールアドレスごとの、続けて間違えた回数と止める期限
