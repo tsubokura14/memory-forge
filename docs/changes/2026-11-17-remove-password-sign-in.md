@@ -98,7 +98,7 @@
   - `src/server/auth/auth.ts`：`account.accountLinking.disableImplicitLinking` を外す（false）。`emailAndPassword` は消す（下の「パスワードをなくす」）
   - Better Auth は、`user.email_verified` が true で（`requireLocalEmailVerified` の既定）、Google がメールアドレスを確かめ済みのときだけ自動で紐づける。そのため `email_verified` を true にする
   - 自動で紐づくのは `user.email` と同じメールアドレスだけなので、それ以外の Google アカウントでは今までどおり入れない。アカウントが1つしかないので、ほかの人のアカウントに紐づくことはない
-- `scripts/create-user.ts`（`npm run user:create`）は、パスワードを聞かずに `--env-file` の `OWNER_GOOGLE_EMAIL` を読み、`user` の行がなければ作り、あれば `email` と `email_verified` を合わせる（`scripts/insert-user.ts` の `createUser` を、パスワードの行を作らない形に直す）。本番の今のアカウントは、このスクリプトを当て直して合わせる（人間が行う）
+- `scripts/create-user.ts`（`npm run user:create`）は、パスワードを聞かずに `--env-file` の `OWNER_GOOGLE_EMAIL` を読み、`user` の行がなければ作り、あれば `email` と `email_verified` を合わせる（`scripts/insert-user.ts` の `createUser` は、パスワードを省けば行を作らない形にする。パスワードの機能のテストがまだ使うので、`password` を渡す形はタスク3で消す）。本番の今のアカウントは、このスクリプトを当て直して合わせる（人間が行う）
   - 自分の Google アカウントを変えるときは、`OWNER_GOOGLE_EMAIL` を書き換えてスクリプトを当て直す
 - 理由・前提の置き場所：`docs/design.md` の「データ」の「ログイン」（`user` の行の持ち方、`OWNER_GOOGLE_EMAIL` とスクリプト。複数の場所に関わるため）。`auth.ts` の自動の紐づけの設定には、そのコードだけの理由をコメントで書く
 - 比べた選択肢
@@ -129,7 +129,7 @@
 ### 画面のテストのログイン
 
 - `e2e/global-setup.ts`：Login に打つのをやめ、global setup の中だけで Better Auth の `testUtils` プラグインを付けた別の auth を作り（同じデータベースと `BETTER_AUTH_SECRET`）、`login({ userId })` でセッションと署名付きの cookie を作って `e2e/.auth/` に保存する。本番の `auth.ts` には付けない
-- `e2e/test-user.ts` から password を消す。`e2e/home.spec.ts`・`e2e/login.spec.ts` のパスワードで入るテストは、消すか、同じ cookie を使う形に直す
+- `e2e/test-user.ts` の password と、`e2e/home.spec.ts`・`e2e/login.spec.ts` のパスワードで入るテストは、パスワードの機能と一緒にタスク3で消すか、同じ cookie を使う形に直す（タスク1・2の間はパスワードの機能が残るので、そのテストも残す）
 - 理由・前提の置き場所：`docs/design.md` の「画面の画像を撮る・比べる仕組み」の、ログインが要る画面の段落を書き換える（前提：`testUtils` が作る cookie の形が、本番の auth と同じ。版を上げて合わなくなると、ログインが要る画面のテストがすべて Login に移って失敗するので気づける）
 - 比べた選択肢
   - 選んだ：`testUtils` の `login`。Better Auth が自分で cookie を作るので、署名の形に頼らない
@@ -172,6 +172,7 @@
   - 完了：Login のカードが帯と sign in with google のボタンだけになり、パスワードで入る機能と `sign-in.ts`・`lockout.ts` がなくなったら完了（`sign_in_attempts` の表はまだ残す）
   - 合わせるスクリーンショット：`login-default.png`・`login-loading.png`・`login-google-error.png`・`login-server-error.png`
   - 撮り直す画像：上の4つ。`docs/specs/screens/login-error.png`・`login-locked.png` は消す
+  - `createUser` の `password`、`TEST_USER.password`、パスワードで入る画面のテスト（`login.spec.ts`・`home.spec.ts` の sign out）を消すか cookie を使う形に直す
   - `docs/specs/sign-in.md`・`docs/overview.md`・`docs/design.md`（HTTP の入口の理由、`auth/` の説明）を直す
 - [ ] 4. パスワードの行と `sign_in_attempts` の表を消す（データ）
   - 完了：形の変更で `account` の `credential` の行が消え、`sign_in_attempts` の表が drop され、`schema.ts` からも外れたら完了
