@@ -47,10 +47,10 @@
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 通常 | ロゴとアプリ名、カードの中に sign in with google のボタン | |
-| Google に移っている間 | ボタンが「signing in…」で薄く、押せない | |
-| 紐づけていない Google アカウント | ボタンの上に danger の帯で「This Google account isn't linked.」 | |
-| サーバーのエラー | ボタンの上に danger の帯で「Couldn't sign in. Please try again.」 | |
+| 通常 | ロゴとアプリ名、カードの中に sign in with google のボタン |![login-default](2026-11-17-remove-password-sign-in/login-default.png) |
+| Google に移っている間 | ボタンが「signing in…」で薄く、押せない |![login-loading](2026-11-17-remove-password-sign-in/login-loading.png) |
+| 紐づけていない Google アカウント | ボタンの上に danger の帯で「This Google account isn't linked.」 |![login-google-error](2026-11-17-remove-password-sign-in/login-google-error.png) |
+| サーバーのエラー | ボタンの上に danger の帯で「Couldn't sign in. Please try again.」 |![login-server-error](2026-11-17-remove-password-sign-in/login-server-error.png) |
 
 - ボタンの見た目（primary か枠だけか）は、このあと見た目を刷新するので、今は問わない
 
@@ -58,8 +58,8 @@
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 自分の Google アカウントだけ | google の行に、自分の Google アカウント（unlink なし）と link google account | |
-| 足した Google アカウントがある | 自分の Google アカウントの下に、足したものが unlink 付きで並ぶ | |
+| 自分の Google アカウントだけ | google の行に、自分の Google アカウント（unlink なし）と link google account |![settings-default](2026-11-17-remove-password-sign-in/settings-default.png) |
+| 足した Google アカウントがある | 自分の Google アカウントの下に、足したものが unlink 付きで並ぶ |![settings-linked](2026-11-17-remove-password-sign-in/settings-linked.png) |
 
 - 読み込み中・エラー・権限なしは、今までどおり
 
