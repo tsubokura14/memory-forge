@@ -128,7 +128,7 @@
 
 ### 画面のテストのログイン
 
-- `e2e/global-setup.ts`：Login に打つのをやめ、global setup の中だけで Better Auth の `testUtils` プラグインを付けた別の auth を作り（同じデータベースと `BETTER_AUTH_SECRET`）、`login({ userId })` でセッションと署名付きの cookie を作って `e2e/.auth/` に保存する。本番の `auth.ts` には付けない
+- `e2e/global-setup.ts`：Login に打つのをやめ、global setup の中だけで Better Auth の `testUtils` プラグインを付けた別の auth を作り（同じデータベースと `BETTER_AUTH_SECRET`）、`getCookies({ userId })`（`login` と同じくセッションを作り、cookie だけを返す）で署名付きの cookie を作って `e2e/.auth/` に保存する。本番の `auth.ts` には付けない
 - `e2e/test-user.ts` の password と、`e2e/home.spec.ts`・`e2e/login.spec.ts` のパスワードで入るテストは、パスワードの機能と一緒にタスク3で消すか、同じ cookie を使う形に直す（タスク1・2の間はパスワードの機能が残るので、そのテストも残す）
 - 理由・前提の置き場所：`docs/design.md` の「画面の画像を撮る・比べる仕組み」の、ログインが要る画面の段落を書き換える（前提：`testUtils` が作る cookie の形が、本番の auth と同じ。版を上げて合わなくなると、ログインが要る画面のテストがすべて Login に移って失敗するので気づける）
 - 比べた選択肢

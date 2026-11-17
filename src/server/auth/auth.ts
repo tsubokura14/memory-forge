@@ -25,9 +25,8 @@ export const auth = betterAuth({
   },
   account: {
     accountLinking: {
-      // 自分の Google アカウント（user.email と同じメールアドレス）は、Login で初めて選んだときにその場で紐づける（docs/design.md の「データ」）。
-      // Better Auth が自動で紐づけるのは、メールアドレスが user.email と同じで、user.email_verified が true で、Google が確かめ済みのときだけ。
-      // アカウントは1つなので、ほかの Google アカウントは今までどおり signup_disabled で断られる
+      // 自分の Google アカウントを Login で自動で紐づける（docs/design.md の「データ」の「ログイン」）。
+      // Better Auth が自動で紐づけるのは、メールアドレスが user.email と同じで、user.email_verified が true で、Google が確かめ済みのときだけ
       disableImplicitLinking: false,
       // 自分の別の Google アカウント（メールアドレスが違う）も紐づけられるようにする
       allowDifferentEmails: true,

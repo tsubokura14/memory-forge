@@ -27,14 +27,16 @@ export default async function globalSetup(config: FullConfig) {
     await db.delete(schema.user);
     const { id: userId } = await createUser(db, TEST_USER);
 
-    // 本物の Google の画面は通せないので、ここだけで testUtils を付けた auth を作り、セッションと署名付きの cookie を作る
-    // （docs/design.md の「画面の画像を撮る・比べる仕組み」）。秘密の値と URL は、アプリと同じ環境変数を Better Auth が読む
+    // docs/design.md の「画面の画像を撮る・比べる仕組み」
     const testAuth = betterAuth({
       database: drizzleAdapter(db, { provider: "pg", schema }),
       plugins: [testUtils()],
     });
     const { test } = await testAuth.$context;
-    cookies = await test.getCookies({ userId, domain: "localhost" });
+    cookies = await test.getCookies({
+      userId,
+      domain: new URL(config.projects[0].use.baseURL ?? "").hostname,
+    });
   } finally {
     await pool.end();
   }

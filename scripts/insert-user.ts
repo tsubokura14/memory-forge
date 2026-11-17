@@ -7,8 +7,7 @@ import { eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import * as schema from "../src/server/db/schema.ts";
 
-// アカウント（user の行）を1つにそろえる。なければ作り、あれば email を合わせる（docs/design.md の「データ」）。
-// email_verified は true にする。Better Auth は、これが true でないと Login で Google アカウントを自動で紐づけないため。
+// アカウント（user の行）を1つにそろえる。なければ作り、あれば email と email_verified を合わせる（docs/design.md の「データ」の「ログイン」）。
 // password は、パスワードで入る機能のテストだけが渡す（パスワードの機能と一緒に消す）。渡したときは、作るときだけ Better Auth の sign up と同じ形の account（credential）の行も入れる
 export async function createUser(
   db: NodePgDatabase<typeof schema>,
