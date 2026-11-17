@@ -147,7 +147,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 <!-- 保存するものの持ち方（テーブルなど）と、その理由・前提 -->
 
 - ログイン
-  - `user`・`session`・`account`・`verification`：Better Auth の表。形は Better Auth が決める（`src/server/db/schema.ts`）。`session` は、ログインしている端末ごとの行で、期限を持つ。`account` には、パスワードのハッシュを持つ行（`provider_id = 'credential'`）と、紐づけた Google アカウントごとの行（`provider_id = 'google'`）が入る
+  - `user`・`session`・`account`・`verification`：Better Auth の表。形は Better Auth が決める（`src/server/db/schema.ts`）。`session` は、ログインしている端末ごとの行で、期限を持つ。`account` には、紐づけた Google アカウントごとの行（`provider_id = 'google'`）が入る（パスワードの行はない）
   - アカウント（`user` の行）は1つだけ。その `email` は自分の Google アカウントのメールアドレス（環境変数 `OWNER_GOOGLE_EMAIL`）と同じにし、`email_verified` を true にする
     - 自分の Google アカウントは、Login で初めて選んだときに、Better Auth の自動の紐づけで `google` の行が足される（`src/server/auth/auth.ts`）。`user.email` と違うメールアドレスの Google アカウントは、Settings で紐づけたものだけが入れる
     - 理由：Better Auth の仕組みのままで、環境変数に書けるメールアドレスから自分の Google アカウントを決められるため
@@ -155,7 +155,6 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
     - 前提（崩れたら見直す）：アカウントは1つだけ。増やすなら、自動の紐づけでほかの人のアカウントに紐づかないか決め直す
   - アカウントの行は、`scripts/insert-user.ts` で入れる（なければ作り、あれば `email` を合わせる）。`npm run user:create` と、テスト（Vitest・画面のテストの global setup）がこれを使う
     - 前提（崩れたら見直す）：Better Auth の sign up と同じ形の行を、手で入れている。Better Auth の版を上げて行の形が変わったら、ここを直す。画面のテストが、global setup で作ったアカウントでログインした状態で通ることで気づける
-  - `sign_in_attempts`：入れたメールアドレスごとの、続けて間違えた回数と止める期限
 - 問題
   - `subjects`：Subject ごとの行。名前は重ならない
   - `questions`：問題ごとの行。Subject とファイルの ID の組み合わせは重ならない（データベースの決まりでも守る）。Subject を消すと、その問題も消える
