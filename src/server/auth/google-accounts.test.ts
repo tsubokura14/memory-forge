@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { createUser } from "../../../scripts/insert-user";
 import { db } from "@/server/db/client";
 import { account, user } from "@/server/db/schema";
-import { listGoogleAccounts } from "./google-accounts";
+import { listGoogleAccounts, splitGoogleAccounts } from "./google-accounts";
 
 // Google の ID トークンと同じ形（ヘッダー.中身.署名）。中身の email だけを使う
 function fakeIdToken(email: string) {
@@ -72,5 +72,30 @@ describe("listGoogleAccounts", () => {
     expect(await listGoogleAccounts(await userId("me@example.com"))).toEqual(
       [],
     );
+  });
+});
+
+describe("splitGoogleAccounts", () => {
+  test("自分の Google アカウントの行は、足したものに入れず、足したものは並びのまま残す", () => {
+    const accounts = [
+      { id: "1", email: "me.work@gmail.com" },
+      { id: "2", email: "Me@Gmail.com" },
+      { id: "3", email: "me.side@gmail.com" },
+    ];
+
+    expect(splitGoogleAccounts("me@gmail.com", accounts)).toEqual({
+      owner: "me@gmail.com",
+      added: [
+        { id: "1", email: "me.work@gmail.com" },
+        { id: "3", email: "me.side@gmail.com" },
+      ],
+    });
+  });
+
+  test("自分の Google の行がまだなくても、自分のメールアドレスを返す", () => {
+    expect(splitGoogleAccounts("me@gmail.com", [])).toEqual({
+      owner: "me@gmail.com",
+      added: [],
+    });
   });
 });
