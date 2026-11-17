@@ -97,6 +97,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
   - 本番と確かめ用の公開：Vercel のビルドの最初に当てる（`vercel.json` の `buildCommand`）。接続プールを通さない `DATABASE_URL_UNPOOLED` を使う（`drizzle.config.ts`）。当て方の決まりは「どこでも守る決まり」の「データベースの形の変更は「足す」ものにする」
 - 秘密の値は `.env.local`・`.env.test`（Git に入らない）、GitHub の Secret、Vercel にだけ置く。`.env.example` に名前だけを書く
   - データベースの接続先（`DATABASE_URL`）のほかに、ログインの cookie の署名に使う `BETTER_AUTH_SECRET` と、アプリの URL の `BETTER_AUTH_URL` を置く（GitHub の Secret は `BETTER_AUTH_SECRET` だけ。CI の URL は `ci.yml` に書く）。`BETTER_AUTH_SECRET` は置く場所ごとに別の値にする
+  - 自分の Google アカウントのメールアドレス `OWNER_GOOGLE_EMAIL` を、手元と本番の接続先を書いたファイルに置く。`npm run user:create` だけが読む（「データ」の「ログイン」）
   - Google でのログインに使う `GOOGLE_CLIENT_ID`・`GOOGLE_CLIENT_SECRET` を、手元と Vercel の本番に置く。Google に登録する戻り先（`<アプリの URL>/api/auth/callback/google`）は、本番と `http://localhost:3000` だけ
   - Vercel の Preview には `BETTER_AUTH_URL` を置かない。公開のたびに URL が変わるため。置かないと Better Auth はアクセスされた URL を使う
   - 前提（崩れたら見直す）：Preview では Google でのログインを使わない（戻り先を Google に登録できないため。押すとエラーの帯になる）。Preview で使うなら、決まった URL を用意して登録し、`BETTER_AUTH_URL` の扱いも決め直す
@@ -132,8 +133,10 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
   - Subject と問題は、テストごとに `e2e/questions.ts` の `resetQuestions` で入れ直す
   - 画面のテストは、ファイルを並べずに1つずつ動かす（`playwright.config.ts` の `workers: 1`）。並べると、ほかのファイルのテストが入れ直したデータで、撮っている画面が変わるため
 - ログインが要る画面は、テスト用のユーザーでログインした状態で撮る
-  - global setup（`e2e/global-setup.ts`）が、`test`（CI では `ci`）のデータベースの表を空にし、テスト用のユーザーを `scripts/insert-user.ts` で作り、Login から sign in した cookie を `e2e/.auth/` に保存する。ログインが要るテストは、それを `storageState` で使う
-  - テスト用のユーザーのメールアドレスとパスワードは、`e2e/test-user.ts` に書いた決まった値（`test`・`ci` のデータベースにだけ入る）
+  - global setup（`e2e/global-setup.ts`）が、`test`（CI では `ci`）のデータベースの表を空にし、テスト用のユーザーを `scripts/insert-user.ts` で作り、ログインした cookie を `e2e/.auth/` に保存する。ログインが要るテストは、それを `storageState` で使う
+    - cookie は、global setup の中だけで Better Auth の `testUtils` プラグインを付けた auth を作り、`getCookies` で作る（本物の Google の画面は通せないため）。本番の `src/server/auth/auth.ts` には付けない
+    - 前提（崩れたら見直す）：`testUtils` が作る cookie の名前と署名が、アプリの auth と同じ（同じ環境変数の `BETTER_AUTH_SECRET`・`BETTER_AUTH_URL` を読む）。合わなくなると、ログインが要る画面のテストがすべて Login に移って失敗するので気づける
+  - テスト用のユーザーのメールアドレスとパスワードは、`e2e/test-user.ts` に書いた決まった値（`test`・`ci` のデータベースにだけ入る）。パスワードは、パスワードで入る画面のテストだけが使う
   - 前提（崩れたら見直す）：Vitest と Playwright を同じ `test` のデータベースで同時に動かさない。どちらも始める前に表を空にするので、ぶつかる
 - サーバーで組み立てる画面（Home・Setup）の読み込み中と、読み込めなかった状態は撮らない
   - テスト用のデータベースでは、読み込みを止めたり失敗させたりできないため（ブラウザからのアクションの返事は `page.route` で止められるので、Solve の読み込み中と保存のエラーは撮る）
@@ -145,8 +148,13 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 
 - ログイン
   - `user`・`session`・`account`・`verification`：Better Auth の表。形は Better Auth が決める（`src/server/db/schema.ts`）。`session` は、ログインしている端末ごとの行で、期限を持つ。`account` には、パスワードのハッシュを持つ行（`provider_id = 'credential'`）と、紐づけた Google アカウントごとの行（`provider_id = 'google'`）が入る
-  - アカウントの行は、`scripts/insert-user.ts` で入れる。`npm run user:create` と、画面のテストの global setup の両方がこれを使う
-    - 前提（崩れたら見直す）：Better Auth の sign up と同じ形の行を、手で入れている（ハッシュは `better-auth/crypto` の `hashPassword`）。Better Auth の版を上げて行の形が変わったら、ここを直す。sign in の画面のテストが、global setup で作ったアカウントで通ることで気づける
+  - アカウント（`user` の行）は1つだけ。その `email` は自分の Google アカウントのメールアドレス（環境変数 `OWNER_GOOGLE_EMAIL`）と同じにし、`email_verified` を true にする
+    - 自分の Google アカウントは、Login で初めて選んだときに、Better Auth の自動の紐づけで `google` の行が足される（`src/server/auth/auth.ts`）。`user.email` と違うメールアドレスの Google アカウントは、Settings で紐づけたものだけが入れる
+    - 理由：Better Auth の仕組みのままで、環境変数に書けるメールアドレスから自分の Google アカウントを決められるため
+    - 自分の Google アカウントを変えるときは、`OWNER_GOOGLE_EMAIL` を書き換えて `npm run user:create` を当て直す
+    - 前提（崩れたら見直す）：アカウントは1つだけ。増やすなら、自動の紐づけでほかの人のアカウントに紐づかないか決め直す
+  - アカウントの行は、`scripts/insert-user.ts` で入れる（なければ作り、あれば `email` を合わせる）。`npm run user:create` と、テスト（Vitest・画面のテストの global setup）がこれを使う
+    - 前提（崩れたら見直す）：Better Auth の sign up と同じ形の行を、手で入れている（パスワードの行のハッシュは `better-auth/crypto` の `hashPassword`）。Better Auth の版を上げて行の形が変わったら、ここを直す。画面のテストが、global setup で作ったアカウントでログインした状態で通ることで気づける
   - `sign_in_attempts`：入れたメールアドレスごとの、続けて間違えた回数と止める期限
 - 問題
   - `subjects`：Subject ごとの行。名前は重ならない
