@@ -10,11 +10,6 @@ const DAY_SECONDS = 60 * 60 * 24;
 // 秘密の値と URL は、環境変数の BETTER_AUTH_SECRET・BETTER_AUTH_URL を Better Auth が読む
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg", schema }),
-  emailAndPassword: {
-    enabled: true,
-    // アカウントは画面の外（scripts/create-user.ts）で作る
-    disableSignUp: true,
-  },
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",

@@ -5,7 +5,8 @@ import {
   type TestQuestion,
   testQuestion,
 } from "./questions";
-import { SIGNED_IN_STATE, TEST_USER } from "./test-user";
+import { signedInCookies } from "./session";
+import { SIGNED_IN_STATE } from "./test-user";
 
 // 最後の答えが正解・不正解の問題、まだ解いていない問題、印の付いた問題（正解の記録つき）を持つ Subject。
 // insertAnswers はファイルの ID で問題を探すので、ID の頭に Subject ごとの prefix を付けて重ならないようにする
@@ -194,14 +195,13 @@ test.describe("ログインした状態を保存したもので開く", () => {
   });
 });
 
-// sign out するとセッションが消えるので、保存したログインの状態を使わず、ここで sign in したセッションで試す
+// sign out するとセッションが消えるので、保存したログインの状態を使わず、ここで作ったセッションで試す
 test("sign out すると Login に移り、戻っても中身は見えない", async ({
   page,
+  baseURL,
 }) => {
-  await page.goto("/login");
-  await page.getByLabel("email").fill(TEST_USER.email);
-  await page.getByLabel("password").fill(TEST_USER.password);
-  await page.getByRole("button", { name: "sign in", exact: true }).click();
+  await page.context().addCookies(await signedInCookies(baseURL ?? ""));
+  await page.goto("/");
   await expect(page).toHaveURL("/");
 
   await page.getByRole("button", { name: "sign out" }).click();
@@ -210,6 +210,6 @@ test("sign out すると Login に移り、戻っても中身は見えない", a
   await page.goBack();
   await expect(page).toHaveURL(/^[^?]*\/login\?next=%2F$/);
   await expect(
-    page.getByRole("button", { name: "sign in", exact: true }),
+    page.getByRole("button", { name: "sign in with google" }),
   ).toBeVisible();
 });

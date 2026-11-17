@@ -6,7 +6,7 @@ import { withVerifyFull } from "../src/server/db/connection-url";
 import * as schema from "../src/server/db/schema";
 import { TEST_USER } from "./test-user";
 
-// 画面のテストで、テスト用のユーザーに紐づけた Google アカウントを入れ直す。
+// 画面のテストで、テスト用のユーザーに紐づけた Google アカウントを入れ直す。emails は Settings で足したもの。
 // 本物の Google の画面は通せないので、Better Auth が紐づけたときと同じ形の account の行を直接入れる
 export async function resetGoogleAccounts(emails: string[] = []) {
   const pool = new Pool({
@@ -26,8 +26,10 @@ export async function resetGoogleAccounts(emails: string[] = []) {
           eq(schema.account.providerId, "google"),
         ),
       );
-    // 紐づけた順に並ぶので、1秒ずつずらして入れる
-    for (const [i, email] of emails.entries()) {
+    // 本番では Google でしか入れないので、自分の Google アカウントの行がいつもある（Login で初めて入ったときに自動で紐づく）。
+    // Better Auth は最後の1つの行を外させないので、この行がないと、足したものの最後の1つを外せない。
+    // 紐づけた順に並ぶので、自分の行をいちばん前にして、1秒ずつずらして入れる
+    for (const [i, email] of [TEST_USER.email, ...emails].entries()) {
       const linkedAt = new Date(Date.UTC(2026, 10, 1, 0, 0, i));
       await db.insert(schema.account).values({
         id: randomUUID(),

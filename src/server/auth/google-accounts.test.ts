@@ -36,7 +36,7 @@ async function linkGoogle(ownerId: string, email: string, createdAt: Date) {
 beforeEach(async () => {
   // account は user を消すと一緒に消える
   await db.delete(user);
-  await createUser(db, { email: "me@example.com", password: "password-1" });
+  await createUser(db, { email: "me@example.com" });
   // createUser はアカウントを1つにそろえるので、ほかの人の行は直接入れる
   await db.insert(user).values({
     id: randomUUID(),
@@ -61,7 +61,7 @@ describe("listGoogleAccounts", () => {
 
     const accounts = await listGoogleAccounts(me);
 
-    // パスワードの行（credential）とほかの人の行は入らない
+    // ほかの人の行は入らない
     expect(accounts.map((a) => a.email)).toEqual([
       "me@gmail.com",
       "me.work@gmail.com",

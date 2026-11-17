@@ -168,7 +168,7 @@
   - 合わせるスクリーンショット：`settings-default.png`・`settings-linked.png`
   - 撮り直す画像（account の枠が写るもの全部）：`settings-default.png`・`settings-linked.png`・`settings-dark.png`・`settings-linking.png`・`settings-unlinking.png`・`settings-link-error.png`・`settings-unlink-error.png`
   - `docs/specs/settings.md` を直す
-- [ ] 3. Login からパスワードをなくす（画面）
+- [x] 3. Login からパスワードをなくす（画面）
   - 完了：Login のカードが帯と sign in with google のボタンだけになり、パスワードで入る機能と `sign-in.ts`・`lockout.ts` がなくなったら完了（`sign_in_attempts` の表はまだ残す）
   - 合わせるスクリーンショット：`login-default.png`・`login-loading.png`・`login-google-error.png`・`login-server-error.png`
   - 撮り直す画像：上の4つ。`docs/specs/screens/login-error.png`・`login-locked.png` は消す
