@@ -163,7 +163,7 @@
   - `auth.ts` の自動の紐づけ、`create-user.ts`・`insert-user.ts`、`e2e/global-setup.ts`・`e2e/test-user.ts` を `testUtils` に、`docs/design.md`（データ・画面の画像の仕組み）
   - パスワードでもまだ入れる（Login の画面は変えない）。マージ後、人間が本番に `OWNER_GOOGLE_EMAIL` を置き、`npm run user:create` を当て直す
   - 撮り直す画像：なし
-- [ ] 2. Settings に自分の Google アカウントを unlink なしで出す（画面）
+- [x] 2. Settings に自分の Google アカウントを unlink なしで出す（画面）
   - 完了：Settings の account の枠が google の行だけになり、いちばん上に自分の Google アカウントが unlink なしで出て、自分の行は unlink のアクションでも外せなくなったら完了
   - 合わせるスクリーンショット：`settings-default.png`・`settings-linked.png`
   - 撮り直す画像（account の枠が写るもの全部）：`settings-default.png`・`settings-linked.png`・`settings-dark.png`・`settings-linking.png`・`settings-unlinking.png`・`settings-link-error.png`・`settings-unlink-error.png`

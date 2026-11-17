@@ -4,7 +4,10 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/server/auth/auth";
-import { listGoogleAccounts } from "@/server/auth/google-accounts";
+import {
+  listGoogleAccounts,
+  splitGoogleAccounts,
+} from "@/server/auth/google-accounts";
 import { getSession, requireSession } from "@/server/auth/session";
 
 export type GoogleActionState = { result: "idle" | "error" };
@@ -36,12 +39,16 @@ export async function unlinkGoogleAction(
 ): Promise<GoogleActionState> {
   await requireSession();
   try {
-    // Better Auth の unlinkAccount は、自分の行ならパスワードの行（credential）でも外すので、自分の Google の行だけを通す
+    // Better Auth の unlinkAccount は、自分の行ならパスワードの行（credential）や自分の Google アカウントの行でも外すので、
+    // Settings で足した Google の行だけを通す（画面に unlink がなくても、アクションは直接呼べるため）
     const { session } = await getSession(await headers());
-    const googleAccounts = session
-      ? await listGoogleAccounts(session.user.id)
+    const added = session
+      ? splitGoogleAccounts(
+          session.user.email,
+          await listGoogleAccounts(session.user.id),
+        ).added
       : [];
-    if (!googleAccounts.some((account) => account.id === accountId)) {
+    if (!added.some((account) => account.id === accountId)) {
       return { result: "error" };
     }
     await auth.api.unlinkAccount({

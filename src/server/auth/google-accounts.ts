@@ -31,3 +31,16 @@ function emailFrom(idToken: string | null): string {
     return "";
   }
 }
+
+// Settings の google の行に並べる形に分ける。owner は自分の Google アカウント（user.email。docs/design.md の「データ」の「ログイン」）で、
+// Google の行がまだなくても（一度も Google で入っていなくても）返す。added は Settings で足したもので、unlink で外せるのはこれだけ
+export function splitGoogleAccounts(
+  ownerEmail: string,
+  accounts: GoogleAccount[],
+): { owner: string; added: GoogleAccount[] } {
+  const owner = ownerEmail.toLowerCase();
+  return {
+    owner: ownerEmail,
+    added: accounts.filter((account) => account.email.toLowerCase() !== owner),
+  };
+}
