@@ -158,7 +158,7 @@
 
 ## タスク
 
-- [ ] 1. 自分の Google アカウントで入れるようにする（データ・設定）
+- [x] 1. 自分の Google アカウントで入れるようにする（データ・設定）
   - 完了：`OWNER_GOOGLE_EMAIL` のメールアドレスの Google アカウントで Login から入れ、画面のテストが cookie を作ってログインした状態で通ったら完了
   - `auth.ts` の自動の紐づけ、`create-user.ts`・`insert-user.ts`、`e2e/global-setup.ts`・`e2e/test-user.ts` を `testUtils` に、`docs/design.md`（データ・画面の画像の仕組み）
   - パスワードでもまだ入れる（Login の画面は変えない）。マージ後、人間が本番に `OWNER_GOOGLE_EMAIL` を置き、`npm run user:create` を当て直す
