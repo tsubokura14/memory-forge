@@ -105,9 +105,7 @@ test("紐づけていない Google アカウントで戻ってくると、帯が
   // Google から戻ってきたときの URL（Better Auth が error を付ける）を直接開く
   await page.goto("/login?error=signup_disabled");
 
-  await expect(banner(page)).toHaveText(
-    "This Google account isn't linked. Sign in with your email, then link it in settings.",
-  );
+  await expect(banner(page)).toHaveText("This Google account isn't linked.");
   await expect(page).toHaveScreenshot("login-google-error.png", {
     fullPage: true,
   });
