@@ -7,11 +7,15 @@ import { Button } from "@/components/button";
 import type { GoogleAccount } from "@/server/auth/google-accounts";
 import { linkGoogleAction, unlinkGoogleAction } from "./actions";
 
-// account の枠の google の行。紐づけた Google アカウントの一覧、link google account、説明、失敗の帯
+// account の枠の google の行。自分の Google アカウント、足した Google アカウントの一覧、link google account、説明、失敗の帯
 export function GoogleAccounts({
+  owner,
   accounts,
   linkFailed,
 }: {
+  // 自分の Google アカウントのメールアドレス。外せないので unlink を置かない
+  owner: string;
+  // Settings で足した Google アカウント
   accounts: GoogleAccount[];
   // Google から紐づけに失敗して戻ってきた（Settings の URL の error から決める）
   linkFailed: boolean;
@@ -58,35 +62,38 @@ export function GoogleAccounts({
           google
         </span>
         <div className="flex min-w-0 flex-1 flex-col gap-2">
-          {accounts.length === 0 ? (
-            <p className="pt-1 text-sm text-muted">Not linked</p>
-          ) : (
-            <ul className="flex flex-col gap-2">
-              {accounts.map((account) => {
-                const pending = unlinking && unlinkingId === account.id;
-                return (
-                  <li
-                    key={account.id}
-                    className="flex items-center justify-between gap-3"
-                  >
-                    <span className="flex min-w-0 items-center gap-1 font-mono text-sm">
-                      <span aria-hidden className="icon text-base leading-none">
-                        check
-                      </span>
-                      <span className="truncate">{account.email}</span>
+          <ul className="flex flex-col gap-2">
+            {/* unlink がなくても、ほかの行（md のボタンの高さ）とそろえる */}
+            <li className="flex min-h-9.5 min-w-0 items-center gap-1 font-mono text-sm">
+              <span aria-hidden className="icon text-base leading-none">
+                check
+              </span>
+              <span className="truncate">{owner}</span>
+            </li>
+            {accounts.map((account) => {
+              const pending = unlinking && unlinkingId === account.id;
+              return (
+                <li
+                  key={account.id}
+                  className="flex items-center justify-between gap-3"
+                >
+                  <span className="flex min-w-0 items-center gap-1 font-mono text-sm">
+                    <span aria-hidden className="icon text-base leading-none">
+                      check
                     </span>
-                    <Button
-                      variant="outline"
-                      disabled={pending}
-                      onClick={() => unlink(account.id)}
-                    >
-                      {pending ? "unlinking…" : "unlink"}
-                    </Button>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
+                    <span className="truncate">{account.email}</span>
+                  </span>
+                  <Button
+                    variant="outline"
+                    disabled={pending}
+                    onClick={() => unlink(account.id)}
+                  >
+                    {pending ? "unlinking…" : "unlink"}
+                  </Button>
+                </li>
+              );
+            })}
+          </ul>
           <div>
             <Button variant="outline" disabled={linking} onClick={link}>
               {linking ? "linking…" : "link google account"}

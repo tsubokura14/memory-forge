@@ -6,6 +6,7 @@ import { RetryButton } from "@/components/retry-button";
 import {
   type GoogleAccount,
   listGoogleAccounts,
+  splitGoogleAccounts,
 } from "@/server/auth/google-accounts";
 import { linkErrorFromGoogle } from "@/server/auth/google-errors";
 import { getSession } from "@/server/auth/session";
@@ -42,27 +43,23 @@ async function AccountCard({
   if (!session) return null;
   const { error } = await searchParams;
 
-  let accounts: GoogleAccount[] | null;
+  let google: { owner: string; added: GoogleAccount[] } | null;
   try {
-    accounts = await listGoogleAccounts(session.user.id);
+    google = splitGoogleAccounts(
+      session.user.email,
+      await listGoogleAccounts(session.user.id),
+    );
   } catch {
-    accounts = null;
+    google = null;
   }
 
   return (
     <div className="divide-y divide-border rounded-md border border-border bg-surface">
-      <div className="flex items-center gap-3 px-4 py-3">
-        <span className="w-20 shrink-0 font-mono text-xs text-muted">
-          email
-        </span>
-        <span className="min-w-0 truncate font-mono text-sm">
-          {session.user.email}
-        </span>
-      </div>
       <div className="px-4 py-3">
-        {accounts ? (
+        {google ? (
           <GoogleAccounts
-            accounts={accounts}
+            owner={google.owner}
+            accounts={google.added}
             linkFailed={linkErrorFromGoogle(
               typeof error === "string" ? error : undefined,
             )}

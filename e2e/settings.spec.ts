@@ -1,7 +1,7 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures";
 import { resetGoogleAccounts } from "./google-accounts";
-import { SIGNED_IN_STATE } from "./test-user";
+import { SIGNED_IN_STATE, TEST_USER } from "./test-user";
 
 test.use({ storageState: SIGNED_IN_STATE });
 
@@ -32,7 +32,9 @@ async function holdServerActions(page: Page, mode: "hold" | "abort") {
 test("settings-default", async ({ page }) => {
   await page.goto("/settings");
   await expect(page.getByRole("radio", { name: "system" })).toBeChecked();
-  await expect(page.getByText("Not linked")).toBeVisible();
+  // 自分の Google アカウントがいちばん上に出て、外せない
+  await expect(page.getByText(TEST_USER.email)).toBeVisible();
+  await expect(page.getByRole("button", { name: "unlink" })).toHaveCount(0);
   await expect(page).toHaveScreenshot("settings-default.png", {
     fullPage: true,
   });
@@ -63,7 +65,7 @@ test("選んだ値を覚えていて、読み直しても暗く、dark が選ば
   await expect(page.getByRole("radio", { name: "dark" })).toBeChecked();
 });
 
-test("settings-linked：unlink を押すとその行が消え、最後の1つも外せる", async ({
+test("settings-linked：unlink を押すとその行が消え、足したものを全部外すと自分の Google アカウントだけが残る", async ({
   page,
 }) => {
   await resetGoogleAccounts(["me@gmail.com", "me.work@gmail.com"]);
@@ -78,11 +80,13 @@ test("settings-linked：unlink を押すとその行が消え、最後の1つも
   await expect(page.getByText("me.work@gmail.com")).toBeVisible();
 
   await unlinks.first().click();
-  await expect(page.getByText("Not linked")).toBeVisible();
+  await expect(page.getByText("me.work@gmail.com")).toBeHidden();
+  await expect(unlinks).toHaveCount(0);
+  await expect(page.getByText(TEST_USER.email)).toBeVisible();
 
   // 読み直しても戻らない（データベースから消えている）
   await page.reload();
-  await expect(page.getByText("Not linked")).toBeVisible();
+  await expect(page.getByText("me.work@gmail.com")).toBeHidden();
 });
 
 test("settings-unlinking：外している間は、押した行のボタンが unlinking… になって押せない", async ({
