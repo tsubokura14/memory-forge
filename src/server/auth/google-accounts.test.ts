@@ -37,7 +37,14 @@ beforeEach(async () => {
   // account は user を消すと一緒に消える
   await db.delete(user);
   await createUser(db, { email: "me@example.com", password: "password-1" });
-  await createUser(db, { email: "other@example.com", password: "password-2" });
+  // createUser はアカウントを1つにそろえるので、ほかの人の行は直接入れる
+  await db.insert(user).values({
+    id: randomUUID(),
+    name: "",
+    email: "other@example.com",
+    emailVerified: true,
+    updatedAt: new Date(),
+  });
 });
 
 describe("listGoogleAccounts", () => {
