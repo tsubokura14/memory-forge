@@ -9,16 +9,16 @@ export function TopicResultRow({ topic }: { topic: TopicResult }) {
       <span className="w-24 shrink-0 truncate text-base sm:w-48">
         {topic.name}
       </span>
-      <span aria-hidden className="flex h-1 flex-1 overflow-hidden rounded-sm">
+      <span
+        aria-hidden
+        className="flex h-1 flex-1 overflow-hidden rounded-sm bg-border"
+      >
         <span className="bg-success" style={{ width: width(topic.correct) }} />
         <span className="bg-warning" style={{ width: width(topic.slipped) }} />
         <span className="bg-danger" style={{ width: width(topic.wrong) }} />
       </span>
-      <span className="w-8 shrink-0 text-right text-sm text-muted tabular-nums">
-        {topic.correct}/{topic.total}
-      </span>
       <span className="w-10 shrink-0 text-right text-sm tabular-nums">
-        {topic.accuracy}%
+        {topic.correct}/{topic.total}
       </span>
     </li>
   );
