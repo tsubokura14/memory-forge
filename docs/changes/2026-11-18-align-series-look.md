@@ -53,7 +53,7 @@ memory-forge と md-leaf を、同じ人が作ったシリーズのアプリに�
   - 画面の部品：ヒラギノ角ゴ → 游ゴシック UI → Noto Sans JP（md-leaf の font-ui と同じ並び）
   - コード：OS の等幅（ui-monospace → SFMono-Regular → Consolas。md-leaf の font-mono と同じ）。Geist と Geist Mono は使わない
 - 太さは、ふつう（400）と太字（700）の2つ（md-leaf と同じ）。太字にするのは、アプリ名、画面の見出し、枠の外の上の小さな見出し（day streak、menu など）
-- ダークモードの色：地・面・文字・枠は md-leaf のダークと同じ。差し色・正解・不正解は、暖かい地に浮かないよう、彩度を落とした色にする
+- 色の値は md-leaf に揃える（ライトもダークも）。memory-forge だけにあるもの（差し色の藍、炎の弁柄色、border-strong）だけを足し、ダークの藍は暖かい地に浮かないよう彩度を落とした色にする
 - 差し色は藍の1色だけ（md-leaf の「差し色は若葉の1色だけ」と同じ考え方）。ふだんの画面に出る色は、地・文字・muted・藍だけにする。例外は連続日数の枠の中の弁柄色（flame）だけ
   - 炎は暖かい色でないと「灯す」感じが出ない（藍の炎は冷たく見えた）。ほかの場所では使わない
   - 正解（success）・不正解（danger）は答え合わせ（Solve・Result）だけ、不備（warning）は不備の印だけに使う
@@ -81,8 +81,8 @@ memory-forge と md-leaf を、同じ人が作ったシリーズのアプリに�
 | muted | `#77736a` | `#a19c8f` |
 | primary | `#1f5a80` | `#5f97c9` |
 | on-primary | `#ffffff` | `#1d1c19` |
-| success | `#3f8a6a` | `#93c29b` |
-| danger | `#b0453a` | `#e3907f` |
+| success | `#3f8a6a` | `#7fc4a4` |
+| danger | `#b0453a` | `#e58a7f` |
 | warning | `#b07a1c` | `#e0b35e` |
 | flame | `#b5562b` | `#d98656` |
 | backdrop | `rgb(30 28 24 / 0.4)` | `rgb(0 0 0 / 0.55)` |
@@ -93,7 +93,7 @@ memory-forge と md-leaf を、同じ人が作ったシリーズのアプリに�
 
 - -soft の色（primary-soft、success-soft、danger-soft、warning-soft）は、元の色を地（bg）に混ぜて作る。割合はライトで primary 10%・success と danger 12%・warning 14%、ダークはどれも 14%
 - 文字の大きさ：xs 0.75rem、sm 0.875rem、base 1.0625rem（行の高さ 1.75rem）、lg 1.25rem（行の高さ 1.75rem）。xl と display は今のまま
-- 角の丸み：sm 2px、md 4px。浮かせるものの影：ライト `0 4px 16px rgb(0 0 0 / 0.12)`、ダーク `0 4px 16px rgb(0 0 0 / 0.5)`
+- 角の丸み：sm 2px、md 4px。浮かせるものの影：`0 4px 16px rgb(0 0 0 / 0.12)`（ライトもダークも同じ。md-leaf と同じ）
 - アイコン：24 の方眼、線の太さ 2、線の端と角は丸（md-leaf と同じ）。形は Lucide のもの（check、x、flag、arrow-left、arrow-right、chevron-right、chevron-left、chevron-down、book-open、external-link、trash-2、flame、hammer）。炎は灯ったら同じ形を塗りつぶす。ロゴは hammer を傾けずに置く
 
 ## やらないこと
