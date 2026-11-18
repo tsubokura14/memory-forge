@@ -188,6 +188,30 @@ Result の「間違えた問題」の一覧と「間違えた問題を解き直�
 
 ## 設計
 
+### 変えるファイル
+
+- トークン：`src/styles/tokens.css`（色の値・-soft・文字の大きさ・角丸・影・書体の並び。code-function・code-builtin・code-decorator を消す）、`src/styles/globals.css`（`icon` のユーティリティを消す）
+- 書体：`src/app/layout.tsx`。Noto Sans JP・Noto Serif JP・Geist Mono を `next/font` で配り、Geist・Unbounded・Material Symbols をやめる。`<html lang="ja">`。`material-symbols` のパッケージを外す
+- アイコン：`src/components/icons.tsx`（新しく作る）。Lucide の形を SVG で書き写し、先頭のコメントに Lucide の著作権と ISC ライセンスの文を書く。今 `icon` のクラスで出しているところを、すべてここの部品に替える
+- コードの色分け：`src/server/questions/highlight.ts`。Prism の言葉の種類を、keyword・string・comment の3つと、それ以外（code-text）に分け直す
+- 部品：`src/components/` の button・logo・app-bar・page-header・banner・empty-state（実線の枠）・dialog（bg の地と影）・choice（枠線のないカード・記号・`aria-label`）・mastery（primary・border-strong・border の線、数は muted）・day-streak（1行）・accuracy-ring と result（得点を大きく）など
+- 「続きから」：`src/server/subjects/continue.ts`（新しく作る）。いちばん最近答えた Subject（印のない問題の答えだけで見る）と、その Subject の「最後に間違えた問題 + まだ解いていない問題」の数を返す。答えがなければ `subjects.id` のいちばん小さい Subject。Subject がなければ null。数え方は `listSubjects` と同じ `lastAnswer` を使う
+- 連続日数：`src/server/streak/` の今週の計算は、画面で使わなくなったら消す
+- 画面の文言：`src/app/` と `src/components/` の英語の表記を、スクリーンショットのとおりの日本語にする。取り込みの誤りの文言（`src/server/import/validate.ts`）も日本語にする
+- 文書：`docs/ui.md`（「見た目の決まり」を移して書き直す）、`docs/specs/`（文言と、Home・Solve・Result の変わった動き）、`docs/overview.md`（用語の「英語」、連続日数の今週）、`docs/design.md`（画面の画像の書体の決まり）
+- 画像：`docs/specs/screens/` を撮り直す。今週の表示がなくなるので `home-default-mobile.png`・`home-long-mobile.png` は、残すか撮り直すかを画面のテストに合わせる
+
+### データの変更
+
+- なし（表の形は変えない）
+
+### 理由と残す場所
+
+- 書体の並び（OS の書体 → Web フォント）：md-leaf と同じに見せつつ、Docker の中では Web フォントで決まった書体で撮るため。`docs/design.md` の「画面の画像を撮る・比べる仕組み」の書体の行に書く
+- 色・書体・部品の使い分け：`docs/ui.md` に書く（理由もそこにだけ）
+- Lucide のライセンス：`src/components/icons.tsx` の先頭のコメント
+- 「続きから」の選び方（印の付いた問題の答えを数えない）：`src/server/subjects/continue.ts` の関数のコメントと `docs/specs/home.md`
+
 ## AIが決めたこと
 
 - ダークモードの地・面・文字・枠の色は、md-leaf のダークの値に揃える
@@ -195,11 +219,44 @@ Result の「間違えた問題」の一覧と「間違えた問題を解き直�
 - アイコンの形は、Lucide の形を書き写す（ライブラリは入れない。md-leaf も同じ線のアイコンを SVG で書いている）
 - 「続きから」の科目と N を数える処理は `src/server/` に置き、Home の今の数え方（`src/server/subjects/subjects.ts`）を使う
 - プロトタイプを作り直した（見た目全体が変わるため）。この仕様は、作り直したプロトタイプで人と合意した見た目を書いている
+- タスクの分け方：トークン・書体・アイコンを変えると全部の画面の画像が変わるので、最初の2つのタスク（トークンと共通の部品）で全部の画面を撮り直し、そのあとは画面ごとのタスクで、その画面だけを撮り直す。比べた案：画面ごとにトークンも少しずつ変える＝途中のコミットで画面ごとに色が混ざる
+- 撮る画像は今と同じライトの状態だけ（`docs/specs/screens/`）。仕様の `-dark.png` は見本として使い、本番では撮らない（今もダークは撮っていない）
+- 「続きから」は、Home の Subject の一覧（`listSubjects`）とは別の関数にし、Home では一覧と同じ `<Suspense>` の中で読む（一覧が読み込み中・読み込めないときにカードを出さないため）
+
 
 ## 確かめ方
 
--
+| 受け入れ条件 | 確かめ方 |
+| --- | --- |
+| 地・面・文字・補足・枠の色が md-leaf と同じ | コードを見て確かめる（`src/styles/tokens.css` の値を「色の値」の表と照らす）＋画像を比べるテスト |
+| 差し色と、正解・不正解・不備・連続日数の色 | 画像を比べるテスト（全画面）＋コードを見て確かめる（tokens.css） |
+| 部品・明朝・等幅の書体 | コードを見て確かめる（tokens.css の `--font-*`、`layout.tsx`）＋画像を比べるテスト（solve-question、solve-code-choices） |
+| 画面の言葉がすべて日本語 | テスト（e2e の各画面のテストを日本語の文言で探す）＋画像を比べるテスト |
+| アイコンが同じ種類 | コードを見て確かめる（`src/components/icons.tsx` の stroke-width 2・丸い端と角）＋触って確かめる（md-leaf と並べて見る） |
+| 角の丸み・影 | コードを見て確かめる（tokens.css の radius・shadow） |
+| ロゴ | 画像を比べるテスト（login-default、home-default） |
+| 項目・並び・動きが変わらない、missed をなくす | テスト（今の e2e と Vitest が通る。solve の答えたあとに missed がない） |
+| 続きから：いちばん最近答えた Subject（印の付いた問題の答えは数えない） | テスト（Vitest：`src/server/subjects/continue.test.ts`） |
+| 続きから：答えがなければ一番上、Subject なし・読み込み中・エラーで出さない | テスト（Vitest と e2e の home）＋画像を比べるテスト（home-empty） |
+| 続きから：N の数え方 | テスト（Vitest） |
+| 続きから：解きはじめるで Setup | テスト（e2e の home） |
+| 連続日数の1行（灯る・まだ・0日・読み込めない） | テスト（e2e の home）＋画像を比べるテスト（home-default、home-streak-pending、home-no-streak） |
+| Result の得点・数・Topic ごと・—・ボタン | テスト（e2e の solve）＋画像を比べるテスト（result-default、result-all-flagged） |
+| 答えたあとの結果の帯 | テスト（e2e の solve） |
+| 答えたあと選択肢の右端に何も出ない、幅が変わらない | 画像を比べるテスト（solve-answered、solve-answered-multiple） |
+| 選ばなかった正解と選んで間違えたものの見分け | 画像を比べるテスト（solve-answered-multiple）＋テスト（e2e で `aria-label` の「正解」「選んだ答え・不正解」を確かめる） |
+| 選択肢が枠線のないカード | 画像を比べるテスト（solve-question） |
 
 ## タスク
 
-- [ ]
+- [ ] トークン・書体・アイコンを md-leaf に揃えられたら完了（tokens.css、layout.tsx、icons.tsx、highlight.ts。文言とレイアウトは変えない。全部の画面を撮り直す。合わせる画像：すべての `*-<状態>.png` の色・書体・アイコン）
+- [ ] 共通の部品（ボタン、ロゴ、上のバー、ページの上、帯、0件の枠、ダイアログ、一覧、プルダウン、ページ、身についている具合の線）を新しい見た目と日本語にできたら完了（全部の画面を撮り直す。合わせる画像：login-default、home-default、manage-default、manage-delete-question、manage-empty、setup-default）
+- [ ] 「続きから」の Subject と N を返す関数ができたら完了（`src/server/subjects/continue.ts`。画面は変えない）
+- [ ] Home を「続きから」のカードと1行の連続日数・日本語にできたら完了（合わせる画像：home-default、home-streak-pending、home-no-streak、home-long、home-streak-loading、home-streak-error、home-empty、home-many、home-loading、home-error）
+- [ ] Login を日本語にできたら完了（合わせる画像：login-default、login-loading、login-google-error、login-server-error）
+- [ ] Setup を日本語にできたら完了（合わせる画像：setup-default、setup-few、setup-none、setup-unanswered、setup-many、setup-loading、setup-error）
+- [ ] Solve を、枠線のない選択肢のカード・missed なし・読み上げの名前・明朝・日本語にできたら完了（合わせる画像：solve-question、solve-answered、solve-explanation、solve-answered-flagged、solve-multiple、solve-answered-multiple、solve-code-choices、solve-answered-code-choices、solve-flagged、solve-last、solve-many、solve-loading、solve-error、solve-quit、solve-no-language）
+- [ ] Result を、大きな得点・数・Topic ごと・日本語にできたら完了（合わせる画像：result-default、result-all-flagged）
+- [ ] Manage を日本語にできたら完了（合わせる画像：manage-default、manage-subject-open、manage-topic-open、manage-topics-many、manage-flagged、manage-flagged-empty、manage-empty、manage-many、manage-loading、manage-error、manage-export-error、manage-delete-question、manage-delete-topic、manage-delete-subject、manage-delete-error）
+- [ ] Import を、取り込みの誤りの文言も含めて日本語にできたら完了（合わせる画像：import-select、import-checking、import-errors、import-preview、import-preview-new、import-done、import-error）
+- [ ] Settings を日本語にできたら完了（合わせる画像：settings-default、settings-dark、settings-linking、settings-linked、settings-link-error、settings-unlinking、settings-unlink-error）
