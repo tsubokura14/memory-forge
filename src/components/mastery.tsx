@@ -24,7 +24,10 @@ export function MasteryBar({
           className="bg-primary"
           style={{ width: width(mastery.correct) }}
         />
-        <span className="bg-border-strong" style={{ width: width(mastery.wrong) }} />
+        <span
+          className="bg-border-strong"
+          style={{ width: width(mastery.wrong) }}
+        />
       </span>
       <span className="text-xs text-muted tabular-nums">
         正解 {mastery.correct} · 不正解 {mastery.wrong} · まだ {mastery.new}
