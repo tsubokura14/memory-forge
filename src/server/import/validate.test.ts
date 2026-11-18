@@ -40,7 +40,7 @@ describe("validateQuestionFile", () => {
 
   test("JSON として読めないと、ファイル全体の誤りになる", () => {
     expect(errorsOf("{ subject:")).toEqual([
-      { id: "—", item: "file", message: "Not valid JSON." },
+      { id: "—", item: "file", message: "JSON として読めません。" },
     ]);
   });
 
@@ -51,7 +51,7 @@ describe("validateQuestionFile", () => {
       base + " ".repeat(MAX_FILE_BYTES - Buffer.byteLength(base, "utf8"));
     expect(validateQuestionFile(exact).ok).toBe(true);
     expect(errorsOf(exact + " ")).toEqual([
-      { id: "—", item: "file", message: "Too large. Up to 4 MB." },
+      { id: "—", item: "file", message: "大きすぎます。4 MB までです。" },
     ]);
   });
 
@@ -63,23 +63,23 @@ describe("validateQuestionFile", () => {
       {
         id: "—",
         item: "questions",
-        message: "Too many questions (1,001). Up to 1,000.",
+        message: "問題が多すぎます（1,001問）。1,000問までです。",
       },
     ]);
   });
 
   test("問題が0問だと誤りになる", () => {
     expect(errorsOf(file([]))).toEqual([
-      { id: "—", item: "questions", message: "No questions." },
+      { id: "—", item: "questions", message: "問題が1つもありません。" },
     ]);
   });
 
   test("Subject がない・1つの文字でないと誤りになる", () => {
     expect(errorsOf(file([question()], " "))).toEqual([
-      { id: "—", item: "subject", message: "Missing." },
+      { id: "—", item: "subject", message: "ありません。" },
     ]);
     expect(errorsOf(file([question()], ["Python", "Rust"]))).toEqual([
-      { id: "—", item: "subject", message: "Wrong format." },
+      { id: "—", item: "subject", message: "形が違います。" },
     ]);
   });
 
@@ -87,25 +87,25 @@ describe("validateQuestionFile", () => {
     const noExplanation: Record<string, unknown> = question();
     delete noExplanation.explanation;
     expect(errorsOf(file([noExplanation]))).toEqual([
-      { id: "k3f9a2", item: "explanation", message: "Missing." },
+      { id: "k3f9a2", item: "explanation", message: "ありません。" },
     ]);
     expect(errorsOf(file([question({ topic: "  \n" })]))).toEqual([
-      { id: "k3f9a2", item: "topic", message: "Missing." },
+      { id: "k3f9a2", item: "topic", message: "ありません。" },
     ]);
     expect(errorsOf(file([question({ text: 42 })]))).toEqual([
-      { id: "k3f9a2", item: "text", message: "Wrong format." },
+      { id: "k3f9a2", item: "text", message: "形が違います。" },
     ]);
   });
 
   test("ID がない問題は、何問目かで示す", () => {
     expect(
       errorsOf(file([question({ id: "a1" }), question({ id: "" })])),
-    ).toEqual([{ id: "#2", item: "id", message: "Missing." }]);
+    ).toEqual([{ id: "#2", item: "id", message: "ありません。" }]);
   });
 
   test("種類が single・multiple でないと誤りになる", () => {
     expect(errorsOf(file([question({ type: "multi" })]))).toEqual([
-      { id: "k3f9a2", item: "type", message: "Must be single or multiple." },
+      { id: "k3f9a2", item: "type", message: "single か multiple にしてください。" },
     ]);
   });
 
@@ -123,32 +123,32 @@ describe("validateQuestionFile", () => {
       expect(
         errorsOf(file([question({ choices: choices(n), correct: ["A"] })])),
       ).toEqual([
-        { id: "k3f9a2", item: "choices", message: "Needs 2 to 8 choices." },
+        { id: "k3f9a2", item: "choices", message: "選択肢は2〜8個にしてください。" },
       ]);
     }
   });
 
   test("選択肢が空の並びだと、ないのと同じ誤りになる", () => {
     expect(errorsOf(file([question({ choices: [] })]))).toEqual([
-      { id: "k3f9a2", item: "choices", message: "Missing." },
+      { id: "k3f9a2", item: "choices", message: "ありません。" },
     ]);
   });
 
   test("正解に同じ記号が2回あると、形の誤りになる", () => {
     expect(
       errorsOf(file([question({ type: "multiple", correct: ["A", "A"] })])),
-    ).toEqual([{ id: "k3f9a2", item: "correct", message: "Wrong format." }]);
+    ).toEqual([{ id: "k3f9a2", item: "correct", message: "形が違います。" }]);
   });
 
   test("空の選択肢は、その記号で示す", () => {
     expect(errorsOf(file([question({ choices: ["a", "", "c"] })]))).toEqual([
-      { id: "k3f9a2", item: "choice B", message: "Missing." },
+      { id: "k3f9a2", item: "choice B", message: "ありません。" },
     ]);
   });
 
   test("正解が選択肢の中にないと誤りになる", () => {
     expect(errorsOf(file([question({ correct: ["E"] })]))).toEqual([
-      { id: "k3f9a2", item: "correct", message: "Not one of the choices (E)." },
+      { id: "k3f9a2", item: "correct", message: "選択肢にありません（E）。" },
     ]);
   });
 
@@ -157,7 +157,7 @@ describe("validateQuestionFile", () => {
       {
         id: "k3f9a2",
         item: "correct",
-        message: "Single choice needs exactly 1 correct answer.",
+        message: "1つを選ぶ問題は、正解が1つだけ要ります。",
       },
     ]);
     expect(
@@ -166,7 +166,7 @@ describe("validateQuestionFile", () => {
       {
         id: "k3f9a2",
         item: "correct",
-        message: "Multiple choice needs 2 or more correct answers.",
+        message: "すべて選ぶ問題は、正解が2つ以上要ります。",
       },
     ]);
     expect(
@@ -192,17 +192,17 @@ describe("validateQuestionFile", () => {
       {
         id: "k3f9a2",
         item: "text",
-        message: "Code block is not closed (```).",
+        message: "コードブロックが閉じていません（```）。",
       },
       {
         id: "k3f9a2",
         item: "choice B",
-        message: "Code block is not closed (```).",
+        message: "コードブロックが閉じていません（```）。",
       },
       {
         id: "k3f9a2",
         item: "explanation",
-        message: "Code block is not closed (```).",
+        message: "コードブロックが閉じていません（```）。",
       },
     ]);
   });
@@ -217,7 +217,7 @@ describe("validateQuestionFile", () => {
         ]),
       ),
     ).toEqual([
-      { id: "a1", item: "id", message: "Duplicate ID (2 questions)." },
+      { id: "a1", item: "id", message: "ID が重なっています（2問）。" },
     ]);
   });
 
@@ -233,16 +233,16 @@ describe("validateQuestionFile", () => {
       {
         id: "p81xq0",
         item: "correct",
-        message: "Multiple choice needs 2 or more correct answers.",
+        message: "すべて選ぶ問題は、正解が2つ以上要ります。",
       },
-      { id: "m2v7c4", item: "explanation", message: "Missing." },
+      { id: "m2v7c4", item: "explanation", message: "ありません。" },
     ]);
   });
 });
 
 describe("countProblems", () => {
-  test("誤りが1つなら単数、2つ以上なら複数で数える", () => {
-    expect(countProblems(1)).toBe("1 problem");
-    expect(countProblems(2)).toBe("2 problems");
+  test("誤りの数を「N 件の不備」で数える", () => {
+    expect(countProblems(1)).toBe("1 件の不備");
+    expect(countProblems(2)).toBe("2 件の不備");
   });
 });
