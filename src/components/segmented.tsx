@@ -6,7 +6,7 @@ export function Segmented<T>({
   onChange,
 }: {
   label: string;
-  options: { value: T; label: string }[];
+  options: { value: T; label: React.ReactNode }[];
   value: T;
   onChange: (value: T) => void;
 }) {
@@ -20,7 +20,7 @@ export function Segmented<T>({
         const checked = option.value === value;
         return (
           <button
-            key={option.label}
+            key={String(option.value)}
             type="button"
             role="radio"
             aria-checked={checked}
