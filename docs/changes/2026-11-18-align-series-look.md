@@ -49,7 +49,12 @@ memory-forge と md-leaf を、同じ人が作ったシリーズのアプリに�
   - 画面の部品：ヒラギノ角ゴ → 游ゴシック UI → Noto Sans JP（md-leaf の font-ui と同じ並び）
   - コード：OS の等幅（ui-monospace → SFMono-Regular → Consolas。md-leaf の font-mono と同じ）。Geist と Geist Mono は使わない
 - 太さは、ふつう（400）と太字（700）の2つ（md-leaf と同じ）。太字にするのは、アプリ名、画面の見出し、枠の外の上の小さな見出し（day streak、menu など）
-- ダークモードの色：地・面・文字・枠は md-leaf のダークと同じ。差し色・正解・不正解・炎は、暖かい地に浮かないよう、彩度を落とした色にする
+- ダークモードの色：地・面・文字・枠は md-leaf のダークと同じ。差し色・正解・不正解は、暖かい地に浮かないよう、彩度を落とした色にする
+- 差し色は藍の1色だけ（md-leaf の「差し色は若葉の1色だけ」と同じ考え方）。ふだんの画面に出る色は、地・文字・muted・藍だけにする
+  - 正解（success）・不正解（danger）は答え合わせ（Solve・Result）だけ、不備（warning）は不備の印だけに使う
+- 連続日数：炎・日数・今日の曜日と点・「done today」「answer today to keep the flame」を藍（primary）で出す。flame の色はなくす。灯る・灯らないは、塗りつぶしか線だけかで見分ける
+- 今の身についている具合（Home の Subject、Setup の Topic）：線は、最後に正解した問題を藍（primary）、最後に間違えた問題を muted、まだ解いていない問題を border で塗り分ける。下の数（correct・wrong）は色を付けず、muted の文字だけにする
+- コードの色分けは md-leaf と同じ3色（code-keyword・code-string・code-comment）だけにし、ほかは code-text の色にする。code-function・code-builtin・code-decorator はなくす
 
 ### 色の値（仕上げで `src/styles/tokens.css` に書く）
 
@@ -65,14 +70,10 @@ memory-forge と md-leaf を、同じ人が作ったシリーズのアプリに�
 | success | `#3f8a6a` | `#93c29b` |
 | danger | `#b0453a` | `#e3907f` |
 | warning | `#b07a1c` | `#e0b35e` |
-| flame | `#e8590c` | `#e98a4f` |
 | backdrop | `rgb(30 28 24 / 0.4)` | `rgb(0 0 0 / 0.55)` |
 | code-line | `#a9a395` | `#6b665a` |
 | code-keyword | `#8a4f9e` | `#c79ad8` |
 | code-string | `#4f7a3a` | `#9cc27f` |
-| code-function | `#3d6ea8` | `#86aee0` |
-| code-builtin | `#b07a1c` | `#e0b35e` |
-| code-decorator | `#c9681f` | `#f0a060` |
 | code-comment | `#8f8a7e` | `#7e796d` |
 
 - -soft の色（primary-soft、success-soft、danger-soft、warning-soft）は、元の色を地（bg）に混ぜて作る。割合はライトで primary 10%・success と danger 12%・warning 14%、ダークはどれも 14%
