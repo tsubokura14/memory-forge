@@ -85,4 +85,4 @@ npm run dev                  # http://localhost:3000 で開く
 | [docs/changes/](docs/changes/) | 機能ごとの変更の記録（何を・なぜ・どう変えたか） |
 | [docs/libraries/](docs/libraries/) | コードを読むために必要なライブラリの前提知識 |
 | [docs/how-we-work.md](docs/how-we-work.md) | 開発の進め方 |
-| [docs/process/](docs/process/) | 進め方のうち、AIが作業で守る決まり（テストの基準、画面の撮り方など） |
+| [AGENTS.md](AGENTS.md)、[CLAUDE.project.md](CLAUDE.project.md)、[.claude/skills/](.claude/skills/) | AIが守る決まり（テンプレートの決まり、このプロジェクトの決まり、テストの基準や画面の撮り方などのスキル） |

@@ -1,5 +1,5 @@
 #!/bin/sh
-# main への push と、秘密情報を含むコミットの push を断る（scripts/setup-github.sh で有効にする）
+# main への push、リモートのブランチを書き換える push（force push）、秘密情報を含むコミットの push を断る（scripts/link-template.sh で有効にする）
 # push の書き方（-u、HEAD:main、上流ブランチへの git push など）に関係なく、送り先が main なら止める
 # 秘密情報は、マージしなくても push した時点で GitHub に残る。GitHub の push protection は非公開リポジトリでは有料なので、手元でも止める
 # 見るのは、形で見分けられるもの（.env のファイルと、決まった形のトークン）だけ。パスワードのような形の決まらない文字列は、誤検知が多いので見ない
@@ -15,14 +15,25 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   fi
   # ブランチを消す push は、送るコミットがない
   case "$local_sha" in *[!0]*) ;; *) continue ;; esac
+  # リモートのブランチを書き換える push（force push）を断る。-f、--force、refspec の + など、書き方に関係なく止める
+  # 新しいブランチは、書き換えるものがない。リモートのコミットが手元になければ、祖先かどうか確かめられないので止める
+  case "$remote_sha" in
+    *[!0]*)
+      if ! git merge-base --is-ancestor "$remote_sha" "$local_sha" 2>/dev/null; then
+        echo "リモートのブランチ（$remote_ref）を書き換える push（force push）はしません。リモートが先に進んでいるなら、pull してから push してください。" >&2
+        exit 1
+      fi
+      ;;
+  esac
   # 送るコミット（まだどのリモートにもないもの）で足した・変えたファイルを、1つずつ見る
-  hits="$(git -c core.quotePath=false log --format= --name-only --diff-filter=AM "$local_sha" --not --remotes | sort -u | while IFS= read -r f; do
+  # リネームとして扱うと AM から外れて見逃すので、--no-renames で「削除＋追加」として見る
+  hits="$(git -c core.quotePath=false log --no-renames --format= --name-only --diff-filter=AM "$local_sha" --not --remotes | sort -u | while IFS= read -r f; do
     [ -z "$f" ] && continue
     case "$f" in
       *.example | *.sample | *.template) ;;
       .env | .env.* | */.env | */.env.*) echo "$f"; continue ;;
     esac
-    if git log -p --format= "$local_sha" --not --remotes -- "$f" | grep -E '^\+' | grep -qE -e "$secret"; then
+    if git log --no-renames -p --format= "$local_sha" --not --remotes -- "$f" | grep -E '^\+' | grep -qE -e "$secret"; then
       echo "$f"
     fi
   done)"
