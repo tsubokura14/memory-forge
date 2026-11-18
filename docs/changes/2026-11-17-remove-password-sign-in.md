@@ -174,7 +174,7 @@
   - 撮り直す画像：上の4つ。`docs/specs/screens/login-error.png`・`login-locked.png` は消す
   - `createUser` の `password`、`TEST_USER.password`、パスワードで入る画面のテスト（`login.spec.ts`・`home.spec.ts` の sign out）を消すか cookie を使う形に直す
   - `docs/specs/sign-in.md`・`docs/overview.md`・`docs/design.md`（HTTP の入口の理由、`auth/` の説明）を直す
-- [ ] 4. パスワードの行と `sign_in_attempts` の表を消す（データ）
+- [x] 4. パスワードの行と `sign_in_attempts` の表を消す（データ）
   - 完了：形の変更で `account` の `credential` の行が消え、`sign_in_attempts` の表が drop され、`schema.ts` からも外れたら完了
   - `docs/design.md` の「データ」から `credential` の行と `sign_in_attempts` を消す
   - 撮り直す画像：なし

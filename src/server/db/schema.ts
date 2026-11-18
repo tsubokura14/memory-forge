@@ -104,15 +104,6 @@ export const accountRelations = relations(account, ({ one }) => ({
   }),
 }));
 
-// 入れたメールアドレス（小文字・前後の空白なし）ごとの、続けて間違えた回数と止める期限。入れたら行を消す。
-// 登録されていないメールアドレスの行は消えずに残るが、ひとりで使うアプリで数は増えないとみなし、掃除はしない。
-// 公開先で総当たりを受けるなどして行が増え続けるようになったら、古い行を消す仕組みを足す
-export const signInAttempts = pgTable("sign_in_attempts", {
-  email: text("email").primaryKey(),
-  failedCount: integer("failed_count").notNull(),
-  lockedUntil: timestamp("locked_until", { withTimezone: true }),
-});
-
 // 問題のまとまりのいちばん上。名前で見分け、取り込むファイルの subject と同じ名前の行に入れる
 export const subjects = pgTable("subjects", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
