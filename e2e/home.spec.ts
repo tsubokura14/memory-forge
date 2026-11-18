@@ -236,6 +236,6 @@ test("sign out すると Login に移り、戻っても中身は見えない", a
   await page.goBack();
   await expect(page).toHaveURL(/^[^?]*\/login\?next=%2F$/);
   await expect(
-    page.getByRole("button", { name: "sign in with google" }),
+    page.getByRole("button", { name: "Google でログインする" }),
   ).toBeVisible();
 });
