@@ -58,7 +58,7 @@ async function openSetup(
 }
 
 function start(page: Page) {
-  return page.getByRole("button", { name: /^start/ });
+  return page.getByRole("button", { name: /解きはじめる$/ });
 }
 
 test("setup-default：印の付いた問題があると、除いたことを start の上に出す。スマホの幅では数が折り返す", async ({
@@ -69,7 +69,9 @@ test("setup-default：印の付いた問題があると、除いたことを sta
     python.map((q) => (q.id === "dec1" ? { ...q, flagged: true } : q)),
     pythonAnswers,
   );
-  await expect(page.getByText("1 flagged excluded")).toBeVisible();
+  await expect(
+    page.getByText("問は不備の印があるので出しません"),
+  ).toBeVisible();
   await expect(page).toHaveScreenshot("setup-default.png", { fullPage: true });
 
   await page.setViewportSize({ width: 390, height: 844 });
@@ -90,10 +92,14 @@ test("setup-none：Topic の問題が全部印付きだと、理由を出し、s
   );
   await page.getByRole("radio", { name: "Typing" }).click();
   await expect(
-    page.getByText("No questions to ask — all 8 in Typing are flagged."),
+    page.getByText(
+      "Typing の 8 問すべてに不備の印があるので、出せる問題がありません。",
+    ),
   ).toBeVisible();
-  await expect(page.getByText("flagged excluded")).toHaveCount(0);
-  await expect(start(page)).toHaveText("start · 0");
+  await expect(page.getByText("問は不備の印があるので出しません")).toHaveCount(
+    0,
+  );
+  await expect(start(page)).toHaveText("解きはじめる");
   await expect(start(page)).toBeDisabled();
   await expect(page).toHaveScreenshot("setup-none.png", { fullPage: true });
 });
@@ -104,18 +110,18 @@ test("setup-few：Topic の問題が足りないと、Topic の名前で案内�
   await openSetup(page, python, pythonAnswers);
   await page.getByRole("radio", { name: "Typing" }).click();
   await expect(
-    page.getByText("Typing has only 8 questions to ask."),
+    page.getByText("Typing で出せるのは 8 問だけです。"),
   ).toBeVisible();
-  await expect(start(page)).toHaveText("start · 8");
+  await expect(start(page)).toHaveText("8問を解きはじめる");
   await expect(page).toHaveScreenshot("setup-few.png", { fullPage: true });
 });
 
 test("All で問題が足りないと、Subject の名前で案内する", async ({ page }) => {
   await openSetup(page, topicQuestions("Basics", 3));
   await expect(
-    page.getByText("Python has only 3 questions to ask."),
+    page.getByText("Python で出せるのは 3 問だけです。"),
   ).toBeVisible();
-  await expect(start(page)).toHaveText("start · 3");
+  await expect(start(page)).toHaveText("3問を解きはじめる");
 });
 
 test("setup-unanswered：lowest accuracy で解いた問題がないと、理由を出し、start を押せない", async ({
@@ -123,13 +129,13 @@ test("setup-unanswered：lowest accuracy で解いた問題がないと、理由
 }) => {
   await openSetup(page, python, pythonAnswers);
   await page.getByRole("radio", { name: "Typing" }).click();
-  await page.getByRole("radio", { name: "lowest accuracy" }).click();
+  await page.getByRole("radio", { name: "苦手な順" }).click();
   await expect(
     page.getByText(
-      "No questions to ask — none in Typing have been answered yet.",
+      "Typing にはまだ解いた問題がないので、苦手な順では出せません。",
     ),
   ).toBeVisible();
-  await expect(start(page)).toHaveText("start · 0");
+  await expect(start(page)).toHaveText("解きはじめる");
   await expect(start(page)).toBeDisabled();
   await expect(page).toHaveScreenshot("setup-unanswered.png", {
     fullPage: true,
@@ -431,7 +437,7 @@ test("skip で次に進み、不正解として数える。最後の問題は re
   await expect(page.getByText("session complete")).toBeVisible();
   await button(page, "try again").click();
   await expect(page.getByRole("radio", { name: "Decorators" })).toBeChecked();
-  await expect(start(page)).toHaveText("start · 10");
+  await expect(start(page)).toHaveText("10問を解きはじめる");
   await expect(page.getByRole("radio", { name: "Decorators" })).toContainText(
     "正解 1 · 不正解 9 · まだ 0",
   );
@@ -479,7 +485,7 @@ test("solve-many：問題が多いと、37/100 のように出す", async ({ pag
       i === 36 ? { ...decorators[3], id: "many37" } : testQuestion(`n${i + 1}`),
     ),
   );
-  await page.getByRole("radio", { name: "all", exact: true }).click();
+  await page.getByRole("radio", { name: "すべて", exact: true }).click();
   await start(page).click();
   for (let i = 1; i <= 36; i++) {
     await button(page, "skip").click();
@@ -703,10 +709,10 @@ test("問題を読めなかったら、Setup のまま帯と retry を出し、r
   );
   await start(page).click();
   await expect(page.getByRole("main").getByRole("alert")).toHaveText(
-    /Couldn't load questions\./,
+    /問題を読み込めませんでした。/,
   );
 
   await page.unrouteAll();
-  await page.getByRole("button", { name: "retry" }).click();
+  await page.getByRole("button", { name: "もう一度読み込む" }).click();
   await expect(page.getByText("1/10", { exact: true })).toBeVisible();
 });
