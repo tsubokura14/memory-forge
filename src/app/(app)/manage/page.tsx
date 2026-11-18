@@ -37,7 +37,7 @@ async function Questions() {
     return (
       <>
         <ManageHeader />
-        <Banner action={<RetryButton />}>Couldn&apos;t load questions.</Banner>
+        <Banner action={<RetryButton />}>問題を読み込めませんでした。</Banner>
       </>
     );
   }
@@ -47,8 +47,8 @@ async function Questions() {
       <>
         <ManageHeader />
         <EmptyState
-          title="No subjects yet."
-          description="Import a question file to get started."
+          title="まだ科目がありません。"
+          description="問題のファイルを取り込むと、ここに科目が並びます。"
         />
       </>
     );

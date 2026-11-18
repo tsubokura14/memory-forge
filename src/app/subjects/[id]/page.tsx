@@ -35,9 +35,7 @@ async function SetupLoader({ params }: { params: Promise<{ id: string }> }) {
         <AppBar signOutAction={signOutAction} />
         <Main>
           <PageHeader back={BACK} kicker={KICKER} />
-          <Banner action={<RetryButton />}>
-            科目を読み込めませんでした。
-          </Banner>
+          <Banner action={<RetryButton />}>科目を読み込めませんでした。</Banner>
         </Main>
       </>
     );
