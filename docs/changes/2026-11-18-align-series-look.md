@@ -41,7 +41,8 @@ memory-forge と md-leaf を、同じ人が作ったシリーズのアプリに�
 - ロゴは、アイコンとアプリ名を横に並べる作りで、アプリ名は画面の部品と同じ書体で出る
 - 画面の項目・並び・動き・文言は変わらない（見た目だけが変わる）。答えたあとの選択肢の「missed」だけはなくす
 - 答えたあと、選択肢の右端には何も出ず、選択肢の中身の幅は変わらない
-- 答えたあと、選ばなかった正解と、選んで間違えたものが、色（緑と赤）で見分けられる
+- 答えたあと、選ばなかった正解と、選んで間違えたものが、カードの地の色（緑と赤）で見分けられる
+- 選択肢は枠線のないカードで出る
 
 ## 画面
 
@@ -61,10 +62,11 @@ memory-forge と md-leaf を、同じ人が作ったシリーズのアプリに�
 - 今の身についている具合（Home の Subject、Setup の Topic）：線は、最後に正解した問題を藍（primary）、最後に間違えた問題を border-strong（muted より薄く、border より濃い灰色）、まだ解いていない問題を border で塗り分ける。下の数（correct・wrong）は色を付けず、muted の文字だけにする
 - コードの色分けは md-leaf と同じ3色（code-keyword・code-string・code-comment）だけにし、ほかは code-text の色にする。code-function・code-builtin・code-decorator はなくす
 
-- 答えたあとの選択肢（Solve）：札や文字は付けず、色・地・記号だけで見分ける。行の右端には何も置かない（今の「missed」もやめる）
-  - 選んで正解：success の枠と success-soft の地、記号は success で塗りつぶす
-  - 選んで不正解：選ばなかった正解の赤版。danger の枠で、地は塗らない（bg）。記号は danger の線だけ（地を赤くしたり、記号を塗りつぶしたりすると、うるさく見えるため）
-  - 選ばなかった正解：success の枠で、地は塗らない（bg）。記号は success の線だけ
+- 選択肢（Solve）：枠線を付けず、地の色だけのカード（surface-raised の地、角は radius-md）にする。カードの間は今と同じだけ空ける。状態は地の色で出す
+  - 答える前：ふつうは surface-raised、指を乗せると primary-soft、選んでいるものは primary-soft の地で、記号を primary で塗りつぶす
+  - 答えたあと：正解の選択肢は success-soft の地、選んで間違えた選択肢は danger-soft の地。ほかは surface-raised のまま
+  - 記号：選んで正解は success で塗りつぶす。選ばなかった正解は success の線だけ、選んで間違えたものは danger の線だけ
+  - 札や文字は付けず、行の右端には何も置かない（今の「missed」もやめる）
 - 点線・破線は使わない。0件の表示も、border の実線の枠にする（`docs/ui.md` の「0件：点線の枠」を直す）
 
 ### 色の値（仕上げで `src/styles/tokens.css` に書く）
