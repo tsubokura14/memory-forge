@@ -221,6 +221,7 @@ Result の「間違えた問題」の一覧と「間違えた問題を解き直�
 - プロトタイプを作り直した（見た目全体が変わるため）。この仕様は、作り直したプロトタイプで人と合意した見た目を書いている
 - タスクの分け方：トークン・書体・アイコンを変えると全部の画面の画像が変わるので、最初の2つのタスク（トークンと共通の部品）で全部の画面を撮り直し、そのあとは画面ごとのタスクで、その画面だけを撮り直す。比べた案：画面ごとにトークンも少しずつ変える＝途中のコミットで画面ごとに色が混ざる
 - 撮る画像は今と同じライトの状態だけ（`docs/specs/screens/`）。仕様の `-dark.png` は見本として使い、本番では撮らない（今もダークは撮っていない）
+- ページのボタンの読み上げの名前は「ページ」「前のページ」「次のページ」「Nページ」にした（スクリーンショットに出ない文言）
 - 「続きから」は、Home の Subject の一覧（`listSubjects`）とは別の関数にし、Home では一覧と同じ `<Suspense>` の中で読む（一覧が読み込み中・読み込めないときにカードを出さないため）
 
 
@@ -250,7 +251,7 @@ Result の「間違えた問題」の一覧と「間違えた問題を解き直�
 ## タスク
 
 - [x] トークン・書体・アイコンを md-leaf に揃えられたら完了（tokens.css、layout.tsx、icons.tsx、highlight.ts。文言とレイアウトは変えない。全部の画面を撮り直す。合わせる画像：すべての `*-<状態>.png` の色・書体・アイコン）
-- [ ] 共通の部品（ボタン、ロゴ、上のバー、ページの上、帯、0件の枠、ダイアログ、一覧、プルダウン、ページ、身についている具合の線）を新しい見た目と日本語にできたら完了（全部の画面を撮り直す。合わせる画像：login-default、home-default、manage-default、manage-delete-question、manage-empty、setup-default）
+- [x] 共通の部品（ボタン、ロゴ、上のバー、ページの上、帯、0件の枠、ダイアログ、一覧、プルダウン、ページ、身についている具合の線）を新しい見た目と日本語にできたら完了（全部の画面を撮り直す。合わせる画像：login-default、home-default、manage-default、manage-delete-question、manage-empty、setup-default）
 - [ ] 「続きから」の Subject と N を返す関数ができたら完了（`src/server/subjects/continue.ts`。画面は変えない）
 - [ ] Home を「続きから」のカードと1行の連続日数・日本語にできたら完了（合わせる画像：home-default、home-streak-pending、home-no-streak、home-long、home-streak-loading、home-streak-error、home-empty、home-many、home-loading、home-error）
 - [ ] Login を日本語にできたら完了（合わせる画像：login-default、login-loading、login-google-error、login-server-error）
