@@ -32,14 +32,14 @@ export function DropZone({
     >
       {children ?? (
         <>
-          <p className="text-base">Drop a question file here</p>
+          <p className="text-base">問題のファイルをここに置いてください</p>
           <p className="text-xs text-muted">{hint}</p>
           <Button
             type="button"
             className="mt-3"
             onClick={() => input.current?.click()}
           >
-            choose file
+            ファイルを選ぶ
           </Button>
           <input
             ref={input}

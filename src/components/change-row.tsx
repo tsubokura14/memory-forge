@@ -34,7 +34,7 @@ export function ChangeRow({
         {flagged && (
           <span className="ml-auto flex shrink-0 items-center gap-1 text-xs text-warning">
             <Icon name="flag" className="text-base leading-none" />
-            flag and records reset
+            印と記録をリセット
           </span>
         )}
       </summary>
@@ -44,13 +44,13 @@ export function ChangeRow({
             <span className="text-xs text-muted">{change.item}</span>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <Side
-                label="before"
+                label="前"
                 value={change.before}
                 look={lookOf(change.item)}
                 tone="danger"
               />
               <Side
-                label="after"
+                label="後"
                 value={change.after}
                 look={lookOf(change.item)}
                 tone="success"
