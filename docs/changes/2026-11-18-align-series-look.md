@@ -128,8 +128,8 @@ memory-forge と md-leaf を、同じ人が作ったシリーズのアプリに�
 ## AIが決めたこと
 
 - ダークモードの地・面・文字・枠の色は、md-leaf のダークの値に揃える
-- 正解（success）・不正解（danger）・不備（warning）の色は、md-leaf の同じ意味の色（tip・danger・warning）に近づける。連続日数の炎（flame）は memory-forge だけの色として残す
-- コードの色分けの色は、md-leaf の code-keyword・code-string・code-comment に揃え、memory-forge だけにある色（function など）は、それに合う色に直す
+- 正解（success）・不正解（danger）・不備（warning）の色は、md-leaf の同じ意味の色（tip・danger・warning）に近づける（炎の色と、コードの色分けの数は、人と決めた。「画面」の「見た目の決まり」）
+- アイコンの形は、Lucide の形を書き写す（ライブラリは入れない。md-leaf も同じ線のアイコンを SVG で書いている）
 - プロトタイプを作り直す（見た目全体が変わるため）
 
 ## 確かめ方
