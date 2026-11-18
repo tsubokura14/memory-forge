@@ -10,11 +10,15 @@
       "Bash(gh pr checks *)",
       "Bash(gh pr list *)",
       "Bash(gh pr list)",
+      "Bash(gh pr create *)",
+      "Bash(gh issue create *)",
+      "Bash(gh issue edit *)",
       "Bash(git fetch *)",
       "Bash(git switch *)",
       "Bash(git checkout -b *)",
       "Bash(git pull)",
       "Bash(git pull *)",
+      "Bash(git merge origin/main)",
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(git push *)",
@@ -25,6 +29,9 @@
       "Bash(npm run test *)",
       "Bash(npm run lint *)",
       "Bash(npm run typecheck *)",
+      "Bash(npm run build)",
+      "Bash(npm run build *)",
+      "Bash(npx playwright *)",
       "PowerShell(gh issue view *)",
       "PowerShell(gh issue list *)",
       "PowerShell(gh issue list)",
@@ -33,11 +40,15 @@
       "PowerShell(gh pr checks *)",
       "PowerShell(gh pr list *)",
       "PowerShell(gh pr list)",
+      "PowerShell(gh pr create *)",
+      "PowerShell(gh issue create *)",
+      "PowerShell(gh issue edit *)",
       "PowerShell(git fetch *)",
       "PowerShell(git switch *)",
       "PowerShell(git checkout -b *)",
       "PowerShell(git pull)",
       "PowerShell(git pull *)",
+      "PowerShell(git merge origin/main)",
       "PowerShell(git add *)",
       "PowerShell(git commit *)",
       "PowerShell(git push *)",
@@ -47,7 +58,10 @@
       "PowerShell(npm test *)",
       "PowerShell(npm run test *)",
       "PowerShell(npm run lint *)",
-      "PowerShell(npm run typecheck *)"
+      "PowerShell(npm run typecheck *)",
+      "PowerShell(npm run build)",
+      "PowerShell(npm run build *)",
+      "PowerShell(npx playwright *)"
     ],
     "ask": [
       "Bash(git reset --hard*)",
@@ -55,19 +69,13 @@
       "Bash(git switch -f*)",
       "Bash(git switch *--force*)",
       "Bash(git switch *--discard-changes*)",
-      "Bash(gh pr create *)",
-      "Bash(gh issue create *)",
       "Bash(gh issue close *)",
-      "Bash(gh issue edit *)",
       "PowerShell(git reset --hard*)",
       "PowerShell(git clean *)",
       "PowerShell(git switch -f*)",
       "PowerShell(git switch *--force*)",
       "PowerShell(git switch *--discard-changes*)",
-      "PowerShell(gh pr create *)",
-      "PowerShell(gh issue create *)",
       "PowerShell(gh issue close *)",
-      "PowerShell(gh issue edit *)",
       "Edit(/.githooks/**)",
       "Edit(/package.json)"
     ],
@@ -109,35 +117,9 @@
         ]
       }
     ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node",
-            "args": [
-              "${CLAUDE_PROJECT_DIR}/.claude/hooks/guard.mjs"
-            ]
-          }
-        ]
-      }
-    ],
-    "UserPromptExpansion": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node",
-            "args": [
-              "${CLAUDE_PROJECT_DIR}/.claude/hooks/guard.mjs"
-            ]
-          }
-        ]
-      }
-    ],
     "PreToolUse": [
       {
-        "matcher": "Skill|Read|Grep|Glob|Bash|PowerShell",
+        "matcher": "Bash|PowerShell",
         "hooks": [
           {
             "type": "command",

@@ -2,6 +2,8 @@
 .env
 .env.*
 !.env.example
+!.env.sample
+!.env.template
 
 # 依存・ビルド成果物（技術に合わせて書き足す）
 node_modules/

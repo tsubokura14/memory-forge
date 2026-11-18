@@ -5,7 +5,7 @@
 - 1か所だけに関わる理由は、コードのコメントに書く。ここには書かない（同じ理由を2か所に書かない）
 - 迷ったら「この前提が崩れたら、直すのは1か所だけか？」。1か所ならコメント、複数ならここ
 - 「今どう作られているか」を現在形で書く。比べた選択肢などの経緯は書かない（docs/changes/ に残っている）
-- 機能を仕上げるとき（/dev-finish）に docs/changes/ の「設計」から反映する。決まりができたタスクPRで書き足してもよい
+- 機能を仕上げるとき（/dev-build の仕上げ）に docs/changes/ の「設計」から反映する。決まりができたタスクPRで書き足してもよい
 - 見た目の決まり（色や部品の使い分け）は docs/ui.md に書く
 - 長くなったら docs/design/ に分ける
 -->
@@ -37,7 +37,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 ```
 
 - 決まり（入力の確かめ、出し分け、計算）は `src/server/` に置き、画面（`src/app/`、`src/components/`）には書かない
-  - 理由：1つの決まりを、いちばん中心の層で1回だけ Vitest で確かめるため（`docs/process/testing.md`）。画面のテストは、結果がどの文言で出るかだけにできる
+  - 理由：1つの決まりを、いちばん中心の層で1回だけ Vitest で確かめるため（testing スキル）。画面のテストは、結果がどの文言で出るかだけにできる
   - 前提（崩れたら見直す）：決まりを使うのはこのアプリの画面だけ。あとで作る「問題を取り出す API」も `src/server/` を呼ぶ
 - データベースに触るのは `src/server/` だけ。画面の部品から直接 `db` を読まない
 - `src/server/` のうち、データベースを使わない決まり（上限の値や文言など）は、ブラウザで動く画面の部品から読み込んでよい（例：Import が、送る前に大きさを確かめるため `src/server/import/validate.ts` を読む）
@@ -115,7 +115,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 
 ## 画面の画像を撮る・比べる仕組み
 
-- 撮る・比べるは、Playwright 公式の Docker イメージ（`mcr.microsoft.com/playwright:v<入れた @playwright/test の版>-noble`）の中で、アプリのビルドと立ち上げも含めて行う。同じイメージにする理由は `docs/process/screenshots.md`
+- 撮る・比べるは、Playwright 公式の Docker イメージ（`mcr.microsoft.com/playwright:v<入れた @playwright/test の版>-noble`）の中で、アプリのビルドと立ち上げも含めて行う。同じイメージにする理由は screenshots スキル
   - 手元：`npm run screens:test`・`npm run screens:update -- <画面のテストのファイル>`（`scripts/screens.mjs` が `docker run` する）
   - CI：`screens` のジョブの `container:` に同じイメージを指定する
   - 前提（崩れたら見直す）：イメージの版は、入れた `@playwright/test` の版から決めている（`scripts/screens.mjs` と `ci.yml`）。違うと、イメージの中のブラウザと合わない
@@ -129,7 +129,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
     - 答えを記録するとき（`src/server/solve/answer.ts`）は、今のままデータベースの `now()` で答えた日時を入れる。画面のテストで答えの日時を決めたいときは、`e2e/questions.ts` の `insertAnswers` で日時を指定して入れる
     - 前提（崩れたら見直す）：画面のテストの中で、Solve で答えてから Home の連続日数を見ることはしない（答えは今の日時、Home は固定した日時で数えるため合わない）
   - アニメーション：`toHaveScreenshot` の既定で止まる
-- 状態（0件など）は、テストの前に `test` のデータベースに決まったデータを入れて作る（`docs/process/screenshots.md`）
+- 状態（0件など）は、テストの前に `test` のデータベースに決まったデータを入れて作る（screenshots スキル）
   - Subject と問題は、テストごとに `e2e/questions.ts` の `resetQuestions` で入れ直す
   - 画面のテストは、ファイルを並べずに1つずつ動かす（`playwright.config.ts` の `workers: 1`）。並べると、ほかのファイルのテストが入れ直したデータで、撮っている画面が変わるため
 - ログインが要る画面は、テスト用のユーザーでログインした状態で撮る
