@@ -19,21 +19,20 @@ const python = [
 ].join("\n");
 
 describe("highlight", () => {
-  test("Python のコードを、6つの種類と null に分ける", () => {
+  test("Python のコードを、3つの種類（keyword・string・comment）と null に分ける", () => {
     const segments = highlight(python, "python");
     expect(segments.map((s) => s.text).join("")).toBe(python);
     expect(kindOf(segments, "def")).toBe("keyword");
     expect(kindOf(segments, '"call"')).toBe("string");
-    expect(kindOf(segments, "logger")).toBe("function");
-    expect(kindOf(segments, "len")).toBe("builtin");
+    expect(kindOf(segments, "logger")).toBeNull();
+    expect(kindOf(segments, "len")).toBeNull();
     expect(kindOf(segments, "# 呼んだことを出す")).toBe("comment");
     expect(kindOf(segments, "42")).toBeNull();
   });
 
-  test("入れ子の言葉は、内側から見て最初に当てはまった種類にする（デコレーターの中の . は decorator）", () => {
+  test("3つに当てはまらない言葉（デコレーター）は null にする", () => {
     const segments = highlight(python, "python");
-    expect(kindOf(segments, "@functools")).toBe("decorator");
-    expect(kindOf(segments, ".")).toBe("decorator");
+    expect(kindOf(segments, "@functools")).toBeNull();
   });
 
   test.each(["Python", "py"])(
