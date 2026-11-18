@@ -6,7 +6,7 @@
 // unflag は Manage の一覧の行の印を外す操作（size は sm）。filter は Manage の絞り込みの flagged（size は filter）、filterActive は押している間の同じボタン
 const VARIANTS = {
   primary: "bg-primary text-on-primary",
-  outline: "border border-border bg-surface",
+  outline: "border border-border bg-bg",
   danger: "border border-danger text-danger",
   destructive: "bg-danger text-on-primary",
   deleteIcon:
@@ -38,7 +38,10 @@ function textClass(variant: keyof typeof VARIANTS, size: keyof typeof SIZES) {
   if (variant === "outline") {
     return size === "lg" ? "text-sm text-muted" : "text-sm text-text";
   }
-  return size === "lg" ? "text-base font-medium" : "text-sm";
+  // 主な操作（primary）と、確認のダイアログの削除（destructive）だけ太字にする（太さは 400 と 700 の2つ）
+  const weight =
+    variant === "primary" || variant === "destructive" ? "font-bold" : "";
+  return `${size === "lg" ? "text-base" : "text-sm"} ${weight}`;
 }
 
 // リンク（Next.js の Link）を、ボタンと同じ見た目にするときに使う

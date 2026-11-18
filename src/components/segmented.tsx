@@ -25,7 +25,7 @@ export function Segmented<T>({
             role="radio"
             aria-checked={checked}
             onClick={() => onChange(option.value)}
-            className={`flex-1 rounded-sm border py-1.5 text-sm ${checked ? "border-border bg-surface text-text" : "border-transparent text-muted"}`}
+            className={`flex-1 rounded-sm border py-1.5 text-sm ${checked ? "border-border bg-bg font-bold text-text" : "border-transparent text-muted"}`}
           >
             {option.label}
           </button>

@@ -59,7 +59,7 @@ export function Dropdown({
         aria-controls={listId}
         onClick={() => setOpen(!open)}
         className={`flex w-full items-center justify-between gap-2 rounded-md border px-3 py-1.5 text-left text-sm ${
-          open ? "border-primary bg-surface" : "border-border bg-surface-raised"
+          open ? "border-primary bg-bg" : "border-border bg-bg"
         }`}
       >
         <span className="truncate">{current?.label}</span>
@@ -73,7 +73,7 @@ export function Dropdown({
           id={listId}
           role="listbox"
           aria-label={label}
-          className="absolute top-full right-0 left-0 z-10 mt-1 max-h-72 overflow-y-auto rounded-md border border-border bg-surface py-1 shadow-popover"
+          className="absolute top-full right-0 left-0 z-10 mt-1 max-h-72 overflow-y-auto rounded-md border border-border bg-bg py-1 shadow-popover"
         >
           {options.map((option) => {
             const isSelected = option.key === selected;
@@ -109,7 +109,7 @@ export function Dropdown({
                     </span>
                   )}
                   {/* 桁の違う行でも、印の数の位置をそろえる */}
-                  <span className="min-w-8 text-right text-xs text-muted">
+                  <span className="min-w-8 text-right text-xs text-muted tabular-nums">
                     {option.count}
                   </span>
                 </button>

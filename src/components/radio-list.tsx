@@ -23,7 +23,7 @@ export function RadioList<T>({
     <div
       role="radiogroup"
       aria-label={label}
-      className="flex flex-col divide-y divide-border overflow-hidden rounded-md border border-border bg-surface"
+      className="flex flex-col divide-y divide-border overflow-hidden rounded-md border border-border bg-bg"
     >
       {options.map((option) => {
         const checked = option.value === value;
@@ -42,7 +42,7 @@ export function RadioList<T>({
             />
             <span className="flex min-w-0 flex-1 flex-col gap-1.5">
               <span
-                className={`break-words ${option.strong ? "font-semibold" : ""}`}
+                className={`break-words ${option.strong ? "font-bold" : ""}`}
               >
                 {option.label}
               </span>

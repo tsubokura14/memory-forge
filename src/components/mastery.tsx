@@ -2,7 +2,8 @@ import { Icon } from "@/components/icons";
 import type { Mastery } from "@/server/mastery/mastery";
 
 // docs/ui.md の「今の身についている具合」の、名前の下に出す線と数。
-// 線は border の地に、correct（success）・wrong（danger）を全体に対する割合の幅で左から塗り、残りが new になる
+// 線は border の地に、最後に正解した問題（primary）・最後に間違えた問題（border-strong）を全体に対する割合の幅で左から塗り、残りがまだ解いていない問題になる。
+// 下の数は色を付けず muted の文字だけにする（差し色を primary の1色に絞るため。docs/ui.md の「色の使い分け」）
 export function MasteryBar({
   mastery,
   flagged = 0,
@@ -20,15 +21,13 @@ export function MasteryBar({
         className="flex h-1 overflow-hidden rounded-sm bg-border"
       >
         <span
-          className="bg-success"
+          className="bg-primary"
           style={{ width: width(mastery.correct) }}
         />
-        <span className="bg-danger" style={{ width: width(mastery.wrong) }} />
+        <span className="bg-border-strong" style={{ width: width(mastery.wrong) }} />
       </span>
-      <span className="text-xs text-muted">
-        <span className="text-success">{mastery.correct}</span> correct ·{" "}
-        <span className="text-danger">{mastery.wrong}</span> wrong ·{" "}
-        {mastery.new} new
+      <span className="text-xs text-muted tabular-nums">
+        正解 {mastery.correct} · 不正解 {mastery.wrong} · まだ {mastery.new}
         {flagged > 0 && (
           <>
             {" "}
@@ -48,7 +47,7 @@ export function MasteryBar({
 // 行の右に出す %。解いた問題がないときは「—」。TopicResultRow の % と同じ幅で右にそろえる
 export function MasteryAccuracy({ accuracy }: { accuracy: number | null }) {
   return (
-    <span className="w-10 shrink-0 text-right text-sm">
+    <span className="w-10 shrink-0 text-right text-sm tabular-nums">
       {accuracy === null ? "—" : `${accuracy}%`}
     </span>
   );

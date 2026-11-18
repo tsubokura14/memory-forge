@@ -19,7 +19,7 @@ export function CountBox({
       data-testid={`count-${label}`}
       className="flex flex-col gap-1 rounded-md border border-border bg-surface px-4 py-3"
     >
-      <span className={`text-lg ${color}`}>{count}</span>
+      <span className={`text-lg tabular-nums ${color}`}>{count}</span>
       <span className="text-xs text-muted">{label}</span>
     </div>
   );
