@@ -5,7 +5,14 @@ import { RichText } from "./rich-text";
 // hit は選んだ正解、wrong は選んで間違えた選択肢、missed は選ばなかった正解。ほかは null
 export type ChoiceMark = "hit" | "wrong" | "missed" | null;
 
-// 選択肢の行（docs/ui.md の「選択肢」）。単一選択は丸い記号、複数選択は四角い記号
+// 答えたあとの状態は、見た目は地の色だけなので、読み上げ用の文字でも伝える
+const MARK_LABELS = {
+  hit: "選んだ答え・正解",
+  wrong: "選んだ答え・不正解",
+  missed: "正解",
+};
+
+// 選択肢のカード（docs/ui.md の「選択肢」）。枠線を付けず、状態は地の色で出す。単一選択は丸い記号、複数選択は四角い記号
 export function Choice({
   letter,
   text,
@@ -24,24 +31,25 @@ export function Choice({
   disabled?: boolean;
   onClick: () => void;
 }) {
+  const before = mark === undefined;
   const row =
     mark === "hit" || mark === "missed"
-      ? "border-success bg-success-soft"
+      ? "bg-success-soft"
       : mark === "wrong"
-        ? "border-danger bg-danger-soft"
-        : mark === undefined && selected
-          ? "border-primary bg-primary-soft"
-          : "border-border bg-surface";
+        ? "bg-danger-soft"
+        : before && selected
+          ? "bg-primary-soft"
+          : `bg-surface-raised ${before && !disabled ? "hover:bg-primary-soft" : ""}`;
   const badge =
     mark === "hit"
-      ? "border-success bg-success text-on-primary"
-      : mark === "wrong"
-        ? "border-danger bg-danger text-on-primary"
-        : mark === "missed"
-          ? "border-success text-success"
-          : mark === undefined && selected
-            ? "border-primary bg-primary text-on-primary"
-            : "border-border text-muted";
+      ? "bg-success/30 text-success"
+      : mark === "missed"
+        ? "bg-success/15 text-success"
+        : mark === "wrong"
+          ? "bg-danger/30 text-danger"
+          : before && selected
+            ? "bg-primary text-on-primary"
+            : "bg-bg text-muted";
   // コードブロックのある選択肢は、スマホの幅では記号を上の行に置き、コードを幅いっぱいに出す
   const hasCode = parseMarkup(text).some((block) => block.kind === "code");
   return (
@@ -50,10 +58,10 @@ export function Choice({
       aria-pressed={selected}
       disabled={disabled}
       onClick={onClick}
-      className={`flex gap-3 rounded-md border px-3 py-3 text-left text-sm ${hasCode ? "flex-col sm:flex-row sm:items-start" : "items-start"} ${row}`}
+      className={`flex gap-3 rounded-md px-4 py-3 text-left text-sm transition-colors duration-300 ${hasCode ? "flex-col sm:flex-row sm:items-start" : "items-start"} ${row}`}
     >
       <span
-        className={`flex size-6 shrink-0 items-center justify-center border text-xs ${multiple ? "rounded-sm" : "rounded-full"} ${badge}`}
+        className={`flex size-6 shrink-0 items-center justify-center text-xs font-bold ${multiple ? "rounded-sm" : "rounded-full"} ${badge}`}
       >
         {letter}
       </span>
@@ -62,13 +70,7 @@ export function Choice({
       >
         <RichText text={text} />
       </span>
-      {mark === "missed" && (
-        <span
-          className={`shrink-0 text-xs text-success ${hasCode ? "self-end sm:self-center" : "self-center"}`}
-        >
-          missed
-        </span>
-      )}
+      {mark && <span className="sr-only">{` ${MARK_LABELS[mark]}`}</span>}
     </button>
   );
 }

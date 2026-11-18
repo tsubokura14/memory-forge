@@ -375,8 +375,8 @@ test("答えるたびに数と番号が進み、正解・不正解の帯と、�
   await next(page);
 
   await expect(page.getByText("4 / 10", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("正解の数")).toHaveText("2");
-  await expect(page.getByLabel("不正解の数")).toHaveText("1");
+  await expect(page.getByLabel("正解の数", { exact: true })).toHaveText("2");
+  await expect(page.getByLabel("不正解の数", { exact: true })).toHaveText("1");
   await choice(page, "B").click();
   await expect(page).toHaveScreenshot("solve-question.png", { fullPage: true });
 
@@ -441,7 +441,7 @@ test("飛ばすと次に進み、不正解として数える。最後の問題�
       page.getByText(`${i + 1} / 10`, { exact: true }),
     ).toBeVisible();
   }
-  await expect(page.getByLabel("不正解の数")).toHaveText("9");
+  await expect(page.getByLabel("不正解の数", { exact: true })).toHaveText("9");
   await answer(page, "B");
   await expect(page.getByRole("button", { name: /^次の問題へ/ })).toHaveCount(
     0,
@@ -569,8 +569,8 @@ test("solve-error：答えを保存できなかったら、数を進めずに帯
   await failActions(page);
   await button(page, "答え合わせする").click();
   await expect(saveError(page)).toHaveText(/答えを保存できませんでした。/);
-  await expect(page.getByLabel("正解の数")).toHaveText("2");
-  await expect(page.getByLabel("不正解の数")).toHaveText("1");
+  await expect(page.getByLabel("正解の数", { exact: true })).toHaveText("2");
+  await expect(page.getByLabel("不正解の数", { exact: true })).toHaveText("1");
   await expect(choice(page, "B")).toHaveAttribute("aria-pressed", "true");
   await expect(page).toHaveScreenshot("solve-error.png", { fullPage: true });
 
@@ -578,7 +578,7 @@ test("solve-error：答えを保存できなかったら、数を進めずに帯
   await button(page, "もう一度保存する").click();
   await expect(page.getByText("正解", { exact: true })).toBeVisible();
   await expect(saveError(page)).toHaveCount(0);
-  await expect(page.getByLabel("正解の数")).toHaveText("3");
+  await expect(page.getByLabel("正解の数", { exact: true })).toHaveText("3");
 });
 
 test("飛ばすを保存できなかったら、同じ帯を出して進まず、「もう一度保存する」で次に進む", async ({
@@ -593,7 +593,7 @@ test("飛ばすを保存できなかったら、同じ帯を出して進まず�
   await page.unrouteAll();
   await button(page, "もう一度保存する").click();
   await expect(page.getByText("2 / 10", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("不正解の数")).toHaveText("1");
+  await expect(page.getByLabel("不正解の数", { exact: true })).toHaveText("1");
   await expect(saveError(page)).toHaveCount(0);
 });
 
@@ -607,8 +607,8 @@ test("solve-flagged：答える前に不備の印を付けると、記録せず�
   );
   await expect(notice).toBeVisible();
   await expect(page.getByText("5 / 10", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("正解の数")).toHaveText("2");
-  await expect(page.getByLabel("不正解の数")).toHaveText("1");
+  await expect(page.getByLabel("正解の数", { exact: true })).toHaveText("2");
+  await expect(page.getByLabel("不正解の数", { exact: true })).toHaveText("1");
   expect(await countAnswers()).toBe(3);
   await expect(page).toHaveScreenshot("solve-flagged.png", { fullPage: true });
 
@@ -641,7 +641,7 @@ test("solve-answered-flagged：答えたあとに不備の印を付けると、�
   await button(page, "解説を見る").click();
   await button(page, "不備の印").click();
   await expect(button(page, "印を付けた")).toBeVisible();
-  await expect(page.getByLabel("正解の数")).toHaveText("3");
+  await expect(page.getByLabel("正解の数", { exact: true })).toHaveText("3");
   await expect(page).toHaveScreenshot("solve-answered-flagged.png", {
     fullPage: true,
   });

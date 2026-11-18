@@ -15,11 +15,11 @@ import type { Outcome } from "@/server/solve/result";
 import type { SolveQuestion } from "@/server/solve/start";
 import { answerAction, flagAction, skipAction } from "./actions";
 
-// 保存できなかった操作。retry は同じ中身で送り直す
+// 保存できなかった操作。「もう一度保存する」は同じ中身で送り直す
 type Failed =
   { kind: "submit"; selected: string[] } | { kind: "skip" } | { kind: "flag" };
 
-// 1問ずつ解く。最後の問題の results・skip・答える前の flag で onComplete（1問ずつの結果を渡す）、quit のダイアログの quit で onQuit
+// 1問ずつ解く。最後の問題の「結果を見る」・飛ばす・答える前の不備の印で onComplete（1問ずつの結果を渡す）、やめるのダイアログの「やめる」で onQuit
 export function SolveView({
   questions,
   onComplete,
@@ -166,13 +166,13 @@ export function SolveView({
     <Banner
       action={
         <Button variant="danger" disabled={busy} onClick={retry}>
-          retry
+          もう一度保存する
         </Button>
       }
     >
       {failed.kind === "flag"
-        ? "Couldn't flag this question."
-        : "Couldn't save your answer."}
+        ? "不備の印を付けられませんでした。"
+        : "答えを保存できませんでした。"}
     </Banner>
   );
 
@@ -191,13 +191,13 @@ export function SolveView({
           <Banner tone="warning">
             <span className="flex items-center gap-1">
               <Icon name="flag" className="text-base leading-none" />
-              <span>{`${notice} flagged — moved on without recording.`}</span>
+              <span>{`${notice} に不備の印を付けました。記録せずに次へ進みました。`}</span>
             </span>
           </Banner>
         )}
         <div className="flex items-center gap-2 text-xs text-muted">
-          <span className="rounded-sm border border-border bg-surface px-1.5 py-0.5">
-            {multiple ? "multi" : "single"}
+          <span className="rounded-sm bg-surface-raised px-1.5 py-0.5">
+            {multiple ? "すべて選ぶ" : "1つ選ぶ"}
           </span>
           <span>{question.topic}</span>
           <span>{question.questionId}</span>
@@ -210,14 +210,14 @@ export function SolveView({
             onClick={flagged ? undefined : flag}
           >
             <Icon name="flag" className="text-base leading-none" />
-            {flagged ? "flagged" : "flag"}
+            {flagged ? "印を付けた" : "不備の印"}
           </Button>
         </div>
         {view === "explanation" && result ? (
           <>
             <section className="flex flex-col gap-2 rounded-md border border-border bg-surface p-4">
-              <h2 className="text-xs text-muted">explanation</h2>
-              <div className="text-base">
+              <h2 className="text-xs text-muted">解説</h2>
+              <div className="font-body text-base leading-loose">
                 <RichText text={result.explanation} />
               </div>
             </section>
@@ -225,12 +225,16 @@ export function SolveView({
           </>
         ) : (
           <>
-            <div className="text-lg">
+            <div className="font-body text-lg">
               <RichText text={question.text} lineNumbers />
             </div>
             {result && <ResultBanner result={result} />}
             <div className="flex items-center gap-3 text-xs text-muted">
-              <span>{multiple ? "select all that apply" : "choose one"}</span>
+              <span>
+                {multiple
+                  ? "当てはまるものをすべて選んでください"
+                  : "1つ選んでください"}
+              </span>
               <span className="h-px flex-1 bg-border" />
             </div>
             <div className="flex flex-col gap-2">
@@ -255,7 +259,7 @@ export function SolveView({
         )}
       </main>
       {/* fixed でなく sticky にして、問題が長いときも、最後の選択肢がバーの下に隠れないようにする */}
-      <div className="sticky bottom-0 border-t border-border bg-surface">
+      <div className="sticky bottom-0 border-t border-border bg-bg">
         <div className="mx-auto flex max-w-page flex-col gap-2 px-4 py-3">
           {result ? (
             <div className="flex gap-2">
@@ -267,14 +271,14 @@ export function SolveView({
                     setView(view === "question" ? "explanation" : "question")
                   }
                 >
-                  {view === "question" ? "explanation" : "question"}
+                  {view === "question" ? "解説を見る" : "問題に戻る"}
                 </Button>
               </div>
               <div className="flex-1">
                 {/* 印を送っている間に進むと、次の問題の結果を置き換えてしまう */}
                 <Button size="lg" disabled={busy} onClick={() => advance()}>
                   <span className="flex items-center justify-center gap-1">
-                    {last ? "results" : "next"}
+                    {last ? "結果を見る" : "次の問題へ"}
                     <Icon name="arrow-right" className="text-base" />
                   </span>
                 </Button>
@@ -285,7 +289,7 @@ export function SolveView({
               <p
                 className={`text-center text-xs text-muted ${selected.length > 0 ? "invisible" : ""}`}
               >
-                select an option to proceed
+                選択肢を選ぶと答え合わせできます
               </p>
               <div className="flex gap-2">
                 <div className="shrink-0">
@@ -295,7 +299,7 @@ export function SolveView({
                     disabled={busy}
                     onClick={skip}
                   >
-                    skip
+                    飛ばす
                   </Button>
                 </div>
                 <div className="flex-1">
@@ -304,7 +308,7 @@ export function SolveView({
                     disabled={selected.length === 0 || busy}
                     onClick={() => submit()}
                   >
-                    submit
+                    答え合わせする
                   </Button>
                 </div>
               </div>
@@ -314,15 +318,15 @@ export function SolveView({
       </div>
       <Dialog
         open={quitting}
-        title="Quit this session?"
-        description="Answers so far are kept."
+        title="途中でやめますか？"
+        description="ここまでの答えは残ります。"
         onCancel={() => setQuitting(false)}
         actions={
           <>
             <Button variant="outline" onClick={() => setQuitting(false)}>
-              continue
+              続ける
             </Button>
-            <Button onClick={onQuit}>quit</Button>
+            <Button onClick={onQuit}>やめる</Button>
           </>
         }
       />
@@ -341,7 +345,7 @@ function outcomeOf(
   };
 }
 
-// 正解は success の「correct」、不正解は danger の「incorrect — answer: B」（複数選択は「A, B」）
+// 正解は success の「正解」、不正解は danger の「不正解。答えは B」（複数選択は「A, B」）
 function ResultBanner({ result }: { result: AnswerResult }) {
   return (
     <Banner tone={result.correct ? "success" : "danger"}>
@@ -349,8 +353,8 @@ function ResultBanner({ result }: { result: AnswerResult }) {
         <Icon name={result.correct ? "check" : "x"} className="text-base" />
         <span>
           {result.correct
-            ? "correct"
-            : `incorrect — answer: ${result.answer.join(", ")}`}
+            ? "正解"
+            : `不正解。答えは ${result.answer.join(", ")}`}
         </span>
       </span>
     </Banner>
