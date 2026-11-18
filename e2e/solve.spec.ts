@@ -433,7 +433,7 @@ test("skip で次に進み、不正解として数える。最後の問題は re
   await expect(page.getByRole("radio", { name: "Decorators" })).toBeChecked();
   await expect(start(page)).toHaveText("start · 10");
   await expect(page.getByRole("radio", { name: "Decorators" })).toContainText(
-    "1 correct · 9 wrong · 0 new",
+    "正解 1 · 不正解 9 · まだ 0",
   );
 });
 

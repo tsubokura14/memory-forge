@@ -231,11 +231,11 @@ test("manage-many：ページを移ると、その50問になる", async ({ page
   await resetManyPython();
   await openManage(page);
   // 番号は今のページの前後だけなので、2・3と順に移る
-  await page.getByRole("button", { name: "page 2" }).click();
+  await page.getByRole("button", { name: "2ページ" }).click();
   await expect(page.getByText("51–100 of 480")).toBeVisible();
-  await page.getByRole("button", { name: "page 3" }).click();
+  await page.getByRole("button", { name: "3ページ" }).click();
   await expect(page.getByText("101–150 of 480")).toBeVisible();
-  await page.getByRole("button", { name: "page 4" }).click();
+  await page.getByRole("button", { name: "4ページ" }).click();
   await expect(page.getByText("151–200 of 480")).toBeVisible();
   await expect(rows(page)).toHaveCount(50);
   await expect(page).toHaveScreenshot("manage-many.png", { fullPage: true });
@@ -253,7 +253,7 @@ test("Subject を変えると All topics と1ページ目に戻り、読み込�
   await resetPython();
   await openManage(page);
   await choose(page, "subject", "AWS SAA");
-  await page.getByRole("button", { name: "page 2" }).click();
+  await page.getByRole("button", { name: "2ページ" }).click();
   await expect(page.getByText("51–100 of 240")).toBeVisible();
 
   await choose(page, "subject", "Python");
@@ -263,7 +263,7 @@ test("Subject を変えると All topics と1ページ目に戻り、読み込�
   await expect(dropdown(page, "topic")).toHaveText(/All topics/);
   await expect(page.getByText("1–50 of 240")).toBeVisible();
 
-  await page.getByRole("button", { name: "page 2" }).click();
+  await page.getByRole("button", { name: "2ページ" }).click();
   await expect(page.getByText("51–100 of 240")).toBeVisible();
   await page.reload();
   await expect(page.getByText("51–100 of 240")).toBeVisible();
@@ -441,7 +441,7 @@ test("1問を消して今のページが空になったら、前のページを�
 }) => {
   await resetQuestions([{ name: "Python", questions: many("py", 51) }]);
   await openManage(page);
-  await page.getByRole("button", { name: "page 2" }).click();
+  await page.getByRole("button", { name: "2ページ" }).click();
   await expect(page.getByText("51–51 of 51")).toBeVisible();
   await rows(page).first().getByRole("button", { name: "delete" }).click();
   await dialog(page).getByRole("button", { name: "delete" }).click();
@@ -536,12 +536,12 @@ test("flagged を押すと1ページ目に戻り、unflag で今のページが�
     },
   ]);
   await openManage(page);
-  await page.getByRole("button", { name: "page 2" }).click();
+  await page.getByRole("button", { name: "2ページ" }).click();
   await expect(page.getByText("51–51 of 51")).toBeVisible();
   await flaggedButton(page).click();
   await expect(page.getByText("1–50 of 51")).toBeVisible();
 
-  await page.getByRole("button", { name: "page 2" }).click();
+  await page.getByRole("button", { name: "2ページ" }).click();
   await expect(page.getByText("51–51 of 51")).toBeVisible();
   await rows(page).first().getByRole("button", { name: "unflag" }).click();
   await expect(page.getByText("1–50 of 50")).toBeVisible();

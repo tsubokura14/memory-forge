@@ -204,7 +204,7 @@ test("sign out すると Login に移り、戻っても中身は見えない", a
   await page.goto("/");
   await expect(page).toHaveURL("/");
 
-  await page.getByRole("button", { name: "sign out" }).click();
+  await page.getByRole("button", { name: "ログアウト" }).click();
   await expect(page).toHaveURL("/login");
 
   await page.goBack();
