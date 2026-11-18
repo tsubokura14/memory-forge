@@ -26,10 +26,10 @@ describe("pageItems", () => {
 
 describe("rangeText", () => {
   test("今のページの最初と最後の問題の番号と、全部の数", () => {
-    expect(rangeText(4, 480)).toBe("151–200 of 480");
+    expect(rangeText(4, 480)).toBe("480問中 151–200");
   });
 
   test("最後のページは、全部の数で止める", () => {
-    expect(rangeText(10, 480)).toBe("451–480 of 480");
+    expect(rangeText(10, 480)).toBe("480問中 451–480");
   });
 });
