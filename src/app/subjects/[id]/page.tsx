@@ -36,7 +36,7 @@ async function SetupLoader({ params }: { params: Promise<{ id: string }> }) {
         <Main>
           <PageHeader back={BACK} kicker={KICKER} />
           <Banner action={<RetryButton />}>
-            Couldn&apos;t load this subject.
+            科目を読み込めませんでした。
           </Banner>
         </Main>
       </>

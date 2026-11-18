@@ -8,37 +8,37 @@ Subject の中から Topic・順番・問題数を選び（Setup）、1問ずつ
 ## Setup
 
 - いちばん上に上のバーが出る（`docs/specs/app-bar.md`）
-- 上から、戻るリンク（back。Home へ）、primary の等幅の小さな「study setup」、Subject の名前（見出し）
-- 「topic」：丸の付いた行で、Topic の名前を、その Topic の問題が最初に出てくる順に並べ、最後に太字の「All」（全部の Topic）。選んでいる行は primary-soft の地
+- 上から、戻るリンク（「ホームへ戻る」。Home へ）、太字の小さな「解く準備」、Subject の名前（見出し）
+- 「Topic」：丸の付いた行で、Topic の名前を、その Topic の問題が最初に出てくる順に並べ、最後に太字の「All」（全部の Topic）。選んでいる行は primary-soft の地
   - 各行の名前の下に、その Topic（All なら Subject の全部）の身についている具合の線と数を出し、行の右に % を出す（数え方と見せ方は `docs/specs/home.md` の「身についている具合」）
   - 印の付いた問題があれば、数の並びの終わりに「· ⚑1」（flag の印と数は warning）を出す。スマホの幅で数が折り返すときも、「⚑1」の印と数は分けない
   - 選んでいる行でも、線と数の色はほかの行と同じ
-- 「order」：in order・random・lowest accuracy から選ぶ
-  - in order：取り込んだ順（最初の取り込みではファイルの順。取り込み直して増えた問題は最後）
-  - random：start を押すたびにランダムに並べる
-  - lowest accuracy：問題ごとの正答率（全部の回答のうち正解の割合）の低い順。まだ一度も解いていない問題は出さない。正答率が同じ問題は、その中でランダムに並べる
+- 「順番」：順番どおり・ばらばら・苦手な順から選ぶ
+  - 順番どおり：取り込んだ順（最初の取り込みではファイルの順。取り込み直して増えた問題は最後）
+  - ばらばら：解きはじめるを押すたびにランダムに並べる
+  - 苦手な順：問題ごとの正答率（全部の回答のうち正解の割合）の低い順。まだ一度も解いていない問題は出さない。正答率が同じ問題は、その中でランダムに並べる
   - どの順番でも、印の付いた問題（Solve の flag）は出さない
-- 「questions」：all・5・10・20 から選ぶ。出せる問題が選んだ数より少ないときは、ある分だけ出す
-- 開いたときは、All・in order・10 を選んでいる
-- 下に、幅いっぱいの start と、出す問題の数（start · 10 など）。押すと、選んだ問題で Solve が始まる
-- 出せる問題の数（start の数と、下の「has only」の数）は、印の付いた問題を除いて数える
-- 出せる問題が選んだ数より少ないときは、start の上に muted の等幅の小さな文字で「Decorators has only 8 questions to ask.」と出す。All を選んでいるときは、Topic の名前の代わりに Subject の名前（「Python has only 8 questions to ask.」）
-- 選んだ Topic（All なら Subject）に印の付いた問題があり、出せる問題が1問以上あるときは、start の上に「⚑1 flagged excluded」（muted の等幅の小さな文字。flag の印と数は warning）を出す
-- 選んだ Topic（All なら Subject）の問題に全部印が付いていると、どの順番でも、warning の文字で「No questions to ask — all 8 in Typing are flagged.」（問題の数と Topic の名前。All なら Subject の名前）と出し、start · 0 を薄くして押せない
-- lowest accuracy で、全部に印が付いてはいないが、印のない問題に一度でも解いた問題がないときは、warning の文字で「No questions to ask — none in Typing have been answered yet.」と出し、start · 0 を薄くして押せない
-- start を押して問題を読めなかったときは、Setup のまま、start の上に danger の帯「Couldn't load questions.」と retry を出す。retry で、同じ選び方でもう一度始める
+- 「問題数」：すべて・5問・10問・20問から選ぶ。出せる問題が選んだ数より少ないときは、ある分だけ出す
+- 開いたときは、All・順番どおり・10問を選んでいる
+- 下に、幅いっぱいの「10問を解きはじめる」（数は出す問題の数）。出せる問題がないときは「解きはじめる」。押すと、選んだ問題で Solve が始まる
+- 出せる問題の数（解きはじめるの数と、下の「出せるのは」の数）は、印の付いた問題を除いて数える
+- 出せる問題が選んだ数より少ないときは、解きはじめるの上に muted の小さな文字で「Decorators で出せるのは 8 問だけです。」と出す。All を選んでいるときは、Topic の名前の代わりに Subject の名前（「Python で出せるのは 8 問だけです。」）
+- 選んだ Topic（All なら Subject）に印の付いた問題があり、出せる問題が1問以上あるときは、解きはじめるの上に「⚑1 問は不備の印があるので出しません」（muted の小さな文字。flag の印と数は warning）を出す
+- 選んだ Topic（All なら Subject）の問題に全部印が付いていると、どの順番でも、warning の文字で「Typing の 8 問すべてに不備の印があるので、出せる問題がありません。」（問題の数と Topic の名前。All なら Subject の名前）と出し、「解きはじめる」を薄くして押せない
+- 苦手な順で、全部に印が付いてはいないが、印のない問題に一度でも解いた問題がないときは、warning の文字で「Typing にはまだ解いた問題がないので、苦手な順では出せません。」と出し、「解きはじめる」を薄くして押せない
+- 解きはじめるを押して問題を読めなかったときは、Setup のまま、解きはじめるの上に danger の帯「問題を読み込めませんでした。」と「もう一度読み込む」を出す。もう一度読み込むで、同じ選び方でもう一度始める
 - Solve の quit と Result の try again で戻ったときは、直前に選んでいた Topic・順番・問題数のまま。身についている具合は、それまでに答えた分を入れて出す
 - 読み込んでいる間は、Subject の名前の場所と、Topic の行の形の枠を6つ点滅させる
-- 読み込めなかったときは、Subject の名前（見出し）を出さず、danger の帯「Couldn't load this subject.」と retry を出す
+- 読み込めなかったときは、Subject の名前（見出し）を出さず、danger の帯「科目を読み込めませんでした。」と「もう一度読み込む」を出す
 - ない Subject の Setup を開くと、見つからない画面（This page could not be found.）を出す
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 通常 | All・in order・10 を選んでいる。Topic の行と All の行に線・数・%。印の付いた問題があり、Decorators と All に「· ⚑1」、start の上に「⚑1 flagged excluded」 | ![](screens/setup-default.png) |
+| 通常 | All・順番どおり・10問を選んでいる。Topic の行と All の行に線・数・%。印の付いた問題があり、Decorators と All に「· ⚑1」、解きはじめるの上に「⚑1 問は不備の印があるので出しません」 | ![](screens/setup-default.png) |
 | 通常（スマホの幅） | 数が折り返し、「⚑1」は次の行にまとめて出る | ![](screens/setup-default-mobile.png) |
-| 全部に印 | Typing を選び、Typing の行が「0 correct · 0 wrong · 0 new · ⚑8」、線が全部 border、「—」。warning の案内「No questions to ask — all 8 in Typing are flagged.」と、押せない start · 0 | ![](screens/setup-none.png) |
-| 問題が足りない | 案内と、ある分の数の start | ![](screens/setup-few.png) |
-| 解いた問題がない（lowest accuracy） | warning の案内と、押せない start · 0 | ![](screens/setup-unanswered.png) |
+| 全部に印 | Typing を選び、Typing の行が「正解 0 · 不正解 0 · まだ 0 · ⚑8」、線が全部 border、「—」。warning の案内「Typing の 8 問すべてに不備の印があるので、出せる問題がありません。」と、押せない「解きはじめる」 | ![](screens/setup-none.png) |
+| 問題が足りない | 案内と、ある分の数の「8問を解きはじめる」 | ![](screens/setup-few.png) |
+| 解いた問題がない（苦手な順） | warning の案内と、押せない「解きはじめる」 | ![](screens/setup-unanswered.png) |
 | Topic が多い | Topic の行が続く | ![](screens/setup-many.png) |
 
 ## Solve
