@@ -265,4 +265,4 @@ Result の「間違えた問題」の一覧と「間違えた問題を解き直�
 - [x] Result を、大きな得点・数・Topic ごと・日本語にできたら完了（合わせる画像：result-default、result-all-flagged）
 - [x] Manage を日本語にできたら完了（合わせる画像：manage-default、manage-subject-open、manage-topic-open、manage-topics-many、manage-flagged、manage-flagged-empty、manage-empty、manage-many、manage-loading、manage-error、manage-export-error、manage-delete-question、manage-delete-topic、manage-delete-subject、manage-delete-error）
 - [x] Import を、取り込みの誤りの文言も含めて日本語にできたら完了（合わせる画像：import-select、import-checking、import-errors、import-preview、import-preview-new、import-done、import-error）
-- [ ] Settings を日本語にできたら完了（合わせる画像：settings-default、settings-dark、settings-linking、settings-linked、settings-link-error、settings-unlinking、settings-unlink-error）
+- [x] Settings を日本語にできたら完了（合わせる画像：settings-default、settings-dark、settings-linking、settings-linked、settings-link-error、settings-unlinking、settings-unlink-error）
