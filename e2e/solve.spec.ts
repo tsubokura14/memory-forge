@@ -431,7 +431,7 @@ test("答えるたびに数と番号が進み、正解・不正解の帯と、�
   });
 });
 
-test("飛ばすと次に進み、不正解として数える。最後の問題は「結果を見る」で Result に移り、try again で選び方の残った Setup に戻り、答えた分が具合に入る", async ({
+test("飛ばすと次に進み、不正解として数える。最後の問題は「結果を見る」で Result に移り、「もう一度解く」で選び方の残った Setup に戻り、答えた分が具合に入る", async ({
   page,
 }) => {
   await startDecorators(page);
@@ -449,8 +449,8 @@ test("飛ばすと次に進み、不正解として数える。最後の問題�
   await expect(page).toHaveScreenshot("solve-last.png", { fullPage: true });
 
   await page.getByRole("button", { name: /^結果を見る/ }).click();
-  await expect(page.getByText("session complete")).toBeVisible();
-  await button(page, "try again").click();
+  await expect(page.getByText("解き終わりました")).toBeVisible();
+  await button(page, "もう一度解く").click();
   await expect(page.getByRole("radio", { name: "Decorators" })).toBeChecked();
   await expect(start(page)).toHaveText("10問を解きはじめる");
   await expect(page.getByRole("radio", { name: "Decorators" })).toContainText(
@@ -461,10 +461,12 @@ test("飛ばすと次に進み、不正解として数える。最後の問題�
 test("最後の問題で飛ばしても、Result に移る", async ({ page }) => {
   await startDecorators(page);
   for (let i = 1; i <= 10; i++) await button(page, "飛ばす").click();
-  await expect(page.getByText("session complete")).toBeVisible();
+  await expect(page.getByText("解き終わりました")).toBeVisible();
 });
 
-test("result-default：解き終わりの結果", async ({ page }) => {
+test("result-default：解き終わりの結果。得点を大きく出し、正答率と数、Topic ごとの正解の数を出す", async ({
+  page,
+}) => {
   // 正解はどれも C。d4 は前に正解した記録があり、今回間違えるので、線の黄色になる
   await openSetup(page, [
     ...topicQuestions("Decorators", 5),
@@ -487,11 +489,19 @@ test("result-default：解き終わりの結果", async ({ page }) => {
   }
   await button(page, "飛ばす").click();
 
-  await expect(page.getByText("session complete")).toBeVisible();
+  await expect(page.getByText("解き終わりました")).toBeVisible();
+  const main = page.getByRole("main");
+  await expect(main).toContainText("6 / 9問 正解");
+  await expect(main).toContainText("正答率 67%");
+  await expect(main).toContainText("不正解 2");
+  await expect(main).toContainText("飛ばした 1");
+  await expect(main).toContainText("不備の印（数えない） 1");
+  await expect(main).toContainText("Decorators3/4");
+  await expect(page.getByRole("link", { name: "ホームへ戻る" })).toBeVisible();
   await expect(page).toHaveScreenshot("result-default.png", { fullPage: true });
 });
 
-test("solve-many：問題が多いと、37/100 のように出す", async ({ page }) => {
+test("solve-many：問題が多いと、37 / 100 のように出す", async ({ page }) => {
   // 36問をスキップして進むので、ふつうの上限（30秒）では足りない
   test.setTimeout(90_000);
   await openSetup(
@@ -626,8 +636,11 @@ test("result-all-flagged：全部の問題に印を付けると、最後は Resu
     await expect(page.getByText(`${n} / 3`, { exact: true })).toBeVisible();
   }
   await button(page, "不備の印").click();
-  await expect(page.getByText("no questions counted")).toBeVisible();
-  await expect(page.getByText("by topic")).toHaveCount(0);
+  await expect(
+    page.getByText("数える問題がありませんでした（すべてに不備の印）"),
+  ).toBeVisible();
+  await expect(page.getByRole("main")).toContainText("—");
+  await expect(page.getByText("Topic ごと")).toHaveCount(0);
   await expect(page).toHaveScreenshot("result-all-flagged.png", {
     fullPage: true,
   });
@@ -647,7 +660,7 @@ test("solve-answered-flagged：答えたあとに不備の印を付けると、�
   });
 });
 
-test("答えたあとに flag した問題は、Result で flagged に数え、得点に入れない", async ({
+test("答えたあとに不備の印を付けた問題は、Result で不備の印に数え、得点に入れない", async ({
   page,
 }) => {
   await openSetup(page, topicQuestions("Decorators", 1));
@@ -656,7 +669,9 @@ test("答えたあとに flag した問題は、Result で flagged に数え、�
   await button(page, "不備の印").click();
   await expect(button(page, "印を付けた")).toBeVisible();
   await page.getByRole("button", { name: /^結果を見る/ }).click();
-  await expect(page.getByText("no questions counted")).toBeVisible();
+  await expect(
+    page.getByText("数える問題がありませんでした（すべてに不備の印）"),
+  ).toBeVisible();
 });
 
 test("答える前の不備の印を保存できなかったら、帯と「もう一度保存する」を出して進まず、押すと次に進む", async ({
