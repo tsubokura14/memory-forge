@@ -253,7 +253,7 @@ Result の「間違えた問題」の一覧と「間違えた問題を解き直�
 - [x] トークン・書体・アイコンを md-leaf に揃えられたら完了（tokens.css、layout.tsx、icons.tsx、highlight.ts。文言とレイアウトは変えない。全部の画面を撮り直す。合わせる画像：すべての `*-<状態>.png` の色・書体・アイコン）
 - [x] 共通の部品（ボタン、ロゴ、上のバー、ページの上、帯、0件の枠、ダイアログ、一覧、プルダウン、ページ、身についている具合の線）を新しい見た目と日本語にできたら完了（全部の画面を撮り直す。合わせる画像：login-default、home-default、manage-default、manage-delete-question、manage-empty、setup-default）
 - [x] 「続きから」の Subject と N を返す関数ができたら完了（`src/server/subjects/continue.ts`。画面は変えない）
-- [ ] Home を「続きから」のカードと1行の連続日数・日本語にできたら完了（合わせる画像：home-default、home-streak-pending、home-no-streak、home-long、home-streak-loading、home-streak-error、home-empty、home-many、home-loading、home-error）
+- [x] Home を「続きから」のカードと1行の連続日数・日本語にできたら完了（合わせる画像：home-default、home-streak-pending、home-no-streak、home-long、home-streak-loading、home-streak-error、home-empty、home-many、home-loading、home-error）
 - [ ] Login を日本語にできたら完了（合わせる画像：login-default、login-loading、login-google-error、login-server-error）
 - [ ] Setup を日本語にできたら完了（合わせる画像：setup-default、setup-few、setup-none、setup-unanswered、setup-many、setup-loading、setup-error）
 - [ ] Solve を、枠線のない選択肢のカード・missed なし・読み上げの名前・明朝・日本語にできたら完了（合わせる画像：solve-question、solve-answered、solve-explanation、solve-answered-flagged、solve-multiple、solve-answered-multiple、solve-code-choices、solve-answered-code-choices、solve-flagged、solve-last、solve-many、solve-loading、solve-error、solve-quit、solve-no-language）
