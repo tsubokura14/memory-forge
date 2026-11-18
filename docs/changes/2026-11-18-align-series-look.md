@@ -259,7 +259,7 @@ Result の「間違えた問題」の一覧と「間違えた問題を解き直�
 - [x] Login を日本語にできたら完了（合わせる画像：login-default、login-loading、login-google-error、login-server-error）
 - [x] Setup を日本語にできたら完了（合わせる画像：setup-default、setup-few、setup-none、setup-unanswered、setup-many、setup-loading、setup-error）
 - [x] Solve を、枠線のない選択肢のカード・missed なし・読み上げの名前・明朝・日本語にできたら完了（合わせる画像：solve-question、solve-answered、solve-explanation、solve-answered-flagged、solve-multiple、solve-answered-multiple、solve-code-choices、solve-answered-code-choices、solve-flagged、solve-last、solve-many、solve-loading、solve-error、solve-quit、solve-no-language）
-- [ ] Result を、大きな得点・数・Topic ごと・日本語にできたら完了（合わせる画像：result-default、result-all-flagged）
+- [x] Result を、大きな得点・数・Topic ごと・日本語にできたら完了（合わせる画像：result-default、result-all-flagged）
 - [ ] Manage を日本語にできたら完了（合わせる画像：manage-default、manage-subject-open、manage-topic-open、manage-topics-many、manage-flagged、manage-flagged-empty、manage-empty、manage-many、manage-loading、manage-error、manage-export-error、manage-delete-question、manage-delete-topic、manage-delete-subject、manage-delete-error）
 - [ ] Import を、取り込みの誤りの文言も含めて日本語にできたら完了（合わせる画像：import-select、import-checking、import-errors、import-preview、import-preview-new、import-done、import-error）
 - [ ] Settings を日本語にできたら完了（合わせる画像：settings-default、settings-dark、settings-linking、settings-linked、settings-link-error、settings-unlinking、settings-unlink-error）
