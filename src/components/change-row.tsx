@@ -1,3 +1,4 @@
+import { Icon } from "@/components/icons";
 import { RichText } from "./rich-text";
 
 // 置き換わる問題の、開閉する行。行に ID と問題文の1行目（印が付いていたら、右に印と記録が消えること）、開くと変わった項目ごとに前（danger）と後（success）を並べる。
@@ -21,17 +22,18 @@ export function ChangeRow({
       className="group rounded-md border border-border bg-surface"
     >
       <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5 text-sm">
-        <span aria-hidden className="icon text-base text-muted">
-          <span className="group-open:hidden">chevron_right</span>
-          <span className="hidden group-open:inline">expand_more</span>
+        <span aria-hidden className="flex text-base text-muted">
+          <Icon name="chevron-right" className="group-open:hidden" />
+          <Icon
+            name="chevron-down"
+            className="hidden group-open:inline-block"
+          />
         </span>
-        <span className="font-mono">{id}</span>
+        <span>{id}</span>
         <span className="truncate">{text.split("\n")[0]}</span>
         {flagged && (
-          <span className="ml-auto flex shrink-0 items-center gap-1 font-mono text-xs text-warning">
-            <span aria-hidden className="icon text-base leading-none">
-              flag
-            </span>
+          <span className="ml-auto flex shrink-0 items-center gap-1 text-xs text-warning">
+            <Icon name="flag" className="text-base leading-none" />
             flag and records reset
           </span>
         )}
@@ -39,7 +41,7 @@ export function ChangeRow({
       <div className="flex flex-col gap-4 border-t border-border px-4 py-3">
         {changes.map((change) => (
           <div key={change.item} className="flex flex-col gap-1.5">
-            <span className="font-mono text-xs text-muted">{change.item}</span>
+            <span className="text-xs text-muted">{change.item}</span>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <Side
                 label="before"
@@ -90,15 +92,13 @@ function Side({
     <div
       className={`flex flex-col gap-1 rounded-md border px-3 py-2 ${colors.box}`}
     >
-      <span className={`font-mono text-xs ${colors.label}`}>{label}</span>
+      <span className={`text-xs ${colors.label}`}>{label}</span>
       {look !== "plain" ? (
-        <div className={`text-sm ${look === "choice" ? "font-mono" : ""}`}>
+        <div className="text-sm">
           <RichText text={value} />
         </div>
       ) : (
-        <span className="font-mono text-sm break-words whitespace-pre-wrap">
-          {value}
-        </span>
+        <span className="text-sm break-words whitespace-pre-wrap">{value}</span>
       )}
     </div>
   );

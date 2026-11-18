@@ -1,3 +1,4 @@
+import { Icon } from "@/components/icons";
 import type { ManageQuestion } from "@/server/manage/list";
 import { Button } from "./button";
 
@@ -22,7 +23,7 @@ export function QuestionRow({
     >
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <p className="truncate text-sm">{question.text.split("\n")[0]}</p>
-        <p className="flex flex-wrap items-center gap-2 font-mono text-xs text-muted">
+        <p className="flex flex-wrap items-center gap-2 text-xs text-muted">
           <span>{question.questionId}</span>
           <span className={tag}>{question.topic}</span>
           {question.type === "multiple" && <span className={tag}>multi</span>}
@@ -39,9 +40,7 @@ export function QuestionRow({
           className="flex items-center gap-1"
           onClick={onUnflag}
         >
-          <span aria-hidden className="icon text-base leading-none">
-            flag
-          </span>
+          <Icon name="flag" className="text-base leading-none" />
           unflag
         </Button>
       )}

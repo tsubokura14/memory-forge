@@ -14,10 +14,10 @@ export function TopicResultRow({ topic }: { topic: TopicResult }) {
         <span className="bg-warning" style={{ width: width(topic.slipped) }} />
         <span className="bg-danger" style={{ width: width(topic.wrong) }} />
       </span>
-      <span className="w-8 shrink-0 text-right font-mono text-sm text-muted">
+      <span className="w-8 shrink-0 text-right text-sm text-muted">
         {topic.correct}/{topic.total}
       </span>
-      <span className="w-10 shrink-0 text-right font-mono text-sm">
+      <span className="w-10 shrink-0 text-right text-sm">
         {topic.accuracy}%
       </span>
     </li>

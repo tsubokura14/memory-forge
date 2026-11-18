@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/components/icons";
 import { unstable_rethrow } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Banner } from "@/components/banner";
@@ -58,16 +59,12 @@ export function GoogleAccounts({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-start gap-3">
-        <span className="w-20 shrink-0 pt-1 font-mono text-xs text-muted">
-          google
-        </span>
+        <span className="w-20 shrink-0 pt-1 text-xs text-muted">google</span>
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <ul className="flex flex-col gap-2">
             {/* unlink がなくても、ほかの行（md のボタンの高さ）とそろえる */}
-            <li className="flex min-h-9.5 min-w-0 items-center gap-1 font-mono text-sm">
-              <span aria-hidden className="icon text-base leading-none">
-                check
-              </span>
+            <li className="flex min-h-9.5 min-w-0 items-center gap-1 text-sm">
+              <Icon name="check" className="text-base leading-none" />
               <span className="truncate">{owner}</span>
             </li>
             {accounts.map((account) => {
@@ -77,10 +74,8 @@ export function GoogleAccounts({
                   key={account.id}
                   className="flex items-center justify-between gap-3"
                 >
-                  <span className="flex min-w-0 items-center gap-1 font-mono text-sm">
-                    <span aria-hidden className="icon text-base leading-none">
-                      check
-                    </span>
+                  <span className="flex min-w-0 items-center gap-1 text-sm">
+                    <Icon name="check" className="text-base leading-none" />
                     <span className="truncate">{account.email}</span>
                   </span>
                   <Button

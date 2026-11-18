@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/components/icons";
 import { unstable_rethrow } from "next/navigation";
 import { useState } from "react";
 import { Banner } from "@/components/banner";
@@ -188,15 +189,13 @@ export function SolveView({
       <main className="mx-auto flex w-full max-w-page flex-1 flex-col gap-4 px-4 pt-5 pb-8">
         {notice && (
           <Banner tone="warning">
-            <span className="flex items-center gap-1 font-mono">
-              <span aria-hidden className="icon text-base leading-none">
-                flag
-              </span>
+            <span className="flex items-center gap-1">
+              <Icon name="flag" className="text-base leading-none" />
               <span>{`${notice} flagged — moved on without recording.`}</span>
             </span>
           </Banner>
         )}
-        <div className="flex items-center gap-2 font-mono text-xs text-muted">
+        <div className="flex items-center gap-2 text-xs text-muted">
           <span className="rounded-sm border border-border bg-surface px-1.5 py-0.5">
             {multiple ? "multi" : "single"}
           </span>
@@ -210,16 +209,14 @@ export function SolveView({
             disabled={busy}
             onClick={flagged ? undefined : flag}
           >
-            <span aria-hidden className="icon text-base leading-none">
-              flag
-            </span>
+            <Icon name="flag" className="text-base leading-none" />
             {flagged ? "flagged" : "flag"}
           </Button>
         </div>
         {view === "explanation" && result ? (
           <>
             <section className="flex flex-col gap-2 rounded-md border border-border bg-surface p-4">
-              <h2 className="font-mono text-xs text-muted">explanation</h2>
+              <h2 className="text-xs text-muted">explanation</h2>
               <div className="text-base">
                 <RichText text={result.explanation} />
               </div>
@@ -232,7 +229,7 @@ export function SolveView({
               <RichText text={question.text} lineNumbers />
             </div>
             {result && <ResultBanner result={result} />}
-            <div className="flex items-center gap-3 font-mono text-xs text-muted">
+            <div className="flex items-center gap-3 text-xs text-muted">
               <span>{multiple ? "select all that apply" : "choose one"}</span>
               <span className="h-px flex-1 bg-border" />
             </div>
@@ -278,9 +275,7 @@ export function SolveView({
                 <Button size="lg" disabled={busy} onClick={() => advance()}>
                   <span className="flex items-center justify-center gap-1">
                     {last ? "results" : "next"}
-                    <span aria-hidden className="icon text-base">
-                      arrow_forward
-                    </span>
+                    <Icon name="arrow-right" className="text-base" />
                   </span>
                 </Button>
               </div>
@@ -288,7 +283,7 @@ export function SolveView({
           ) : (
             <>
               <p
-                className={`text-center font-mono text-xs text-muted ${selected.length > 0 ? "invisible" : ""}`}
+                className={`text-center text-xs text-muted ${selected.length > 0 ? "invisible" : ""}`}
               >
                 select an option to proceed
               </p>
@@ -350,10 +345,8 @@ function outcomeOf(
 function ResultBanner({ result }: { result: AnswerResult }) {
   return (
     <Banner tone={result.correct ? "success" : "danger"}>
-      <span className="flex items-center gap-1 font-mono">
-        <span aria-hidden className="icon text-base">
-          {result.correct ? "check" : "close"}
-        </span>
+      <span className="flex items-center gap-1">
+        <Icon name={result.correct ? "check" : "x"} className="text-base" />
         <span>
           {result.correct
             ? "correct"

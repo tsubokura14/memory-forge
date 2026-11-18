@@ -46,7 +46,7 @@ export function buttonClass(
   variant: keyof typeof VARIANTS = "primary",
   size: keyof typeof SIZES = "md",
 ) {
-  return `rounded-md font-mono disabled:opacity-50 ${SIZES[size]} ${VARIANTS[variant]} ${textClass(variant, size)}`;
+  return `rounded-md disabled:opacity-50 ${SIZES[size]} ${VARIANTS[variant]} ${textClass(variant, size)}`;
 }
 
 export function Button({

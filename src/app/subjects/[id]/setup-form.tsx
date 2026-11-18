@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/components/icons";
 import { Banner } from "@/components/banner";
 import { Button } from "@/components/button";
 import { MasteryAccuracy, MasteryBar } from "@/components/mastery";
@@ -90,28 +91,26 @@ export function SetupForm({
       </Field>
       <div className="flex flex-col gap-3">
         {stats.flagged > 0 && start.count > 0 && (
-          <p className="flex items-center gap-1 font-mono text-xs text-muted">
+          <p className="flex items-center gap-1 text-xs text-muted">
             <span className="flex items-center gap-0.5 text-warning">
-              <span aria-hidden className="icon text-sm leading-none">
-                flag
-              </span>
+              <Icon name="flag" className="text-sm leading-none" />
               {stats.flagged}
             </span>{" "}
             flagged excluded
           </p>
         )}
         {start.notice === "few" && (
-          <p className="font-mono text-xs text-muted">
+          <p className="text-xs text-muted">
             {scope} has only {start.count} questions to ask.
           </p>
         )}
         {start.notice === "unanswered" && (
-          <p className="font-mono text-xs text-warning">
+          <p className="text-xs text-warning">
             No questions to ask — none in {scope} have been answered yet.
           </p>
         )}
         {start.notice === "flagged" && (
-          <p className="font-mono text-xs text-warning">
+          <p className="text-xs text-warning">
             No questions to ask — all {stats.flagged} in {scope} are flagged.
           </p>
         )}
@@ -157,7 +156,7 @@ function Field({
 }) {
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="font-mono text-xs text-muted">{label}</h2>
+      <h2 className="text-xs text-muted">{label}</h2>
       {children}
     </section>
   );

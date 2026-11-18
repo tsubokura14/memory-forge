@@ -1,3 +1,4 @@
+import { Icon } from "@/components/icons";
 import type { Mastery } from "@/server/mastery/mastery";
 
 // docs/ui.md の「今の身についている具合」の、名前の下に出す線と数。
@@ -24,7 +25,7 @@ export function MasteryBar({
         />
         <span className="bg-danger" style={{ width: width(mastery.wrong) }} />
       </span>
-      <span className="font-mono text-xs text-muted">
+      <span className="text-xs text-muted">
         <span className="text-success">{mastery.correct}</span> correct ·{" "}
         <span className="text-danger">{mastery.wrong}</span> wrong ·{" "}
         {mastery.new} new
@@ -34,9 +35,7 @@ export function MasteryBar({
             · {/* 折り返しても、flag の印と数は分けない */}
             {/* 印は文字より大きいので、下にそろえて行の高さを増やさない */}
             <span className="inline-flex items-center gap-0.5 align-bottom whitespace-nowrap text-warning">
-              <span aria-hidden className="icon text-sm leading-none">
-                flag
-              </span>
+              <Icon name="flag" className="text-sm leading-none" />
               {flagged}
             </span>
           </>
@@ -49,7 +48,7 @@ export function MasteryBar({
 // 行の右に出す %。解いた問題がないときは「—」。TopicResultRow の % と同じ幅で右にそろえる
 export function MasteryAccuracy({ accuracy }: { accuracy: number | null }) {
   return (
-    <span className="w-10 shrink-0 text-right font-mono text-sm">
+    <span className="w-10 shrink-0 text-right text-sm">
       {accuracy === null ? "—" : `${accuracy}%`}
     </span>
   );

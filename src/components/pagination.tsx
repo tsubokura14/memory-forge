@@ -1,3 +1,4 @@
+import { Icon } from "@/components/icons";
 import { pageItems } from "@/server/manage/pages";
 
 // ページの前後のボタンと番号（docs/ui.md の「ページ」）。今のページは primary の地。
@@ -14,7 +15,7 @@ export function Pagination({
   const items = pageItems(page, last);
   if (items.length === 0) return null;
   const box =
-    "flex h-7 min-w-7 items-center justify-center rounded-md border px-1.5 font-mono text-xs disabled:opacity-50";
+    "flex h-7 min-w-7 items-center justify-center rounded-md border px-1.5 text-xs disabled:opacity-50";
 
   return (
     <nav aria-label="pages" className="flex items-center gap-1">
@@ -25,15 +26,13 @@ export function Pagination({
         onClick={() => onPage(page - 1)}
         className={`${box} border-border bg-surface`}
       >
-        <span aria-hidden className="icon text-base leading-none">
-          chevron_left
-        </span>
+        <Icon name="chevron-left" className="text-base leading-none" />
       </button>
       {items.map((item, i) =>
         item === "…" ? (
           <span
             key={`gap-${i}`}
-            className="hidden px-1 font-mono text-xs text-muted sm:inline"
+            className="hidden px-1 text-xs text-muted sm:inline"
           >
             …
           </span>
@@ -54,7 +53,7 @@ export function Pagination({
           </button>
         ),
       )}
-      <span className="px-2 font-mono text-xs sm:hidden">
+      <span className="px-2 text-xs sm:hidden">
         {page} / {last}
       </span>
       <button
@@ -64,9 +63,7 @@ export function Pagination({
         onClick={() => onPage(page + 1)}
         className={`${box} border-border bg-surface`}
       >
-        <span aria-hidden className="icon text-base leading-none">
-          chevron_right
-        </span>
+        <Icon name="chevron-right" className="text-base leading-none" />
       </button>
     </nav>
   );

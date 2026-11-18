@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/components/icons";
 import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
 import { useState } from "react";
@@ -101,11 +102,9 @@ export function ImportFlow() {
         title="Import"
       >
         {phase.kind === "preview" && (
-          <p className="flex flex-wrap items-center gap-1 font-mono text-sm">
+          <p className="flex flex-wrap items-center gap-1 text-sm">
             <span className="text-muted">{phase.fileName}</span>
-            <span aria-hidden className="icon text-base text-muted">
-              arrow_forward
-            </span>
+            <Icon name="arrow-right" className="text-base text-muted" />
             <span>{phase.preview.subject}</span>
             {phase.preview.isNewSubject && (
               <span className="ml-1 rounded-sm border border-success px-1.5 text-xs text-success">
@@ -149,10 +148,8 @@ export function ImportFlow() {
           busy
           onFile={() => {}}
         >
-          <p className="font-mono text-sm">{phase.fileName}</p>
-          <p className="animate-pulse font-mono text-xs text-muted">
-            checking…
-          </p>
+          <p className="text-sm">{phase.fileName}</p>
+          <p className="animate-pulse text-xs text-muted">checking…</p>
         </DropZone>
       )}
 
@@ -160,8 +157,7 @@ export function ImportFlow() {
         <>
           <Banner>
             {countProblems(phase.errors.length)} found in{" "}
-            <span className="font-mono">{phase.fileName}</span>. Nothing was
-            imported.
+            <span>{phase.fileName}</span>. Nothing was imported.
           </Banner>
           <ErrorList errors={phase.errors} />
           <Footer>
@@ -193,7 +189,7 @@ export function ImportFlow() {
           </div>
           {phase.preview.replaced.length > 0 && (
             <section className="mt-4 flex flex-col gap-2">
-              <h2 className="font-mono text-xs text-muted">
+              <h2 className="text-xs text-muted">
                 replaced — records are kept, except for flagged questions
               </h2>
               {phase.preview.replaced.map((question, index) => (
@@ -232,13 +228,11 @@ export function ImportFlow() {
 
       {phase.kind === "done" && (
         <div className="flex flex-col items-center gap-2 rounded-md border border-success bg-success-soft px-4 py-8 text-center">
-          <p className="flex items-center gap-1 font-mono text-base text-success">
-            <span aria-hidden className="icon text-base">
-              check
-            </span>
+          <p className="flex items-center gap-1 text-base text-success">
+            <Icon name="check" className="text-base" />
             imported into {phase.subject}
           </p>
-          <p className="font-mono text-xs text-muted">
+          <p className="text-xs text-muted">
             {phase.counts.added} new · {phase.counts.replaced} replaced ·{" "}
             {phase.counts.unchanged} unchanged
           </p>

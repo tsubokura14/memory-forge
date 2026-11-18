@@ -14,7 +14,7 @@ export function AppBar({
           <Logo size="sm" />
         </Link>
         <form action={signOutAction} className="flex">
-          <button type="submit" className="font-mono text-sm text-muted">
+          <button type="submit" className="text-sm text-muted">
             sign out
           </button>
         </form>

@@ -1,3 +1,4 @@
+import { Icon } from "@/components/icons";
 import type { DayStreak, WeekDay } from "@/server/streak/day-streak";
 
 // docs/ui.md の「連続日数」。左に炎と日数、右に今週の7日、下に今日の様子
@@ -23,14 +24,13 @@ export function DayStreakCard({ streak }: { streak: DayStreak }) {
     <div className="flex flex-col gap-4 rounded-md border border-border bg-surface p-4 sm:p-5">
       <div className="flex items-center justify-between gap-2">
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <Icon
+            name="flame"
+            filled={lit}
+            className={`text-xl sm:text-display ${lit ? "text-flame" : "text-muted"}`}
+          />
           <span
-            aria-hidden
-            className={`icon text-xl leading-none sm:text-display sm:leading-none ${lit ? "icon-fill text-flame" : "text-muted"}`}
-          >
-            local_fire_department
-          </span>
-          <span
-            className={`font-display text-display font-bold ${NUMBER_COLOR[streak.today]}`}
+            className={`text-display font-bold ${NUMBER_COLOR[streak.today]}`}
           >
             {streak.days}
           </span>
@@ -44,7 +44,7 @@ export function DayStreakCard({ streak }: { streak: DayStreak }) {
             >
               <DayMark day={day} />
               <span
-                className={`font-mono text-xs ${i === streak.todayIndex ? "text-flame" : "text-muted"}`}
+                className={`text-xs ${i === streak.todayIndex ? "text-flame" : "text-muted"}`}
               >
                 <span className="hidden sm:inline">{WEEKDAYS[i][0]}</span>
                 <span className="sm:hidden">{WEEKDAYS[i][1]}</span>
@@ -58,7 +58,7 @@ export function DayStreakCard({ streak }: { streak: DayStreak }) {
           ))}
         </ol>
       </div>
-      <div className="border-t border-border pt-4 font-mono text-xs">
+      <div className="border-t border-border pt-4 text-xs">
         <TodayStatus today={streak.today} />
       </div>
     </div>
@@ -78,17 +78,16 @@ function DayMark({ day }: { day: WeekDay }) {
     );
   }
   const style = {
-    answered: "icon-fill text-flame",
+    answered: "text-flame",
     pending: "animate-pulse text-flame",
     missed: "text-border",
   }[day];
   return (
-    <span
-      aria-hidden
-      className={`icon text-lg leading-none sm:text-xl sm:leading-none ${style}`}
-    >
-      local_fire_department
-    </span>
+    <Icon
+      name="flame"
+      filled={day === "answered"}
+      className={`text-lg sm:text-xl ${style}`}
+    />
   );
 }
 
@@ -96,9 +95,7 @@ function TodayStatus({ today }: { today: DayStreak["today"] }) {
   if (today === "done") {
     return (
       <p className="flex items-center gap-1 text-success">
-        <span aria-hidden className="icon text-sm leading-none">
-          check
-        </span>
+        <Icon name="check" className="text-sm leading-none" />
         done today
       </p>
     );

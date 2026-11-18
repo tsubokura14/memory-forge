@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/components/icons";
 import { useState, useTransition } from "react";
 import { Banner } from "@/components/banner";
 import { Button } from "@/components/button";
@@ -238,9 +239,7 @@ export function ManageView({
               })
             }
           >
-            <span aria-hidden className="icon text-base leading-none">
-              flag
-            </span>
+            <Icon name="flag" className="text-base leading-none" />
             flagged
           </Button>
         </div>
@@ -273,7 +272,7 @@ export function ManageView({
         ) : (
           <>
             <div className="flex min-h-7 items-center justify-between gap-3">
-              <p className="font-mono text-xs">
+              <p className="text-xs">
                 {first} <span className="text-muted">of</span> {rest.join("")}
               </p>
               <Pagination
@@ -393,9 +392,7 @@ function DeleteIcon({
       aria-label={label}
       onClick={onClick}
     >
-      <span aria-hidden className="icon text-lg leading-none">
-        delete
-      </span>
+      <Icon name="trash-2" className="text-lg leading-none" />
     </Button>
   );
 }
@@ -423,7 +420,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5 sm:w-64">
-      <span aria-hidden className="font-mono text-xs text-muted">
+      <span aria-hidden className="text-xs text-muted">
         {label}
       </span>
       <div className="flex gap-2">{children}</div>

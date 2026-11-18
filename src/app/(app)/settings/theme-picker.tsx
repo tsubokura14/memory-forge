@@ -27,7 +27,7 @@ export function ThemePicker() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
-        <span className="w-20 font-mono text-xs text-muted">theme</span>
+        <span className="w-20 text-xs text-muted">theme</span>
         {/* Segmented のボタンは横の余白を持たず、幅いっぱいに等分して広がるので、外から幅を決めて、合意したスクリーンショットの幅（3つで約 236px）にする */}
         <div className="w-59">
           <Segmented

@@ -31,11 +31,11 @@ export function AccuracyRing({ accuracy }: { accuracy: number | null }) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         {accuracy === null ? (
-          <span className="font-mono text-lg text-muted">—</span>
+          <span className="text-lg text-muted">—</span>
         ) : (
-          <span className="font-mono text-lg">{accuracy}%</span>
+          <span className="text-lg">{accuracy}%</span>
         )}
-        <span className="font-mono text-xs text-muted">accuracy</span>
+        <span className="text-xs text-muted">accuracy</span>
       </div>
     </div>
   );

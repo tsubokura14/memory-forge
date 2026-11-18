@@ -38,7 +38,7 @@ export function ResultView({
                   {result.total}
                 </p>
               )}
-              <p className="font-mono text-xs text-muted">
+              <p className="text-xs text-muted">
                 {result.accuracy === null
                   ? "no questions counted"
                   : "questions correct"}
@@ -62,7 +62,7 @@ export function ResultView({
         </div>
         {result.accuracy !== null && (
           <section className="flex flex-col gap-2">
-            <h2 className="font-mono text-xs text-muted">by topic</h2>
+            <h2 className="text-xs text-muted">by topic</h2>
             <ul className="divide-y divide-border rounded-md border border-border bg-surface">
               {result.topics.map((topic) => (
                 <TopicResultRow key={topic.name} topic={topic} />

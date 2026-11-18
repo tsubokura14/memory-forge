@@ -23,24 +23,18 @@ export function SolveBar({
           type="button"
           onClick={onQuit}
           disabled={!onQuit}
-          className="flex items-center gap-1 font-mono text-sm text-muted disabled:opacity-50"
+          className="flex items-center gap-1 text-sm text-muted disabled:opacity-50"
         >
-          <span aria-hidden className="icon text-base">
-            arrow_back
-          </span>
+          <Icon name="arrow-left" className="text-base" />
           quit
         </button>
-        <div className="flex items-center gap-3 font-mono text-sm">
+        <div className="flex items-center gap-3 text-sm">
           <span className="flex items-center gap-0.5 text-success">
-            <span aria-hidden className="icon text-base">
-              check
-            </span>
+            <Icon name="check" className="text-base" />
             <span aria-label="correct answers">{correct}</span>
           </span>
           <span className="flex items-center gap-0.5 text-danger">
-            <span aria-hidden className="icon text-base">
-              close
-            </span>
+            <Icon name="x" className="text-base" />
             <span aria-label="wrong answers">{wrong}</span>
           </span>
           <span className="text-muted">
@@ -54,3 +48,5 @@ export function SolveBar({
     </header>
   );
 }
+
+import { Icon } from "@/components/icons";

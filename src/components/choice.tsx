@@ -50,10 +50,10 @@ export function Choice({
       aria-pressed={selected}
       disabled={disabled}
       onClick={onClick}
-      className={`flex gap-3 rounded-md border px-3 py-3 text-left font-mono text-sm ${hasCode ? "flex-col sm:flex-row sm:items-start" : "items-start"} ${row}`}
+      className={`flex gap-3 rounded-md border px-3 py-3 text-left text-sm ${hasCode ? "flex-col sm:flex-row sm:items-start" : "items-start"} ${row}`}
     >
       <span
-        className={`flex size-6 shrink-0 items-center justify-center border font-mono text-xs ${multiple ? "rounded-sm" : "rounded-full"} ${badge}`}
+        className={`flex size-6 shrink-0 items-center justify-center border text-xs ${multiple ? "rounded-sm" : "rounded-full"} ${badge}`}
       >
         {letter}
       </span>
@@ -64,7 +64,7 @@ export function Choice({
       </span>
       {mark === "missed" && (
         <span
-          className={`shrink-0 font-mono text-xs text-success ${hasCode ? "self-end sm:self-center" : "self-center"}`}
+          className={`shrink-0 text-xs text-success ${hasCode ? "self-end sm:self-center" : "self-center"}`}
         >
           missed
         </span>

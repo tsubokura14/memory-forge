@@ -1,3 +1,4 @@
+import { Icon } from "@/components/icons";
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
@@ -17,20 +18,20 @@ export default function Home() {
   return (
     <main className="mx-auto flex max-w-page flex-col gap-6 px-4 pt-6 pb-10">
       <section className="flex flex-col gap-2">
-        <h2 className="font-mono text-xs text-muted">day streak</h2>
+        <h2 className="text-xs text-muted">day streak</h2>
         {/* Subject の一覧とは別に読み込み、別に失敗を出す */}
         <Suspense fallback={<DayStreakSkeleton />}>
           <DayStreakSection />
         </Suspense>
       </section>
       <section className="flex flex-col gap-2">
-        <h2 className="font-mono text-xs text-muted">menu</h2>
+        <h2 className="text-xs text-muted">menu</h2>
         <div className="grid gap-2 sm:grid-cols-2">
           <Link
             href="/manage"
             className="flex flex-col gap-0.5 rounded-md border border-border bg-surface px-3 py-3 hover:bg-surface-raised"
           >
-            <span className="font-mono text-sm">manage</span>
+            <span className="text-sm">manage</span>
             <span className="text-xs text-muted">
               Import, export, delete, flagged
             </span>
@@ -39,13 +40,13 @@ export default function Home() {
             href="/settings"
             className="flex flex-col gap-0.5 rounded-md border border-border bg-surface px-3 py-3 hover:bg-surface-raised"
           >
-            <span className="font-mono text-sm">settings</span>
+            <span className="text-sm">settings</span>
             <span className="text-xs text-muted">Theme</span>
           </Link>
         </div>
       </section>
       <section className="flex flex-col gap-2">
-        <h2 className="font-mono text-xs text-muted">subjects</h2>
+        <h2 className="text-xs text-muted">subjects</h2>
         <Suspense fallback={<SubjectsSkeleton />}>
           <Subjects />
         </Suspense>
@@ -124,12 +125,10 @@ async function Subjects() {
               </span>
               <MasteryAccuracy accuracy={m.accuracy} />
               {/* 印の行の高さで行が高くならないように、行の高さを文字の大きさにそろえる */}
-              <span
-                aria-hidden
-                className="icon shrink-0 text-lg leading-none text-muted"
-              >
-                chevron_right
-              </span>
+              <Icon
+                name="chevron-right"
+                className="shrink-0 text-lg leading-none text-muted"
+              />
             </Link>
           </li>
         );

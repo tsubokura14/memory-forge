@@ -19,14 +19,14 @@ export default function SettingsPage({ searchParams }: PageProps<"/settings">) {
     <main className="mx-auto flex max-w-page flex-col gap-6 px-4 pt-6 pb-10">
       <PageHeader back={{ href: "/", label: "home" }} title="Settings" />
       <section className="flex flex-col gap-2">
-        <h2 className="font-mono text-xs text-muted">account</h2>
+        <h2 className="text-xs text-muted">account</h2>
         {/* 仕様では読み込み中の別の表示はないので、読み終わるまで何も出さない */}
         <Suspense fallback={null}>
           <AccountCard searchParams={searchParams} />
         </Suspense>
       </section>
       <section className="flex flex-col gap-2">
-        <h2 className="font-mono text-xs text-muted">appearance</h2>
+        <h2 className="text-xs text-muted">appearance</h2>
         <div className="rounded-md border border-border bg-surface px-4 py-3">
           <ThemePicker />
         </div>
@@ -66,7 +66,7 @@ async function AccountCard({
           />
         ) : (
           <div className="flex items-start gap-3">
-            <span className="w-20 shrink-0 pt-2 font-mono text-xs text-muted">
+            <span className="w-20 shrink-0 pt-2 text-xs text-muted">
               google
             </span>
             <div className="min-w-0 flex-1">

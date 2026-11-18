@@ -33,7 +33,7 @@ export function DropZone({
       {children ?? (
         <>
           <p className="text-base">Drop a question file here</p>
-          <p className="font-mono text-xs text-muted">{hint}</p>
+          <p className="text-xs text-muted">{hint}</p>
           <Button
             type="button"
             className="mt-3"

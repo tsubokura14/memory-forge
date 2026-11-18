@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/components/icons";
 import { useEffect, useId, useRef, useState } from "react";
 
 export type DropdownOption = {
@@ -62,9 +63,10 @@ export function Dropdown({
         }`}
       >
         <span className="truncate">{current?.label}</span>
-        <span aria-hidden className="icon text-lg leading-none text-muted">
-          {open ? "expand_less" : "expand_more"}
-        </span>
+        <Icon
+          name="chevron-down"
+          className={`text-lg text-muted ${open ? "rotate-180" : ""}`}
+        />
       </button>
       {open && (
         <ul
@@ -94,22 +96,20 @@ export function Dropdown({
                       : "hover:bg-surface-raised"
                   }`}
                 >
-                  <span aria-hidden className="icon w-4 text-base leading-none">
-                    {isSelected ? "check" : ""}
+                  <span aria-hidden className="flex w-4 text-base">
+                    {isSelected && <Icon name="check" />}
                   </span>
                   <span className="min-w-0 flex-1 truncate">
                     {option.label}
                   </span>
                   {!!option.flagged && (
-                    <span className="flex items-center gap-1 font-mono text-xs text-warning">
-                      <span aria-hidden className="icon text-sm leading-none">
-                        flag
-                      </span>
+                    <span className="flex items-center gap-1 text-xs text-warning">
+                      <Icon name="flag" className="text-sm leading-none" />
                       {option.flagged}
                     </span>
                   )}
                   {/* 桁の違う行でも、印の数の位置をそろえる */}
-                  <span className="min-w-8 text-right font-mono text-xs text-muted">
+                  <span className="min-w-8 text-right text-xs text-muted">
                     {option.count}
                   </span>
                 </button>

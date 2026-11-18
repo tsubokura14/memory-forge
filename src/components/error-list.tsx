@@ -12,8 +12,8 @@ export function ErrorList({
           key={`${index}-${error.id}-${error.item}`}
           className="flex flex-col gap-1 px-4 py-2.5 text-sm sm:flex-row sm:items-baseline sm:gap-0"
         >
-          <span className="font-mono sm:w-23 sm:shrink-0">{error.id}</span>
-          <span className="font-mono text-xs text-muted sm:w-27 sm:shrink-0">
+          <span className="sm:w-23 sm:shrink-0">{error.id}</span>
+          <span className="text-xs text-muted sm:w-27 sm:shrink-0">
             {error.item}
           </span>
           <span>{error.message}</span>
