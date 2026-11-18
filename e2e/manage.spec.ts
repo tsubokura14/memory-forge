@@ -386,7 +386,10 @@ test("最後の Subject を消すと前の Subject、Subject が1つもなくな
   await expect(dropdown(page, "科目")).toHaveText(/Python/);
 
   // 最後の1問を消すと、Subject も消える
-  await rows(page).first().getByRole("button", { name: "削除", exact: true }).click();
+  await rows(page)
+    .first()
+    .getByRole("button", { name: "削除", exact: true })
+    .click();
   await dialog(page).getByRole("button", { name: "削除する" }).click();
   await expect(page.getByText("まだ科目がありません。")).toBeVisible();
 });
@@ -424,7 +427,10 @@ test("manage-delete-topic：All topics では Topic の delete を出さず、To
 test("manage-delete-question：1問を消す", async ({ page }) => {
   await resetPython();
   await openManage(page);
-  await rows(page).first().getByRole("button", { name: "削除", exact: true }).click();
+  await rows(page)
+    .first()
+    .getByRole("button", { name: "削除", exact: true })
+    .click();
   await expect(dialog(page)).toContainText(
     "次のコードを実行したとき、出力されるものはどれか。",
   );
@@ -443,7 +449,10 @@ test("1問を消して今のページが空になったら、前のページを�
   await openManage(page);
   await page.getByRole("button", { name: "2ページ" }).click();
   await expect(page.getByText("51問中 51–51")).toBeVisible();
-  await rows(page).first().getByRole("button", { name: "削除", exact: true }).click();
+  await rows(page)
+    .first()
+    .getByRole("button", { name: "削除", exact: true })
+    .click();
   await dialog(page).getByRole("button", { name: "削除する" }).click();
   await expect(page.getByText("50問中 1–50")).toBeVisible();
 });
@@ -457,7 +466,10 @@ test("消している間は cancel と delete を押せず、Esc でも閉じな
   await page.route("/manage", async (route) => {
     if (!isServerAction(route.request())) await route.continue();
   });
-  await rows(page).first().getByRole("button", { name: "削除", exact: true }).click();
+  await rows(page)
+    .first()
+    .getByRole("button", { name: "削除", exact: true })
+    .click();
   await dialog(page).getByRole("button", { name: "削除する" }).click();
   await expect(
     dialog(page).getByRole("button", { name: "削除する" }),
@@ -481,7 +493,9 @@ test("manage-delete-error：消せなかったら、ダイアログの中に帯�
   );
   await page.getByRole("button", { name: "Topic を削除" }).click();
   await dialog(page).getByRole("button", { name: "削除する" }).click();
-  await expect(dialog(page).getByRole("alert")).toHaveText("削除できませんでした。");
+  await expect(dialog(page).getByRole("alert")).toHaveText(
+    "削除できませんでした。",
+  );
   await expect(page).toHaveScreenshot("manage-delete-error.png", {
     fullPage: true,
   });
@@ -557,7 +571,9 @@ test("export flagged で、Topic で絞っていても Subject の印の付い�
   await choose(page, "Topic", "Decorators");
   await expect(rows(page)).toHaveCount(1);
   const download = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Python の不備の印を書き出す" }).click();
+  await page
+    .getByRole("button", { name: "Python の不備の印を書き出す" })
+    .click();
   const file = await download;
   expect(file.suggestedFilename()).toBe("python.json");
   expect((await readJson(file)).questions).toHaveLength(2);
@@ -569,7 +585,9 @@ test("manage-flagged-empty：Subject に印がなければ、0件の表示で ex
   await resetPython([], []);
   await openManage(page);
   await flaggedButton(page).click();
-  await expect(page.getByText("Python に不備の印の付いた問題はありません。")).toBeVisible();
+  await expect(
+    page.getByText("Python に不備の印の付いた問題はありません。"),
+  ).toBeVisible();
   await expect(page.getByRole("button", { name: /書き出す$/ })).toHaveCount(0);
   await expect(page).toHaveScreenshot("manage-flagged-empty.png", {
     fullPage: true,
@@ -584,7 +602,9 @@ test("flagged を Topic で絞って0件なら Topic の名前を出し、Subjec
   await flaggedButton(page).click();
   await expect(rows(page)).toHaveCount(2);
   await choose(page, "Topic", "Typing");
-  await expect(page.getByText("Typing に不備の印の付いた問題はありません。")).toBeVisible();
+  await expect(
+    page.getByText("Typing に不備の印の付いた問題はありません。"),
+  ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Python の不備の印を書き出す" }),
   ).toBeVisible();
@@ -611,7 +631,9 @@ test("flagged の一覧で unflag すると行が消え、全部外すと0件の
   await unflag(page, "p81xq0").click();
   await expect(rows(page)).toHaveCount(1);
   await unflag(page, "c0y8u3").click();
-  await expect(page.getByText("Python に不備の印の付いた問題はありません。")).toBeVisible();
+  await expect(
+    page.getByText("Python に不備の印の付いた問題はありません。"),
+  ).toBeVisible();
   await expect(page.getByRole("button", { name: /書き出す$/ })).toHaveCount(0);
 });
 

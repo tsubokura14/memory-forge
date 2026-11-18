@@ -105,7 +105,11 @@ describe("validateQuestionFile", () => {
 
   test("種類が single・multiple でないと誤りになる", () => {
     expect(errorsOf(file([question({ type: "multi" })]))).toEqual([
-      { id: "k3f9a2", item: "type", message: "single か multiple にしてください。" },
+      {
+        id: "k3f9a2",
+        item: "type",
+        message: "single か multiple にしてください。",
+      },
     ]);
   });
 
@@ -123,7 +127,11 @@ describe("validateQuestionFile", () => {
       expect(
         errorsOf(file([question({ choices: choices(n), correct: ["A"] })])),
       ).toEqual([
-        { id: "k3f9a2", item: "choices", message: "選択肢は2〜8個にしてください。" },
+        {
+          id: "k3f9a2",
+          item: "choices",
+          message: "選択肢は2〜8個にしてください。",
+        },
       ]);
     }
   });
