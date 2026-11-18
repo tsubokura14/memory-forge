@@ -7,8 +7,8 @@ import { Button } from "@/components/button";
 import { type SignInState, signInWithGoogleAction } from "./actions";
 
 const MESSAGES: Record<Exclude<SignInState["result"], "idle">, string> = {
-  error: "Couldn't sign in. Please try again.",
-  notLinked: "This Google account isn't linked.",
+  error: "ログインできませんでした。もう一度お試しください。",
+  notLinked: "この Google アカウントは紐づけられていません。",
 };
 
 export function SignInForm({
@@ -39,7 +39,7 @@ export function SignInForm({
         {state.result !== "idle" && <Banner>{MESSAGES[state.result]}</Banner>}
         {next && <input type="hidden" name="next" value={next} />}
         <Button type="submit">
-          {pending ? "signing in…" : "sign in with google"}
+          {pending ? "ログインしています…" : "Google でログインする"}
         </Button>
       </fieldset>
     </form>
