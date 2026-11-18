@@ -51,9 +51,9 @@ memory-forge と md-leaf を、同じ人が作ったシリーズのアプリに�
 
 ### 見た目の決まり（仕上げで `docs/ui.md` に移す）
 
-- 書体は md-leaf と同じものだけを使い、Web フォントで読み込むのは連続日数の数字（Unbounded）と、日本語の書体がない端末のための Noto Sans JP だけにする
+- 書体は md-leaf と同じものだけを使い、Web フォントで読み込むのは連続日数の数字（Unbounded）と、日本語の書体がない端末のための Noto Sans JP と、等幅の書体がない端末のための Geist Mono だけにする（画面の画像を Docker の中で決まった書体で撮るため）
   - 画面の部品：ヒラギノ角ゴ → 游ゴシック UI → Noto Sans JP（md-leaf の font-ui と同じ並び）
-  - コード：OS の等幅（ui-monospace → SFMono-Regular → Consolas。md-leaf の font-mono と同じ）。Geist と Geist Mono は使わない
+  - コード：OS の等幅（ui-monospace → SFMono-Regular → Consolas。md-leaf の font-mono と同じ）→ 最後に Geist Mono。Geist は使わない
 - 太さは、ふつう（400）と太字（700）の2つ（md-leaf と同じ）。太字にするのは、アプリ名、画面の見出し、枠の外の上の小さな見出し（day streak、menu など）
 - 色の値は md-leaf に揃える（ライトもダークも）。memory-forge だけにあるもの（差し色の藍、炎の弁柄色、border-strong）だけを足し、ダークの藍は暖かい地に浮かないよう彩度を落とした色にする
 - 差し色は藍の1色だけ（md-leaf の「差し色は若葉の1色だけ」と同じ考え方）。ふだんの画面に出る色は、地・文字・muted・藍だけにする。例外は連続日数の枠の中の弁柄色（flame）だけ
@@ -71,6 +71,7 @@ memory-forge と md-leaf を、同じ人が作ったシリーズのアプリに�
     - 答えたあと：選んで正解は success で塗りつぶす。選ばなかった正解は success の文字、選んで間違えたものは danger の文字（どちらも塗らない）
   - カードの内側の余白は、左右 px-4・上下 py-3。地の色はゆっくり変える（指を乗せたとき）
   - 札や文字は付けず、行の右端には何も置かない（今の「missed」もやめる）
+  - 答えたあとの状態は、見た目は変えず、読み上げ用の名前（`aria-label` など）でも伝える（正解、選んで間違えた、など）
 - 点線・破線は使わない。0件の表示も、border の実線の枠にする（`docs/ui.md` の「0件：点線の枠」を直す）
 
 ### 色の値（仕上げで `src/styles/tokens.css` に書く）
@@ -98,7 +99,7 @@ memory-forge と md-leaf を、同じ人が作ったシリーズのアプリに�
 - -soft の色（primary-soft、success-soft、danger-soft、warning-soft）は、元の色を地（bg）に混ぜて作る。割合はライトで primary 10%・success と danger 12%・warning 14%、ダークはどれも 14%
 - 文字の大きさ：xs 0.75rem、sm 0.875rem、base 1.0625rem（行の高さ 1.75rem）、lg 1.25rem（行の高さ 1.75rem）。xl と display は今のまま
 - 角の丸み：sm 2px、md 4px。浮かせるものの影：`0 4px 16px rgb(0 0 0 / 0.12)`（ライトもダークも同じ。md-leaf と同じ）
-- アイコン：24 の方眼、線の太さ 2、線の端と角は丸（md-leaf と同じ）。形は Lucide のもの（check、x、flag、arrow-left、arrow-right、chevron-right、chevron-left、chevron-down、book-open、external-link、trash-2、flame、hammer）。炎は灯ったら同じ形を塗りつぶす。ロゴは hammer を傾けずに置く
+- アイコン：24 の方眼、線の太さ 2、線の端と角は丸（md-leaf と同じ）。形は Lucide のもの（check、x、flag、arrow-left、arrow-right、chevron-right、chevron-left、chevron-down、book-open、external-link、trash-2、flame、hammer）。炎は灯ったら同じ形を塗りつぶす。ロゴは hammer を傾けずに置く。書き写したファイルの先頭のコメントに、Lucide の著作権とライセンス（ISC）の文を書く
 
 ## やらないこと
 
@@ -119,10 +120,10 @@ memory-forge と md-leaf を、同じ人が作ったシリーズのアプリに�
 - [x] 文字の大きさと詰め方は？（推す答え：md-leaf の画面の部品の段階に合わせ、今より一回り大きく・行間を広くする。日本語にするときに読みやすい。比べた案：今の詰めた大きさのまま＝1画面に多く並ぶが、シリーズの手触りが揃わない） → md-leaf の段階に合わせる（おすすめのまま）
 - [x] 地の上の白いカード（上のバー、選択肢、枠）は？（推す答え：md-leaf と同じく、白を使わず地と同じ色にし、枠で囲む。比べた案：白いカードを残す＝面が分かりやすいが、md-leaf にない見せ方になる） → 白をやめ、地と同じ色にして枠で囲む（おすすめのまま）。ただし選択肢（Solve）だけは、あとで枠線のない surface-raised の地のカードに決め直した（「見た目の決まり」の選択肢）
 - [x] 連続日数の数字の書体（Unbounded）は？（推す答え：残す。「ごほうび」の見た目で、memory-forge だけの見せ場にしてよい） → 残す（おすすめのまま）
-- [ ] コードの等幅の書体と、画面の画像の比べは？（Docker の中には ui-monospace・SFMono・Consolas、ヒラギノ・游ゴシックがなく、イメージに入っている書体で描かれ、`docs/design.md` の決まりに反する。推す答え：画面の部品は Noto Sans JP を Web フォントで配っているのでそのままでよく、等幅だけ Web フォントを1つ配って並びの最後に置く（例：Geist Mono を残し、ui-monospace → SFMono-Regular → Consolas → Geist Mono）。手元の Mac・Windows では md-leaf と同じに見え、Docker の中では決まった書体で撮れる。比べた案：design.md の決まりを「等幅はイメージの書体でよい」に直す＝書体は md-leaf と同じものだけになるが、イメージの版を上げたときに画像が変わりうる）
-- [ ] 答えたあとの選択肢の状態を、色のほかでも伝えるか？（「missed」をなくすと、選ばなかった正解と選んで間違えたものの違いが、緑と赤の地と記号の色だけになる。推す答え：見た目は変えず、読み上げ用の名前（`aria-label` など）で「correct」「your answer, wrong」などを伝える。比べた案：色だけ＝赤と緑を見分けにくい人と、読み上げでは分からない）
-- [ ] 答える前、指を乗せたときと選んでいるときが、どちらも primary-soft の地でよいか？（違いは記号の塗りだけになる。推す答え：このままでよい。指を乗せるのは PC だけで、選んだら記号が藍で塗られるので分かる。比べた案：指を乗せたときは primary-soft より薄くする＝見分けやすいが、-soft の色が1つ増える）
-- [ ] Lucide の形を書き写すときのライセンスの表記は？（Lucide は ISC ライセンスで、書き写すときも著作権とライセンスの文を残す必要がある。推す答え：アイコンを書いたファイルの先頭のコメントに、Lucide の著作権とライセンスの文を書く。比べた案：リポジトリに `THIRD_PARTY_NOTICES` を置く＝1か所にまとまるが、ファイルが増える）
+- [x] コードの等幅の書体と、画面の画像の比べは？（Docker の中には ui-monospace・SFMono・Consolas、ヒラギノ・游ゴシックがなく、イメージに入っている書体で描かれ、`docs/design.md` の決まりに反する。推す答え：画面の部品は Noto Sans JP を Web フォントで配っているのでそのままでよく、等幅だけ Web フォントを1つ配って並びの最後に置く（例：Geist Mono を残し、ui-monospace → SFMono-Regular → Consolas → Geist Mono）。手元の Mac・Windows では md-leaf と同じに見え、Docker の中では決まった書体で撮れる。比べた案：design.md の決まりを「等幅はイメージの書体でよい」に直す＝書体は md-leaf と同じものだけになるが、イメージの版を上げたときに画像が変わりうる） → おすすめのまま
+- [x] 答えたあとの選択肢の状態を、色のほかでも伝えるか？（「missed」をなくすと、選ばなかった正解と選んで間違えたものの違いが、緑と赤の地と記号の色だけになる。推す答え：見た目は変えず、読み上げ用の名前（`aria-label` など）で「correct」「your answer, wrong」などを伝える。比べた案：色だけ＝赤と緑を見分けにくい人と、読み上げでは分からない） → おすすめのまま
+- [x] 答える前、指を乗せたときと選んでいるときが、どちらも primary-soft の地でよいか？（違いは記号の塗りだけになる。推す答え：このままでよい。指を乗せるのは PC だけで、選んだら記号が藍で塗られるので分かる。比べた案：指を乗せたときは primary-soft より薄くする＝見分けやすいが、-soft の色が1つ増える） → おすすめのまま
+- [x] Lucide の形を書き写すときのライセンスの表記は？（Lucide は ISC ライセンスで、書き写すときも著作権とライセンスの文を残す必要がある。推す答え：アイコンを書いたファイルの先頭のコメントに、Lucide の著作権とライセンスの文を書く。比べた案：リポジトリに `THIRD_PARTY_NOTICES` を置く＝1か所にまとまるが、ファイルが増える） → おすすめのまま
 
 ## 技術の確認表
 
