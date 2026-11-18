@@ -50,10 +50,11 @@ memory-forge と md-leaf を、同じ人が作ったシリーズのアプリに�
   - コード：OS の等幅（ui-monospace → SFMono-Regular → Consolas。md-leaf の font-mono と同じ）。Geist と Geist Mono は使わない
 - 太さは、ふつう（400）と太字（700）の2つ（md-leaf と同じ）。太字にするのは、アプリ名、画面の見出し、枠の外の上の小さな見出し（day streak、menu など）
 - ダークモードの色：地・面・文字・枠は md-leaf のダークと同じ。差し色・正解・不正解は、暖かい地に浮かないよう、彩度を落とした色にする
-- 差し色は藍の1色だけ（md-leaf の「差し色は若葉の1色だけ」と同じ考え方）。ふだんの画面に出る色は、地・文字・muted・藍だけにする
+- 差し色は藍の1色だけ（md-leaf の「差し色は若葉の1色だけ」と同じ考え方）。ふだんの画面に出る色は、地・文字・muted・藍だけにする。例外は連続日数の枠の中の弁柄色（flame）だけ
+  - 炎は暖かい色でないと「灯す」感じが出ない（藍の炎は冷たく見えた）。ほかの場所では使わない
   - 正解（success）・不正解（danger）は答え合わせ（Solve・Result）だけ、不備（warning）は不備の印だけに使う
-- 連続日数：炎・日数・今日の曜日と点・「done today」「answer today to keep the flame」を藍（primary）で出す。flame の色はなくす。灯る・灯らないは、塗りつぶしか線だけかで見分ける
-- 今の身についている具合（Home の Subject、Setup の Topic）：線は、最後に正解した問題を藍（primary）、最後に間違えた問題を muted、まだ解いていない問題を border で塗り分ける。下の数（correct・wrong）は色を付けず、muted の文字だけにする
+- 連続日数：炎・日数・今日の曜日と点・「done today」「answer today to keep the flame」を弁柄色（flame）で出す。今の炎のオレンジより落ち着いた、生成りの地になじむ色にする。灯る・灯らないは、塗りつぶしか線だけかで見分ける
+- 今の身についている具合（Home の Subject、Setup の Topic）：線は、最後に正解した問題を藍（primary）、最後に間違えた問題を border-strong（muted より薄く、border より濃い灰色）、まだ解いていない問題を border で塗り分ける。下の数（correct・wrong）は色を付けず、muted の文字だけにする
 - コードの色分けは md-leaf と同じ3色（code-keyword・code-string・code-comment）だけにし、ほかは code-text の色にする。code-function・code-builtin・code-decorator はなくす
 
 ### 色の値（仕上げで `src/styles/tokens.css` に書く）
@@ -63,13 +64,15 @@ memory-forge と md-leaf を、同じ人が作ったシリーズのアプリに�
 | bg、surface | `#fbf8f1` | `#1d1c19` |
 | surface-raised、code-bg | `#f2ede0` | `#272520` |
 | border | `#e2dac7` | `#39362e` |
+| border-strong | `#c9c0ad` | `#57534a` |
 | text、code-text | `#2b2a26` | `#e6e1d5` |
 | muted | `#77736a` | `#a19c8f` |
-| primary | `#1f5a80` | `#7fa9cc` |
+| primary | `#1f5a80` | `#5f97c9` |
 | on-primary | `#ffffff` | `#1d1c19` |
 | success | `#3f8a6a` | `#93c29b` |
 | danger | `#b0453a` | `#e3907f` |
 | warning | `#b07a1c` | `#e0b35e` |
+| flame | `#b5562b` | `#d98656` |
 | backdrop | `rgb(30 28 24 / 0.4)` | `rgb(0 0 0 / 0.55)` |
 | code-line | `#a9a395` | `#6b665a` |
 | code-keyword | `#8a4f9e` | `#c79ad8` |
