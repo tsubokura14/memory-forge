@@ -9,14 +9,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
 });
-// 日本語の文字は subsets で選べないので、先読みしない（Google Fonts が文字の範囲ごとに分けて配る）
+// 英字（latin）の範囲だけを先読みする。先読みしないと、太字のファイルが届く前にふつうの太さから作った太字で描かれ、
+// 画面の画像が撮るたびに変わる。日本語の文字は subsets で選べないので、Google Fonts が文字の範囲ごとに分けて配る
 const notoSansJp = Noto_Sans_JP({
-  preload: false,
+  subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-noto-sans-jp",
 });
 const notoSerifJp = Noto_Serif_JP({
-  preload: false,
+  subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-noto-serif-jp",
 });
