@@ -1,56 +1,100 @@
+import { Icon } from "@/components/icons";
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { Banner } from "@/components/banner";
 import { buttonClass } from "@/components/button";
-import { DayStreakCard } from "@/components/day-streak";
+import { DayStreakLine } from "@/components/day-streak";
 import { EmptyState } from "@/components/empty-state";
 import { MasteryAccuracy, MasteryBar } from "@/components/mastery";
 import { RetryButton } from "@/components/retry-button";
 import { now } from "@/server/clock";
 import { mastery } from "@/server/mastery/mastery";
 import { getDayStreak } from "@/server/streak/streak";
+import {
+  type ContinueSubject,
+  getContinueSubject,
+} from "@/server/subjects/continue";
 import { listSubjects } from "@/server/subjects/subjects";
 
-// Home。上から day streak、menu、subjects
+// Home。上から「続きから」のカード（右上に連続日数）、科目、設定
 export default function Home() {
   return (
     <main className="mx-auto flex max-w-page flex-col gap-6 px-4 pt-6 pb-10">
+      {/* 「続きから」は科目の一覧と同じ読み込みにし、一覧を読み込み中・読み込めないときはカードを出さない */}
+      <Suspense
+        fallback={
+          <section className="flex flex-col gap-2">
+            <SubjectsHeading />
+            <SubjectsSkeleton />
+          </section>
+        }
+      >
+        <SubjectsAndContinue />
+      </Suspense>
+      <Link href="/settings" className="self-start text-sm text-muted">
+        設定
+      </Link>
+    </main>
+  );
+}
+
+async function SubjectsAndContinue() {
+  // ビルドのときにデータベースを読まず、開くたびに読む
+  await connection();
+  let subjects: Awaited<ReturnType<typeof listSubjects>>;
+  let next: ContinueSubject | null;
+  try {
+    [subjects, next] = await Promise.all([
+      listSubjects(),
+      getContinueSubject(),
+    ]);
+  } catch {
+    return (
       <section className="flex flex-col gap-2">
-        <h2 className="font-mono text-xs text-muted">day streak</h2>
-        {/* Subject の一覧とは別に読み込み、別に失敗を出す */}
-        <Suspense fallback={<DayStreakSkeleton />}>
+        <SubjectsHeading />
+        <Banner action={<RetryButton />}>科目を読み込めませんでした。</Banner>
+      </section>
+    );
+  }
+
+  return (
+    <>
+      {next && <ContinueCard subject={next} />}
+      <section className="flex flex-col gap-2">
+        <SubjectsHeading />
+        <Subjects subjects={subjects} />
+      </section>
+    </>
+  );
+}
+
+function ContinueCard({ subject }: { subject: ContinueSubject }) {
+  return (
+    <section
+      aria-labelledby="continue-heading"
+      className="mb-2 flex flex-col rounded-md border border-border p-6"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <h2 id="continue-heading" className="text-xs font-bold text-muted">
+          続きから
+        </h2>
+        {/* 連続日数は「続きから」とは別に読み込み、読み込み中は何も出さない */}
+        <Suspense fallback={null}>
           <DayStreakSection />
         </Suspense>
-      </section>
-      <section className="flex flex-col gap-2">
-        <h2 className="font-mono text-xs text-muted">menu</h2>
-        <div className="grid gap-2 sm:grid-cols-2">
-          <Link
-            href="/manage"
-            className="flex flex-col gap-0.5 rounded-md border border-border bg-surface px-3 py-3 hover:bg-surface-raised"
-          >
-            <span className="font-mono text-sm">manage</span>
-            <span className="text-xs text-muted">
-              Import, export, delete, flagged
-            </span>
-          </Link>
-          <Link
-            href="/settings"
-            className="flex flex-col gap-0.5 rounded-md border border-border bg-surface px-3 py-3 hover:bg-surface-raised"
-          >
-            <span className="font-mono text-sm">settings</span>
-            <span className="text-xs text-muted">Theme</span>
-          </Link>
-        </div>
-      </section>
-      <section className="flex flex-col gap-2">
-        <h2 className="font-mono text-xs text-muted">subjects</h2>
-        <Suspense fallback={<SubjectsSkeleton />}>
-          <Subjects />
-        </Suspense>
-      </section>
-    </main>
+      </div>
+      <p className="mt-3 text-lg font-bold break-words">{subject.name}</p>
+      <p className="text-sm text-muted">
+        {subject.remaining}問がまだ身についていません
+      </p>
+      <Link
+        href={`/subjects/${subject.id}`}
+        className={`mt-5 text-center ${buttonClass("primary", "lg")}`}
+      >
+        解きはじめる
+      </Link>
+    </section>
   );
 }
 
@@ -61,43 +105,35 @@ async function DayStreakSection() {
   try {
     streak = await getDayStreak(now());
   } catch {
-    return (
-      <Banner action={<RetryButton />}>Couldn&apos;t load day streak.</Banner>
-    );
+    return <p className="text-xs text-muted">連続日数を読み込めませんでした</p>;
   }
-  return <DayStreakCard streak={streak} />;
+  return <DayStreakLine streak={streak} />;
 }
 
-// docs/ui.md の「読み込み中」。連続日数の枠と同じ高さの枠を1つ点滅させる。高さは、撮った画像で測った枠の高さ（スマホの幅 130px、PC 140px）。枠の中身を変えたら測り直す
-function DayStreakSkeleton() {
+function SubjectsHeading() {
   return (
-    <div
-      data-testid="day-streak-loading"
-      className="h-32.5 animate-pulse rounded-md border border-border bg-surface-raised sm:h-35"
-    />
+    <div className="flex items-baseline justify-between gap-3">
+      <h2 className="text-xs font-bold text-muted">科目</h2>
+      <Link href="/manage" className="text-sm text-muted">
+        問題の管理
+      </Link>
+    </div>
   );
 }
 
-async function Subjects() {
-  // ビルドのときにデータベースを読まず、開くたびに読む
-  await connection();
-  let subjects: Awaited<ReturnType<typeof listSubjects>>;
-  try {
-    subjects = await listSubjects();
-  } catch {
-    return (
-      <Banner action={<RetryButton />}>Couldn&apos;t load subjects.</Banner>
-    );
-  }
-
+function Subjects({
+  subjects,
+}: {
+  subjects: Awaited<ReturnType<typeof listSubjects>>;
+}) {
   if (subjects.length === 0) {
     return (
       <EmptyState
-        title="No subjects yet."
-        description="Import a question file to get started."
+        title="まだ科目がありません。"
+        description="問題のファイルを取り込むと、ここに科目が並びます。"
       >
         <Link href="/manage/import" className={`mt-3 ${buttonClass()}`}>
-          import
+          取り込む
         </Link>
       </EmptyState>
     );
@@ -105,7 +141,7 @@ async function Subjects() {
 
   return (
     <ul
-      aria-label="subjects"
+      aria-label="科目"
       className="flex flex-col divide-y divide-border overflow-hidden rounded-md border border-border bg-surface"
     >
       {subjects.map((subject) => {
@@ -124,12 +160,10 @@ async function Subjects() {
               </span>
               <MasteryAccuracy accuracy={m.accuracy} />
               {/* 印の行の高さで行が高くならないように、行の高さを文字の大きさにそろえる */}
-              <span
-                aria-hidden
-                className="icon shrink-0 text-lg leading-none text-muted"
-              >
-                chevron_right
-              </span>
+              <Icon
+                name="chevron-right"
+                className="shrink-0 text-lg leading-none text-muted"
+              />
             </Link>
           </li>
         );

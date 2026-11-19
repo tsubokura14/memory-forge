@@ -128,11 +128,11 @@ function isServerAction(request: { method(): string; headers(): object }) {
   return request.method() === "POST" && "next-action" in request.headers();
 }
 
-function dropdown(page: Page, name: "subject" | "topic") {
+function dropdown(page: Page, name: "科目" | "Topic") {
   return page.getByRole("button", { name, exact: true });
 }
 
-async function choose(page: Page, name: "subject" | "topic", option: string) {
+async function choose(page: Page, name: "科目" | "Topic", option: string) {
   await dropdown(page, name).click();
   await page.getByRole("option", { name: new RegExp(`^${option}`) }).click();
 }
@@ -143,7 +143,7 @@ function loadError(page: Page) {
 }
 
 function rows(page: Page) {
-  return page.getByRole("list", { name: "questions" }).getByRole("listitem");
+  return page.getByRole("list", { name: "問題" }).getByRole("listitem");
 }
 
 async function openManage(page: Page) {
@@ -152,13 +152,13 @@ async function openManage(page: Page) {
 }
 
 function flaggedButton(page: Page) {
-  return page.getByRole("button", { name: "flagged", exact: true });
+  return page.getByRole("button", { name: "不備の印", exact: true });
 }
 
 function unflag(page: Page, questionId: string) {
   return rows(page)
     .filter({ hasText: questionId })
-    .getByRole("button", { name: "unflag" });
+    .getByRole("button", { name: "印を外す" });
 }
 
 // 保存されたファイルの中身を JSON として読む
@@ -172,8 +172,8 @@ test("manage-default：開くと、最初の Subject と All topics の1ペー�
 }) => {
   await resetPython();
   await openManage(page);
-  await expect(dropdown(page, "subject")).toHaveText(/Python/);
-  await expect(dropdown(page, "topic")).toHaveText(/All topics/);
+  await expect(dropdown(page, "科目")).toHaveText(/Python/);
+  await expect(dropdown(page, "Topic")).toHaveText(/すべての Topic/);
   await expect(rows(page)).toHaveCount(10);
   await expect(page).toHaveScreenshot("manage-default.png", { fullPage: true });
 });
@@ -181,7 +181,7 @@ test("manage-default：開くと、最初の Subject と All topics の1ペー�
 test("manage-subject-open", async ({ page }) => {
   await resetPython();
   await openManage(page);
-  await dropdown(page, "subject").click();
+  await dropdown(page, "科目").click();
   await expect(page.getByRole("option")).toHaveCount(4);
   await expect(page).toHaveScreenshot("manage-subject-open.png", {
     fullPage: true,
@@ -193,9 +193,9 @@ test("manage-topic-open：Topic を選ぶと、その問題だけになる", asy
 }) => {
   await resetPython();
   await openManage(page);
-  await choose(page, "topic", "Decorators");
+  await choose(page, "Topic", "Decorators");
   await expect(rows(page)).toHaveCount(3);
-  await dropdown(page, "topic").click();
+  await dropdown(page, "Topic").click();
   await expect(page).toHaveScreenshot("manage-topic-open.png", {
     fullPage: true,
   });
@@ -213,7 +213,7 @@ test("manage-topics-many", async ({ page }) => {
     "Testing",
   ]);
   await openManage(page);
-  await dropdown(page, "topic").click();
+  await dropdown(page, "Topic").click();
   await expect(page).toHaveScreenshot("manage-topics-many.png", {
     fullPage: true,
   });
@@ -222,8 +222,8 @@ test("manage-topics-many", async ({ page }) => {
 test("manage-empty", async ({ page }) => {
   await resetQuestions();
   await page.goto("/manage");
-  await expect(page.getByText("No subjects yet.")).toBeVisible();
-  await expect(dropdown(page, "subject")).toHaveCount(0);
+  await expect(page.getByText("まだ科目がありません。")).toBeVisible();
+  await expect(dropdown(page, "科目")).toHaveCount(0);
   await expect(page).toHaveScreenshot("manage-empty.png", { fullPage: true });
 });
 
@@ -231,12 +231,12 @@ test("manage-many：ページを移ると、その50問になる", async ({ page
   await resetManyPython();
   await openManage(page);
   // 番号は今のページの前後だけなので、2・3と順に移る
-  await page.getByRole("button", { name: "page 2" }).click();
-  await expect(page.getByText("51–100 of 480")).toBeVisible();
-  await page.getByRole("button", { name: "page 3" }).click();
-  await expect(page.getByText("101–150 of 480")).toBeVisible();
-  await page.getByRole("button", { name: "page 4" }).click();
-  await expect(page.getByText("151–200 of 480")).toBeVisible();
+  await page.getByRole("button", { name: "2ページ" }).click();
+  await expect(page.getByText("480問中 51–100")).toBeVisible();
+  await page.getByRole("button", { name: "3ページ" }).click();
+  await expect(page.getByText("480問中 101–150")).toBeVisible();
+  await page.getByRole("button", { name: "4ページ" }).click();
+  await expect(page.getByText("480問中 151–200")).toBeVisible();
   await expect(rows(page)).toHaveCount(50);
   await expect(page).toHaveScreenshot("manage-many.png", { fullPage: true });
 
@@ -252,26 +252,26 @@ test("Subject を変えると All topics と1ページ目に戻り、読み込�
 }) => {
   await resetPython();
   await openManage(page);
-  await choose(page, "subject", "AWS SAA");
-  await page.getByRole("button", { name: "page 2" }).click();
-  await expect(page.getByText("51–100 of 240")).toBeVisible();
+  await choose(page, "科目", "AWS SAA");
+  await page.getByRole("button", { name: "2ページ" }).click();
+  await expect(page.getByText("240問中 51–100")).toBeVisible();
 
-  await choose(page, "subject", "Python");
-  await choose(page, "topic", "Typing");
+  await choose(page, "科目", "Python");
+  await choose(page, "Topic", "Typing");
   await expect(rows(page)).toHaveCount(1);
-  await choose(page, "subject", "AWS SAA");
-  await expect(dropdown(page, "topic")).toHaveText(/All topics/);
-  await expect(page.getByText("1–50 of 240")).toBeVisible();
+  await choose(page, "科目", "AWS SAA");
+  await expect(dropdown(page, "Topic")).toHaveText(/すべての Topic/);
+  await expect(page.getByText("240問中 1–50")).toBeVisible();
 
-  await page.getByRole("button", { name: "page 2" }).click();
-  await expect(page.getByText("51–100 of 240")).toBeVisible();
+  await page.getByRole("button", { name: "2ページ" }).click();
+  await expect(page.getByText("240問中 51–100")).toBeVisible();
   await page.reload();
-  await expect(page.getByText("51–100 of 240")).toBeVisible();
+  await expect(page.getByText("240問中 51–100")).toBeVisible();
 
   await page.goto("/");
-  await page.getByRole("link", { name: /manage/ }).click();
-  await expect(dropdown(page, "subject")).toHaveText(/AWS SAA/);
-  await expect(page.getByText("51–100 of 240")).toBeVisible();
+  await page.getByRole("link", { name: "問題の管理" }).click();
+  await expect(dropdown(page, "科目")).toHaveText(/AWS SAA/);
+  await expect(page.getByText("240問中 51–100")).toBeVisible();
 });
 
 test("manage-loading：選び方を変えて読み込んでいる間は、行の形の枠を点滅させる", async ({
@@ -283,7 +283,7 @@ test("manage-loading：選び方を変えて読み込んでいる間は、行の
   await page.route("/manage", async (route) => {
     if (!isServerAction(route.request())) await route.continue();
   });
-  await choose(page, "topic", "Decorators");
+  await choose(page, "Topic", "Decorators");
   await expect(page.getByTestId("questions-loading")).toBeVisible();
   await expect(page).toHaveScreenshot("manage-loading.png", { fullPage: true });
 });
@@ -296,12 +296,12 @@ test("manage-error：読み込めなかったら帯と retry を出し、retry �
   await page.route("/manage", (route) =>
     isServerAction(route.request()) ? route.abort() : route.continue(),
   );
-  await choose(page, "topic", "Decorators");
-  await expect(loadError(page)).toHaveText(/Couldn't load questions\./);
+  await choose(page, "Topic", "Decorators");
+  await expect(loadError(page)).toHaveText(/問題を読み込めませんでした。/);
   await expect(page).toHaveScreenshot("manage-error.png", { fullPage: true });
 
   await page.unrouteAll();
-  await page.getByRole("button", { name: "retry" }).click();
+  await page.getByRole("button", { name: "もう一度読み込む" }).click();
   await expect(rows(page)).toHaveCount(3);
   await expect(loadError(page)).toHaveCount(0);
 });
@@ -311,10 +311,10 @@ test("export Python で、Topic で絞っていても Subject の問題を pytho
 }) => {
   await resetPython();
   await openManage(page);
-  await choose(page, "topic", "Decorators");
+  await choose(page, "Topic", "Decorators");
   await expect(rows(page)).toHaveCount(3);
   const download = page.waitForEvent("download");
-  await page.getByRole("button", { name: "export Python" }).click();
+  await page.getByRole("button", { name: "Python を書き出す" }).click();
   const file = await download;
   expect(file.suggestedFilename()).toBe("python.json");
   // 中身の項目と並びは export.test.ts で確かめる。ここでは Subject の全部が入っていることだけを見る
@@ -329,8 +329,8 @@ test("manage-export-error：書き出せなかったら、絞り込みの下に�
   await page.route("/manage", (route) =>
     isServerAction(route.request()) ? route.abort() : route.continue(),
   );
-  await page.getByRole("button", { name: "export Python" }).click();
-  await expect(loadError(page)).toHaveText(/Couldn't export Python\./);
+  await page.getByRole("button", { name: "Python を書き出す" }).click();
+  await expect(loadError(page)).toHaveText(/Python を書き出せませんでした。/);
   await expect(rows(page)).toHaveCount(10);
   await expect(page).toHaveScreenshot("manage-export-error.png", {
     fullPage: true,
@@ -346,9 +346,9 @@ test("manage-delete-subject：cancel と Esc ではそのまま、delete で消�
 }) => {
   await resetPython();
   await openManage(page);
-  await page.getByRole("button", { name: "delete subject" }).click();
+  await page.getByRole("button", { name: "科目を削除" }).click();
   await expect(dialog(page)).toContainText(
-    "5 topics, 10 questions and their records will be deleted.",
+    "5 の Topic と 10 問、その記録を削除します。元に戻せません。",
   );
   await expect(page).toHaveScreenshot("manage-delete-subject.png", {
     fullPage: true,
@@ -356,16 +356,16 @@ test("manage-delete-subject：cancel と Esc ではそのまま、delete で消�
 
   await page.keyboard.press("Escape");
   await expect(dialog(page)).toBeHidden();
-  await page.getByRole("button", { name: "delete subject" }).click();
-  await dialog(page).getByRole("button", { name: "cancel" }).click();
+  await page.getByRole("button", { name: "科目を削除" }).click();
+  await dialog(page).getByRole("button", { name: "やめる" }).click();
   await expect(dialog(page)).toBeHidden();
   await expect(rows(page)).toHaveCount(10);
 
-  await page.getByRole("button", { name: "delete subject" }).click();
-  await dialog(page).getByRole("button", { name: "delete" }).click();
-  await expect(dropdown(page, "subject")).toHaveText(/AWS SAA/);
-  await expect(page.getByText("1–50 of 240")).toBeVisible();
-  await dropdown(page, "subject").click();
+  await page.getByRole("button", { name: "科目を削除" }).click();
+  await dialog(page).getByRole("button", { name: "削除する" }).click();
+  await expect(dropdown(page, "科目")).toHaveText(/AWS SAA/);
+  await expect(page.getByText("240問中 1–50")).toBeVisible();
+  await dropdown(page, "科目").click();
   await expect(page.getByRole("option")).toHaveCount(3);
 });
 
@@ -377,18 +377,21 @@ test("最後の Subject を消すと前の Subject、Subject が1つもなくな
     { name: "Linux", questions: many("linux", 1) },
   ]);
   await openManage(page);
-  await choose(page, "subject", "Linux");
-  await page.getByRole("button", { name: "delete subject" }).click();
+  await choose(page, "科目", "Linux");
+  await page.getByRole("button", { name: "科目を削除" }).click();
   await expect(dialog(page)).toContainText(
-    "1 topic, 1 question and its records will be deleted.",
+    "1 の Topic と 1 問、その記録を削除します。元に戻せません。",
   );
-  await dialog(page).getByRole("button", { name: "delete" }).click();
-  await expect(dropdown(page, "subject")).toHaveText(/Python/);
+  await dialog(page).getByRole("button", { name: "削除する" }).click();
+  await expect(dropdown(page, "科目")).toHaveText(/Python/);
 
   // 最後の1問を消すと、Subject も消える
-  await rows(page).first().getByRole("button", { name: "delete" }).click();
-  await dialog(page).getByRole("button", { name: "delete" }).click();
-  await expect(page.getByText("No subjects yet.")).toBeVisible();
+  await rows(page)
+    .first()
+    .getByRole("button", { name: "削除", exact: true })
+    .click();
+  await dialog(page).getByRole("button", { name: "削除する" }).click();
+  await expect(page.getByText("まだ科目がありません。")).toBeVisible();
 });
 
 test("manage-delete-topic：All topics では Topic の delete を出さず、Topic を消すと All topics になる", async ({
@@ -396,42 +399,45 @@ test("manage-delete-topic：All topics では Topic の delete を出さず、To
 }) => {
   await resetPython();
   await openManage(page);
-  await expect(page.getByRole("button", { name: "delete topic" })).toHaveCount(
+  await expect(page.getByRole("button", { name: "Topic を削除" })).toHaveCount(
     0,
   );
-  await choose(page, "topic", "Typing");
+  await choose(page, "Topic", "Typing");
   await expect(rows(page)).toHaveCount(1);
-  await page.getByRole("button", { name: "delete topic" }).click();
+  await page.getByRole("button", { name: "Topic を削除" }).click();
   await expect(dialog(page)).toContainText(
-    "1 question and its records will be deleted.",
+    "1問と、その記録を削除します。元に戻せません。",
   );
   await page.keyboard.press("Escape");
 
-  await choose(page, "topic", "Decorators");
+  await choose(page, "Topic", "Decorators");
   await expect(rows(page)).toHaveCount(3);
-  await page.getByRole("button", { name: "delete topic" }).click();
+  await page.getByRole("button", { name: "Topic を削除" }).click();
   await expect(dialog(page)).toContainText(
-    "3 questions and their records will be deleted.",
+    "3問と、その記録を削除します。元に戻せません。",
   );
   await expect(page).toHaveScreenshot("manage-delete-topic.png", {
     fullPage: true,
   });
-  await dialog(page).getByRole("button", { name: "delete" }).click();
-  await expect(dropdown(page, "topic")).toHaveText(/All topics/);
+  await dialog(page).getByRole("button", { name: "削除する" }).click();
+  await expect(dropdown(page, "Topic")).toHaveText(/すべての Topic/);
   await expect(rows(page)).toHaveCount(7);
 });
 
 test("manage-delete-question：1問を消す", async ({ page }) => {
   await resetPython();
   await openManage(page);
-  await rows(page).first().getByRole("button", { name: "delete" }).click();
+  await rows(page)
+    .first()
+    .getByRole("button", { name: "削除", exact: true })
+    .click();
   await expect(dialog(page)).toContainText(
     "次のコードを実行したとき、出力されるものはどれか。",
   );
   await expect(page).toHaveScreenshot("manage-delete-question.png", {
     fullPage: true,
   });
-  await dialog(page).getByRole("button", { name: "delete" }).click();
+  await dialog(page).getByRole("button", { name: "削除する" }).click();
   await expect(rows(page)).toHaveCount(9);
   await expect(page.getByText("k3f9a2")).toHaveCount(0);
 });
@@ -441,11 +447,14 @@ test("1問を消して今のページが空になったら、前のページを�
 }) => {
   await resetQuestions([{ name: "Python", questions: many("py", 51) }]);
   await openManage(page);
-  await page.getByRole("button", { name: "page 2" }).click();
-  await expect(page.getByText("51–51 of 51")).toBeVisible();
-  await rows(page).first().getByRole("button", { name: "delete" }).click();
-  await dialog(page).getByRole("button", { name: "delete" }).click();
-  await expect(page.getByText("1–50 of 50")).toBeVisible();
+  await page.getByRole("button", { name: "2ページ" }).click();
+  await expect(page.getByText("51問中 51–51")).toBeVisible();
+  await rows(page)
+    .first()
+    .getByRole("button", { name: "削除", exact: true })
+    .click();
+  await dialog(page).getByRole("button", { name: "削除する" }).click();
+  await expect(page.getByText("50問中 1–50")).toBeVisible();
 });
 
 test("消している間は cancel と delete を押せず、Esc でも閉じない", async ({
@@ -457,13 +466,16 @@ test("消している間は cancel と delete を押せず、Esc でも閉じな
   await page.route("/manage", async (route) => {
     if (!isServerAction(route.request())) await route.continue();
   });
-  await rows(page).first().getByRole("button", { name: "delete" }).click();
-  await dialog(page).getByRole("button", { name: "delete" }).click();
+  await rows(page)
+    .first()
+    .getByRole("button", { name: "削除", exact: true })
+    .click();
+  await dialog(page).getByRole("button", { name: "削除する" }).click();
   await expect(
-    dialog(page).getByRole("button", { name: "delete" }),
+    dialog(page).getByRole("button", { name: "削除する" }),
   ).toBeDisabled();
   await expect(
-    dialog(page).getByRole("button", { name: "cancel" }),
+    dialog(page).getByRole("button", { name: "やめる" }),
   ).toBeDisabled();
   await page.keyboard.press("Escape");
   await expect(dialog(page)).toBeVisible();
@@ -474,21 +486,23 @@ test("manage-delete-error：消せなかったら、ダイアログの中に帯�
 }) => {
   await resetPython();
   await openManage(page);
-  await choose(page, "topic", "Decorators");
+  await choose(page, "Topic", "Decorators");
   await expect(rows(page)).toHaveCount(3);
   await page.route("/manage", (route) =>
     isServerAction(route.request()) ? route.abort() : route.continue(),
   );
-  await page.getByRole("button", { name: "delete topic" }).click();
-  await dialog(page).getByRole("button", { name: "delete" }).click();
-  await expect(dialog(page).getByRole("alert")).toHaveText("Couldn't delete.");
+  await page.getByRole("button", { name: "Topic を削除" }).click();
+  await dialog(page).getByRole("button", { name: "削除する" }).click();
+  await expect(dialog(page).getByRole("alert")).toHaveText(
+    "削除できませんでした。",
+  );
   await expect(page).toHaveScreenshot("manage-delete-error.png", {
     fullPage: true,
   });
 
   // 閉じて開き直すと、帯は消えている
-  await dialog(page).getByRole("button", { name: "cancel" }).click();
-  await page.getByRole("button", { name: "delete topic" }).click();
+  await dialog(page).getByRole("button", { name: "やめる" }).click();
+  await page.getByRole("button", { name: "Topic を削除" }).click();
   await expect(dialog(page).getByRole("alert")).toHaveCount(0);
   await page.keyboard.press("Escape");
   await expect(rows(page)).toHaveCount(3);
@@ -502,11 +516,11 @@ test("manage-flagged：flagged で印の付いた問題だけになり、Topic �
   await flaggedButton(page).click();
   await expect(rows(page)).toHaveCount(2);
   await expect(
-    page.getByRole("button", { name: "export flagged · Python" }),
+    page.getByRole("button", { name: "Python の不備の印を書き出す" }),
   ).toBeVisible();
   await expect(page).toHaveScreenshot("manage-flagged.png", { fullPage: true });
 
-  await choose(page, "topic", "Decorators");
+  await choose(page, "Topic", "Decorators");
   await expect(rows(page)).toHaveCount(1);
   await page.reload();
   await expect(rows(page)).toHaveCount(1);
@@ -514,15 +528,15 @@ test("manage-flagged：flagged で印の付いた問題だけになり、Topic �
   await flaggedButton(page).click();
   await expect(rows(page)).toHaveCount(3);
   await expect(
-    page.getByRole("button", { name: "export Python" }),
+    page.getByRole("button", { name: "Python を書き出す" }),
   ).toBeVisible();
 
   await flaggedButton(page).click();
   await expect(rows(page)).toHaveCount(1);
-  await choose(page, "subject", "AWS SAA");
-  await expect(page.getByText("1–50 of 240")).toBeVisible();
+  await choose(page, "科目", "AWS SAA");
+  await expect(page.getByText("240問中 1–50")).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "export AWS SAA" }),
+    page.getByRole("button", { name: "AWS SAA を書き出す" }),
   ).toBeVisible();
 });
 
@@ -536,15 +550,15 @@ test("flagged を押すと1ページ目に戻り、unflag で今のページが�
     },
   ]);
   await openManage(page);
-  await page.getByRole("button", { name: "page 2" }).click();
-  await expect(page.getByText("51–51 of 51")).toBeVisible();
+  await page.getByRole("button", { name: "2ページ" }).click();
+  await expect(page.getByText("51問中 51–51")).toBeVisible();
   await flaggedButton(page).click();
-  await expect(page.getByText("1–50 of 51")).toBeVisible();
+  await expect(page.getByText("51問中 1–50")).toBeVisible();
 
-  await page.getByRole("button", { name: "page 2" }).click();
-  await expect(page.getByText("51–51 of 51")).toBeVisible();
-  await rows(page).first().getByRole("button", { name: "unflag" }).click();
-  await expect(page.getByText("1–50 of 50")).toBeVisible();
+  await page.getByRole("button", { name: "2ページ" }).click();
+  await expect(page.getByText("51問中 51–51")).toBeVisible();
+  await rows(page).first().getByRole("button", { name: "印を外す" }).click();
+  await expect(page.getByText("50問中 1–50")).toBeVisible();
 });
 
 test("export flagged で、Topic で絞っていても Subject の印の付いた問題を python.json に保存する", async ({
@@ -554,10 +568,12 @@ test("export flagged で、Topic で絞っていても Subject の印の付い�
   await openManage(page);
   await flaggedButton(page).click();
   await expect(rows(page)).toHaveCount(2);
-  await choose(page, "topic", "Decorators");
+  await choose(page, "Topic", "Decorators");
   await expect(rows(page)).toHaveCount(1);
   const download = page.waitForEvent("download");
-  await page.getByRole("button", { name: "export flagged · Python" }).click();
+  await page
+    .getByRole("button", { name: "Python の不備の印を書き出す" })
+    .click();
   const file = await download;
   expect(file.suggestedFilename()).toBe("python.json");
   expect((await readJson(file)).questions).toHaveLength(2);
@@ -569,8 +585,10 @@ test("manage-flagged-empty：Subject に印がなければ、0件の表示で ex
   await resetPython([], []);
   await openManage(page);
   await flaggedButton(page).click();
-  await expect(page.getByText("No flagged questions in Python.")).toBeVisible();
-  await expect(page.getByRole("button", { name: /^export/ })).toHaveCount(0);
+  await expect(
+    page.getByText("Python に不備の印の付いた問題はありません。"),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: /書き出す$/ })).toHaveCount(0);
   await expect(page).toHaveScreenshot("manage-flagged-empty.png", {
     fullPage: true,
   });
@@ -583,10 +601,12 @@ test("flagged を Topic で絞って0件なら Topic の名前を出し、Subjec
   await openManage(page);
   await flaggedButton(page).click();
   await expect(rows(page)).toHaveCount(2);
-  await choose(page, "topic", "Typing");
-  await expect(page.getByText("No flagged questions in Typing.")).toBeVisible();
+  await choose(page, "Topic", "Typing");
   await expect(
-    page.getByRole("button", { name: "export flagged · Python" }),
+    page.getByText("Typing に不備の印の付いた問題はありません。"),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Python の不備の印を書き出す" }),
   ).toBeVisible();
 });
 
@@ -611,8 +631,10 @@ test("flagged の一覧で unflag すると行が消え、全部外すと0件の
   await unflag(page, "p81xq0").click();
   await expect(rows(page)).toHaveCount(1);
   await unflag(page, "c0y8u3").click();
-  await expect(page.getByText("No flagged questions in Python.")).toBeVisible();
-  await expect(page.getByRole("button", { name: /^export/ })).toHaveCount(0);
+  await expect(
+    page.getByText("Python に不備の印の付いた問題はありません。"),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: /書き出す$/ })).toHaveCount(0);
 });
 
 test("unflag できなかったら帯を出して印を残し、選び方を変えたときと、もう一度外せたときに消す", async ({
@@ -625,13 +647,13 @@ test("unflag できなかったら帯を出して印を残し、選び方を変�
       isServerAction(route.request()) ? route.abort() : route.continue(),
     );
     await unflag(page, "p81xq0").click();
-    await expect(loadError(page)).toHaveText(/Couldn't unflag p81xq0\./);
+    await expect(loadError(page)).toHaveText(/p81xq0 の印を外せませんでした。/);
     await expect(unflag(page, "p81xq0")).toHaveCount(1);
     await page.unrouteAll();
   }
 
   await failUnflag();
-  await choose(page, "topic", "Decorators");
+  await choose(page, "Topic", "Decorators");
   await expect(rows(page)).toHaveCount(3);
   await expect(loadError(page)).toHaveCount(0);
 
@@ -648,16 +670,16 @@ test("flagged の一覧で Topic を消すと、確認に Topic の全部の問�
   await openManage(page);
   await flaggedButton(page).click();
   await expect(rows(page)).toHaveCount(2);
-  await choose(page, "topic", "Decorators");
+  await choose(page, "Topic", "Decorators");
   await expect(rows(page)).toHaveCount(1);
-  await page.getByRole("button", { name: "delete topic" }).click();
+  await page.getByRole("button", { name: "Topic を削除" }).click();
   await expect(dialog(page)).toContainText(
-    "3 questions and their records will be deleted.",
+    "3問と、その記録を削除します。元に戻せません。",
   );
-  await dialog(page).getByRole("button", { name: "delete" }).click();
-  await expect(dropdown(page, "topic")).toHaveText(/All topics/);
+  await dialog(page).getByRole("button", { name: "削除する" }).click();
+  await expect(dropdown(page, "Topic")).toHaveText(/すべての Topic/);
   await expect(rows(page)).toHaveCount(1);
   await expect(
-    page.getByRole("button", { name: "export flagged · Python" }),
+    page.getByRole("button", { name: "Python の不備の印を書き出す" }),
   ).toBeVisible();
 });

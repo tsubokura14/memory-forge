@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/components/icons";
 import { Banner } from "@/components/banner";
 import { Button } from "@/components/button";
 import { MasteryAccuracy, MasteryBar } from "@/components/mastery";
@@ -15,16 +16,16 @@ import { mastery } from "@/server/mastery/mastery";
 import type { Setup } from "@/server/solve/setup";
 
 const ORDERS: { value: Order; label: string }[] = [
-  { value: "in-order", label: "in order" },
-  { value: "random", label: "random" },
-  { value: "lowest-accuracy", label: "lowest accuracy" },
+  { value: "in-order", label: "順番どおり" },
+  { value: "random", label: "ばらばら" },
+  { value: "lowest-accuracy", label: "苦手な順" },
 ];
 
 const COUNTS: { value: Count; label: string }[] = [
-  { value: "all", label: "all" },
-  { value: 5, label: "5" },
-  { value: 10, label: "10" },
-  { value: 20, label: "20" },
+  { value: "all", label: "すべて" },
+  { value: 5, label: "5問" },
+  { value: 10, label: "10問" },
+  { value: 20, label: "20問" },
 ];
 
 // 選び方。topic の null は All。Solve から戻ったときに残すため、study.tsx が持つ
@@ -41,7 +42,7 @@ export function SetupForm({
   choices: Choices;
   onChange: (choices: Choices) => void;
   onStart: () => void;
-  // 問題を読めなかったとき。retry は start と同じ
+  // 問題を読めなかったとき。もう一度読み込むは解きはじめると同じ
   failed: boolean;
 }) {
   const { topic, order, count } = choices;
@@ -52,9 +53,9 @@ export function SetupForm({
 
   return (
     <div className="flex flex-col gap-5">
-      <Field label="topic">
+      <Field label="Topic">
         <RadioList
-          label="topic"
+          label="Topic"
           options={[
             ...setup.topics.map((t) => ({
               value: t.name,
@@ -72,17 +73,17 @@ export function SetupForm({
           onChange={(value) => onChange({ ...choices, topic: value })}
         />
       </Field>
-      <Field label="order">
+      <Field label="順番">
         <Segmented
-          label="order"
+          label="順番"
           options={ORDERS}
           value={order}
           onChange={(value) => onChange({ ...choices, order: value })}
         />
       </Field>
-      <Field label="questions">
+      <Field label="問題数">
         <Segmented
-          label="questions"
+          label="問題数"
           options={COUNTS}
           value={count}
           onChange={(value) => onChange({ ...choices, count: value })}
@@ -90,44 +91,43 @@ export function SetupForm({
       </Field>
       <div className="flex flex-col gap-3">
         {stats.flagged > 0 && start.count > 0 && (
-          <p className="flex items-center gap-1 font-mono text-xs text-muted">
+          <p className="flex items-center gap-1 text-xs text-muted">
             <span className="flex items-center gap-0.5 text-warning">
-              <span aria-hidden className="icon text-sm leading-none">
-                flag
-              </span>
+              <Icon name="flag" className="text-sm leading-none" />
               {stats.flagged}
             </span>{" "}
-            flagged excluded
+            問は不備の印があるので出しません
           </p>
         )}
         {start.notice === "few" && (
-          <p className="font-mono text-xs text-muted">
-            {scope} has only {start.count} questions to ask.
+          <p className="text-xs text-muted">
+            {scope} で出せるのは {start.count} 問だけです。
           </p>
         )}
         {start.notice === "unanswered" && (
-          <p className="font-mono text-xs text-warning">
-            No questions to ask — none in {scope} have been answered yet.
+          <p className="text-xs text-warning">
+            {scope} にはまだ解いた問題がないので、苦手な順では出せません。
           </p>
         )}
         {start.notice === "flagged" && (
-          <p className="font-mono text-xs text-warning">
-            No questions to ask — all {stats.flagged} in {scope} are flagged.
+          <p className="text-xs text-warning">
+            {scope} の {stats.flagged}{" "}
+            問すべてに不備の印があるので、出せる問題がありません。
           </p>
         )}
         {failed && (
           <Banner
             action={
               <Button variant="danger" onClick={onStart}>
-                retry
+                もう一度読み込む
               </Button>
             }
           >
-            Couldn&apos;t load questions.
+            問題を読み込めませんでした。
           </Banner>
         )}
         <Button size="lg" disabled={start.count === 0} onClick={onStart}>
-          start · {start.count}
+          {start.count > 0 ? `${start.count}問を解きはじめる` : "解きはじめる"}
         </Button>
       </div>
     </div>
@@ -157,7 +157,7 @@ function Field({
 }) {
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="font-mono text-xs text-muted">{label}</h2>
+      <h2 className="text-xs font-bold text-muted">{label}</h2>
       {children}
     </section>
   );

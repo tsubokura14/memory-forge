@@ -49,41 +49,41 @@
 - 誤りがあると、danger の帯で、誤りの数と、何も取り込んでいないことを出す。その下に、誤りごとに、問題（ID）・項目・内容を1行ずつ、全部を出す
   - ファイル全体の誤りは、ID の列に「—」を出す
   - ID が書かれていない問題は、ID の列に何問目か（`#3` など）を出す
-  - 誤りの数は、1つのときは単数（「1 problem found in …」）、2つ以上は複数（「4 problems found in …」）
+  - 誤りの数は「4 件の不備が … にあります。」の形で出す
 
 | 誤り | 項目 | 内容 |
 | --- | --- | --- |
-| 項目がない・空 | その項目 | Missing. |
-| ID が重なる | id | Duplicate ID (2 questions). |
-| 複数選択で正解が2つ未満 | correct | Multiple choice needs 2 or more correct answers. |
-| 単一選択で正解が1つでない | correct | Single choice needs exactly 1 correct answer. |
-| 正解が選択肢にない | correct | Not one of the choices (E). |
-| 選択肢の数 | choices | Needs 2 to 8 choices. |
-| 種類が違う | type | Must be single or multiple. |
-| コードブロックが閉じていない | text・choice B・explanation | Code block is not closed (\`\`\`). |
-| 項目の形が違う（文字でない、など） | その項目 | Wrong format. |
-| 正解に同じ記号が2回以上ある | correct | Wrong format. |
-| 問題がオブジェクトでない | question | Wrong format. |
-| ファイル全体がオブジェクトでない | file | Wrong format. |
-| JSON として読めない | file | Not valid JSON. |
-| 大きすぎる | file | Too large. Up to 4 MB. |
-| 問題が多すぎる | questions | Too many questions (1,200). Up to 1,000. |
-| 問題が0問 | questions | No questions. |
+| 項目がない・空 | その項目 | ありません。 |
+| ID が重なる | id | ID が重なっています（2問）。 |
+| 複数選択で正解が2つ未満 | correct | すべて選ぶ問題は、正解が2つ以上要ります。 |
+| 単一選択で正解が1つでない | correct | 1つを選ぶ問題は、正解が1つだけ要ります。 |
+| 正解が選択肢にない | correct | 選択肢にありません（E）。 |
+| 選択肢の数 | choices | 選択肢は2〜8個にしてください。 |
+| 種類が違う | type | single か multiple にしてください。 |
+| コードブロックが閉じていない | text・choice B・explanation | コードブロックが閉じていません（\`\`\`）。 |
+| 項目の形が違う（文字でない、など） | その項目 | 形が違います。 |
+| 正解に同じ記号が2回以上ある | correct | 形が違います。 |
+| 問題がオブジェクトでない | question | 形が違います。 |
+| ファイル全体がオブジェクトでない | file | 形が違います。 |
+| JSON として読めない | file | JSON として読めません。 |
+| 大きすぎる | file | 大きすぎます。4 MB までです。 |
+| 問題が多すぎる | questions | 問題が多すぎます（1,200問）。1,000問までです。 |
+| 問題が0問 | questions | 問題が1つもありません。 |
 
 ## 取り込む前の確認
 
 - 誤りがなければ、取り込む前の確認を出す。この時点では、まだ何も変わっていない
-- ファイル名と Subject の名前を出す。まだない Subject なら、「new subject」と添える
+- ファイル名と Subject の名前を出す。まだない Subject なら、「新しい科目」と添える
 - 増える問題・置き換わる問題・変わらない問題の数を出す
   - 増える：その Subject に、同じ ID の問題がない
   - 置き換わる：同じ ID の問題があり、中身（Topic、問題の種類、問題文、選択肢、正解、解説のどれか）が違う。Topic だけが違う問題も、置き換わる
   - 変わらない：同じ ID の問題があり、中身がすべて同じ
-- 置き換わる問題の見出しは「replaced — records are kept, except for flagged questions」。印の付いた問題が置き換わるときは、その問題の行の右に、warning の flag の印と文字で「flag and records reset」と出す
+- 置き換わる問題の見出しは「置き換える問題」。印の付いた問題が置き換わるときは、その問題の行の右に、warning の flag の印と文字で「印と記録をリセット」と出す
 - 置き換わる問題ごとに、変わった項目（topic・type・text・choice A〜H・correct・explanation）の前と後を出す。正解は「A, C」のように出す。選択肢の数が変わったときは、ない側を空にする
   - text・choice A〜H・explanation の前と後は、Solve の選択肢と同じ見せ方で出す。文の中の短いコードは code-bg の地で囲み、```` ``` ```` のところは行番号のないコードブロックにして、Solve と同じ決まり（`docs/specs/solve.md` の「Solve」）で色を付ける。```` ``` ```` の記号は出さない。選択肢は等幅の文字で出す
   - topic・type・correct は、書かれた文字のまま等幅の文字で出す
-- import all を押すと、全部を取り込み、取り込んだという知らせを出す。知らせの open in manage で Manage に移る
-- cancel を押すと、ファイルを選ぶところに戻る。何も変わらない
+- すべて取り込むを押すと、全部を取り込み、取り込んだという知らせを出す。知らせの「問題の管理で見る」で Manage に移る
+- やめるを押すと、ファイルを選ぶところに戻る。何も変わらない
 
 ## 取り込んだあと
 
@@ -98,20 +98,20 @@
 ## Import（`/manage/import`）
 
 - ログインしていないと見られない（`docs/specs/sign-in.md`）。いちばん上に上のバーが出る（`docs/specs/app-bar.md`）
-- 上に、戻るリンク（manage。Manage へ）、パンくず（manage / import）、見出し「Import」を置く
-- choose file でファイルを選ぶか、点線の枠にファイルを落とすと、確かめが始まる。確かめている間は、別のファイルを選べない
-- 誤りの一覧の choose another file で、ファイルを選ぶところに戻る
+- 上に、戻るリンク（問題の管理へ戻る。Manage へ）、パンくず（問題の管理 / 取り込み）、見出し「取り込み」を置く
+- ファイルを選ぶでファイルを選ぶか、実線の枠にファイルを落とすと、確かめが始まる。確かめている間は、別のファイルを選べない
+- 誤りの一覧の「別のファイルを選ぶ」で、ファイルを選ぶところに戻る
 - 増える・置き換わる・変わらない数は、3つの枠に横に並べ、増えるは success、置き換わるは warning（0なら muted）、変わらないは muted の数字にする
 - 置き換わる問題は、1問ずつ開閉する行にする。行には ID と問題文の1行目を出し、開くと、変わった項目ごとに、前（danger の枠）と後（success の枠）を横に並べる（スマホの幅では縦）。最初の1問だけを開いておく
-- 確かめや取り込みの途中で、つながらないなどのサーバーのエラーが起きたら、danger の帯と retry を出し、何も変えない。retry は、最後に失敗した操作（確かめ・取り込み）を同じ中身でやり直す
+- 確かめや取り込みの途中で、つながらないなどのサーバーのエラーが起きたら、danger の帯と「もう一度取り込む」を出し、何も変えない。もう一度取り込むは、最後に失敗した操作（確かめ・取り込み）を同じ中身でやり直す
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| ファイルを選ぶ | 点線の枠の中に「Drop a question file here」「.json」と choose file | ![](screens/import-select.png) |
-| 確かめ中 | 点線の枠の中に、ファイル名と、点滅する「checking…」。choose file は出さない | ![](screens/import-checking.png) |
-| 誤り | danger の帯「4 problems found in python-decorators.json. Nothing was imported.」、誤りの一覧（ID・項目・内容）、choose another file | ![](screens/import-errors.png) |
-| 取り込む前の確認 | 「python-decorators.json → Python」、new・replaced・unchanged の数、「replaced — records are kept, except for flagged questions」の見出しと置き換わる問題（印付きの行の右に「flag and records reset」）。最初の置き換わる問題を開き、前（danger の枠）と後（success の枠）の中に文と色の付いたコードブロック。cancel と import all | ![](screens/import-preview.png) |
-| 取り込む前の確認（まだない Subject） | Subject の名前の右に、success の枠の「new subject」。置き換わる問題がなければ、一覧は出さない | ![](screens/import-preview-new.png) |
-| 取り込み中 | import all の文字が「importing…」になって押せない。cancel も押せない | |
-| 取り込んだ | success の枠に「imported into Python」と数（1 new · 2 replaced · 1 unchanged など）、open in manage | ![](screens/import-done.png) |
-| サーバーのエラー | danger の帯「Import failed. Nothing was imported.」と retry。その下にファイルを選ぶところ | ![](screens/import-error.png) |
+| ファイルを選ぶ | 実線の枠の中に「問題のファイルをここに置いてください」「.json」と「ファイルを選ぶ」 | ![](screens/import-select.png) |
+| 確かめ中 | 実線の枠の中に、ファイル名と、点滅する「確かめています…」。ファイルを選ぶは出さない | ![](screens/import-checking.png) |
+| 誤り | danger の帯「4 件の不備が python-decorators.json にあります。何も取り込んでいません。」、誤りの一覧（ID・項目・内容）、別のファイルを選ぶ | ![](screens/import-errors.png) |
+| 取り込む前の確認 | 「python-decorators.json → Python」、新しい問題・置き換える・変わらないの数、「置き換える問題」の見出しと置き換わる問題（印付きの行の右に「印と記録をリセット」）。最初の置き換わる問題を開き、前（danger の枠）と後（success の枠）の中に文と色の付いたコードブロック。やめるとすべて取り込む | ![](screens/import-preview.png) |
+| 取り込む前の確認（まだない Subject） | Subject の名前の右に、success の枠の「新しい科目」。置き換わる問題がなければ、一覧は出さない | ![](screens/import-preview-new.png) |
+| 取り込み中 | すべて取り込むの文字が「取り込んでいます…」になって押せない。やめるも押せない | |
+| 取り込んだ | success の枠に「Python に取り込みました」と数（新しい問題 1 · 置き換え 2 · 変わらない 1 など）、問題の管理で見る | ![](screens/import-done.png) |
+| サーバーのエラー | danger の帯「取り込めませんでした。何も取り込んでいません。」と「もう一度取り込む」。その下にファイルを選ぶところ | ![](screens/import-error.png) |

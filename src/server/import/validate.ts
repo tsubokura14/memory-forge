@@ -25,16 +25,16 @@ export type FileError = { id: string; item: string; message: string };
 export type ValidateResult =
   { ok: true; file: QuestionFile } | { ok: false; errors: FileError[] };
 
-const MISSING = "Missing.";
-const WRONG_FORMAT = "Wrong format.";
-const UNCLOSED_CODE = "Code block is not closed (```).";
+const MISSING = "ありません。";
+const WRONG_FORMAT = "形が違います。";
+const UNCLOSED_CODE = "コードブロックが閉じていません（```）。";
 const FILE_ID = "—";
 
 // 画面が、大きすぎるファイルを送らずに止めるときにも使う
 export const TOO_LARGE: FileError = {
   id: FILE_ID,
   item: "file",
-  message: "Too large. Up to 4 MB.",
+  message: "大きすぎます。4 MB までです。",
 };
 
 export function choiceLetter(index: number): string {
@@ -66,7 +66,9 @@ export function validateQuestionFile(content: string): ValidateResult {
   try {
     parsed = JSON.parse(content);
   } catch {
-    return fail([{ id: FILE_ID, item: "file", message: "Not valid JSON." }]);
+    return fail([
+      { id: FILE_ID, item: "file", message: "JSON として読めません。" },
+    ]);
   }
   if (!isRecord(parsed)) {
     return fail([{ id: FILE_ID, item: "file", message: WRONG_FORMAT }]);
@@ -94,13 +96,17 @@ export function validateQuestionFile(content: string): ValidateResult {
     return fail(errors);
   }
   if (rawQuestions.length === 0) {
-    errors.push({ id: FILE_ID, item: "questions", message: "No questions." });
+    errors.push({
+      id: FILE_ID,
+      item: "questions",
+      message: "問題が1つもありません。",
+    });
   }
   if (rawQuestions.length > MAX_QUESTIONS) {
     errors.push({
       id: FILE_ID,
       item: "questions",
-      message: `Too many questions (${formatCount(rawQuestions.length)}). Up to ${formatCount(MAX_QUESTIONS)}.`,
+      message: `問題が多すぎます（${formatCount(rawQuestions.length)}問）。${formatCount(MAX_QUESTIONS)}問までです。`,
     });
   }
 
@@ -152,7 +158,7 @@ export function validateQuestionFile(content: string): ValidateResult {
       perQuestion[positions[0]].push({
         id,
         item: "id",
-        message: `Duplicate ID (${positions.length} questions).`,
+        message: `ID が重なっています（${positions.length}問）。`,
       });
     }
   }
@@ -199,7 +205,7 @@ function readType(value: unknown, add: Add): QuestionType | undefined {
     return undefined;
   }
   if (value !== "single" && value !== "multiple") {
-    add("type", "Must be single or multiple.");
+    add("type", "single か multiple にしてください。");
     return undefined;
   }
   return value;
@@ -215,7 +221,7 @@ function readChoices(value: unknown, add: Add): string[] | undefined {
     return undefined;
   }
   if (value.length < MIN_CHOICES || value.length > MAX_CHOICES) {
-    add("choices", "Needs 2 to 8 choices.");
+    add("choices", "選択肢は2〜8個にしてください。");
     return undefined;
   }
   let ok = true;
@@ -255,22 +261,22 @@ function readCorrect(
   const valid = new Set(choices.map((_, index) => choiceLetter(index)));
   const outside = letters.filter((letter) => !valid.has(letter));
   for (const letter of outside) {
-    add("correct", `Not one of the choices (${letter}).`);
+    add("correct", `選択肢にありません（${letter}）。`);
   }
   if (outside.length > 0) return undefined;
 
   if (type === "single" && letters.length !== 1) {
-    add("correct", "Single choice needs exactly 1 correct answer.");
+    add("correct", "1つを選ぶ問題は、正解が1つだけ要ります。");
     return undefined;
   }
   if (type === "multiple" && letters.length < 2) {
-    add("correct", "Multiple choice needs 2 or more correct answers.");
+    add("correct", "すべて選ぶ問題は、正解が2つ以上要ります。");
     return undefined;
   }
   return letters;
 }
 
-// 誤りの帯に出す数。1つのときだけ単数にする
+// 誤りの帯に出す数（「4 件の不備」）
 export function countProblems(count: number): string {
-  return `${count} ${count === 1 ? "problem" : "problems"}`;
+  return `${count} 件の不備`;
 }

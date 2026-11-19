@@ -1,29 +1,25 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Sans_JP, Unbounded } from "next/font/google";
-import localFont from "next/font/local";
+import { Geist_Mono, Noto_Sans_JP, Noto_Serif_JP } from "next/font/google";
 import { themeScript } from "@/components/theme";
 import "@/styles/globals.css";
 
-// 書体の CSS 変数（--font-geist など）は、tokens.css の --font-* から使う
-const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
+// 書体の CSS 変数（--font-noto-sans-jp など）は、tokens.css の --font-* の並びの最後から使う。
+// OS に md-leaf と同じ書体がない端末（画面の画像を撮る Docker の中など）だけが、これらで出す
 const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
 });
-// 日本語の文字は subsets で選べないので、先読みしない（Google Fonts が文字の範囲ごとに分けて配る）
+// 英字（latin）の範囲だけを先読みする。先読みしないと、太字のファイルが届く前にふつうの太さから作った太字で描かれ、
+// 画面の画像が撮るたびに変わる。日本語の文字は subsets で選べないので、Google Fonts が文字の範囲ごとに分けて配る
 const notoSansJp = Noto_Sans_JP({
-  preload: false,
+  subsets: ["latin"],
+  weight: ["400", "700"],
   variable: "--font-noto-sans-jp",
 });
-const unbounded = Unbounded({
+const notoSerifJp = Noto_Serif_JP({
   subsets: ["latin"],
-  variable: "--font-unbounded",
-});
-// アイコンは、名前の文字（hardware など）を書体の合字で絵にする。書体が届く前に名前の文字が見えないよう、block にする
-const materialSymbols = localFont({
-  src: "../../node_modules/material-symbols/material-symbols-outlined.woff2",
-  display: "block",
-  variable: "--font-material-symbols",
+  weight: ["400", "700"],
+  variable: "--font-noto-serif-jp",
 });
 
 export const metadata: Metadata = {
@@ -33,8 +29,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
-      className={`${geist.variable} ${geistMono.variable} ${notoSansJp.variable} ${unbounded.variable} ${materialSymbols.variable}`}
+      lang="ja"
+      className={`${geistMono.variable} ${notoSansJp.variable} ${notoSerifJp.variable}`}
       // data-theme は、下のスクリプトが React より先に付けるので、サーバーの HTML と食い違う
       suppressHydrationWarning
     >

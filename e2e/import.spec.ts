@@ -72,7 +72,7 @@ function isServerAction(request: { method(): string; headers(): object }) {
 
 async function openImport(page: Page) {
   await page.goto("/manage/import");
-  await expect(page.getByRole("heading", { name: "Import" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "取り込み" })).toBeVisible();
 }
 
 function json(questions: TestQuestion[], subject = "Python") {
@@ -101,10 +101,10 @@ test("確かめている間は、ファイル名と checking… を出し、フ�
   await openImport(page);
   await chooseFile(page, "python-decorators.json", json(next));
 
-  await expect(page.getByText("checking…")).toBeVisible();
-  await expect(page.getByRole("button", { name: "choose file" })).toHaveCount(
-    0,
-  );
+  await expect(page.getByText("確かめています…")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "ファイルを選ぶ" }),
+  ).toHaveCount(0);
   await expect(page).toHaveScreenshot("import-checking.png", {
     fullPage: true,
   });
@@ -127,12 +127,14 @@ test("誤りがあると、誤りの数と一覧を出し、何も取り込ま�
   );
 
   await expect(page.getByRole("main").getByRole("alert")).toHaveText(
-    "4 problems found in python-decorators.json. Nothing was imported.",
+    "4 件の不備が python-decorators.json にあります。何も取り込んでいません。",
   );
   await expect(page).toHaveScreenshot("import-errors.png", { fullPage: true });
 
-  await page.getByRole("button", { name: "choose another file" }).click();
-  await expect(page.getByText("Drop a question file here")).toBeVisible();
+  await page.getByRole("button", { name: "別のファイルを選ぶ" }).click();
+  await expect(
+    page.getByText("問題のファイルをここに置いてください"),
+  ).toBeVisible();
 });
 
 test("取り込む前の確認で、数と置き換わる問題の前と後を出し、cancel では何も変わらない", async ({
@@ -141,11 +143,15 @@ test("取り込む前の確認で、数と置き換わる問題の前と後を�
   await openImport(page);
   await chooseFile(page, "python-decorators.json", json(next));
 
-  await expect(page.getByRole("button", { name: "import all" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "すべて取り込む" }),
+  ).toBeVisible();
   await expect(page).toHaveScreenshot("import-preview.png", { fullPage: true });
 
-  await page.getByRole("button", { name: "cancel" }).click();
-  await expect(page.getByText("Drop a question file here")).toBeVisible();
+  await page.getByRole("button", { name: "やめる" }).click();
+  await expect(
+    page.getByText("問題のファイルをここに置いてください"),
+  ).toBeVisible();
 });
 
 test("まだない Subject のときは new subject と出す", async ({ page }) => {
@@ -156,8 +162,10 @@ test("まだない Subject のときは new subject と出す", async ({ page })
     json([testQuestion("r1"), testQuestion("r2")], "Rust"),
   );
 
-  await expect(page.getByRole("button", { name: "import all" })).toBeVisible();
-  await expect(page.getByText("new subject")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "すべて取り込む" }),
+  ).toBeVisible();
+  await expect(page.getByText("新しい科目")).toBeVisible();
   await expect(page).toHaveScreenshot("import-preview-new.png", {
     fullPage: true,
   });
@@ -168,9 +176,9 @@ test("import all で取り込み、取り込んだという知らせを出す", 
 }) => {
   await openImport(page);
   await chooseFile(page, "python-decorators.json", json(next));
-  await page.getByRole("button", { name: "import all" }).click();
+  await page.getByRole("button", { name: "すべて取り込む" }).click();
 
-  await expect(page.getByText("imported into Python")).toBeVisible();
+  await expect(page.getByText("Python に取り込みました")).toBeVisible();
   await expect(page).toHaveScreenshot("import-done.png", { fullPage: true });
 });
 
@@ -188,13 +196,17 @@ test("サーバーにつながらないと、帯と retry を出し、ファイ�
   await chooseFile(page, "python-decorators.json", json(next));
 
   await expect(page.getByRole("main").getByRole("alert")).toHaveText(
-    /Import failed\. Nothing was imported\./,
+    /取り込めませんでした。何も取り込んでいません。/,
   );
-  await expect(page.getByRole("button", { name: "choose file" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "ファイルを選ぶ" }),
+  ).toBeVisible();
   await expect(page).toHaveScreenshot("import-error.png", { fullPage: true });
 
   // つながるようにしてから retry すると、同じ中身で確かめ直す
   await page.unrouteAll();
-  await page.getByRole("button", { name: "retry" }).click();
-  await expect(page.getByRole("button", { name: "import all" })).toBeVisible();
+  await page.getByRole("button", { name: "もう一度取り込む" }).click();
+  await expect(
+    page.getByRole("button", { name: "すべて取り込む" }),
+  ).toBeVisible();
 });

@@ -17,7 +17,7 @@ test("login-default", async ({ page }) => {
   await expect(page).toHaveScreenshot("login-default.png", { fullPage: true });
 });
 
-test("Google に移るまでの間は、ボタンが signing in… になって押せない", async ({
+test("Google に移るまでの間は、ボタンがログインしています… になって押せない", async ({
   page,
 }) => {
   // 返事を返さずに止めて、移っている間の画面を撮る
@@ -28,10 +28,10 @@ test("Google に移るまでの間は、ボタンが signing in… になって�
     },
   );
   await page.goto("/login");
-  await page.getByRole("button", { name: "sign in with google" }).click();
+  await page.getByRole("button", { name: "Google でログインする" }).click();
 
   await expect(
-    page.getByRole("button", { name: "signing in…" }),
+    page.getByRole("button", { name: "ログインしています…" }),
   ).toBeDisabled();
   await expect(page).toHaveScreenshot("login-loading.png", { fullPage: true });
 });
@@ -50,9 +50,11 @@ test("サーバーにつながらないと、エラーの帯が出る", async ({
       isServerAction(route.request()) ? route.abort() : route.continue(),
   );
   await page.goto("/login");
-  await page.getByRole("button", { name: "sign in with google" }).click();
+  await page.getByRole("button", { name: "Google でログインする" }).click();
 
-  await expect(banner(page)).toHaveText("Couldn't sign in. Please try again.");
+  await expect(banner(page)).toHaveText(
+    "ログインできませんでした。もう一度お試しください。",
+  );
   await expect(page).toHaveScreenshot("login-server-error.png", {
     fullPage: true,
   });
@@ -64,7 +66,9 @@ test("紐づけていない Google アカウントで戻ってくると、帯が
   // Google から戻ってきたときの URL（Better Auth が error を付ける）を直接開く
   await page.goto("/login?error=signup_disabled");
 
-  await expect(banner(page)).toHaveText("This Google account isn't linked.");
+  await expect(banner(page)).toHaveText(
+    "この Google アカウントは紐づけられていません。",
+  );
   await expect(page).toHaveScreenshot("login-google-error.png", {
     fullPage: true,
   });

@@ -63,6 +63,12 @@ async function insertStreak(daysBack: number[]) {
   );
 }
 
+// 「続きから」を Python にする。Python の最後に正解した問題（s1-c0）に正解を足すので、身についている具合は変わらない。
+// 同じ日時の答えは、あとに入れた答えを最近とする（getContinueSubject）
+async function answerPythonLast(answeredAt?: Date) {
+  await insertAnswers([{ questionId: "s1-c0", correct: true, answeredAt }]);
+}
+
 // home-default と同じ4つの Subject
 function defaultSubjects() {
   return [
@@ -88,11 +94,13 @@ test.describe("ログインした状態を保存したもので開く", () => {
   test("home-empty", async ({ page }) => {
     await resetQuestions();
     await page.goto("/");
-    await expect(page.getByText("No subjects yet.")).toBeVisible();
+    await expect(page.getByText("まだ科目がありません。")).toBeVisible();
+    // Subject がないときは「続きから」を出さない
+    await expect(page.getByText("続きから")).toHaveCount(0);
     await expect(page).toHaveScreenshot("home-empty.png", { fullPage: true });
   });
 
-  test("home-default：Subject を取り込んだ順に並べ、押すと Setup に移る", async ({
+  test("home-default：続きからと Subject を並べ、押すと Setup に移る", async ({
     page,
   }) => {
     // Python の印の付いた問題は数えず、Home には印の数も出さない
@@ -100,11 +108,16 @@ test.describe("ログインした状態を保存したもので開く", () => {
     const ids = await resetWithAnswers(list);
     // 今日を含めて12日続いている
     await insertStreak(range(1, 11));
+    await answerPythonLast();
     await page.goto("/");
-    const subjects = page.getByRole("list", { name: "subjects" });
+    const subjects = page.getByRole("list", { name: "科目" });
     // 並びは listSubjects の Vitest で確かめる。ここでは読み終えるのを待つ
     await expect(subjects.getByRole("link")).toHaveCount(list.length);
-    await expect(page.getByText("done today")).toBeVisible();
+    const card = page.getByRole("region", { name: "続きから" });
+    await expect(card.getByText("Python")).toBeVisible();
+    // 最後に間違えた10問 + まだ解いていない8問（印の付いた問題は数えない）
+    await expect(card.getByText("18問がまだ身についていません")).toBeVisible();
+    await expect(card.getByText("12日連続", { exact: true })).toBeVisible();
     await expect(page).toHaveScreenshot("home-default.png", { fullPage: true });
 
     await page.setViewportSize({ width: 390, height: 844 });
@@ -115,16 +128,27 @@ test.describe("ログインした状態を保存したもので開く", () => {
 
     await subjects.getByRole("link", { name: "Python" }).click();
     await expect(page).toHaveURL(`/subjects/${ids[1]}`);
+
+    await page.goto("/");
+    await card.getByRole("link", { name: "解きはじめる" }).click();
+    await expect(page).toHaveURL(`/subjects/${ids[1]}`);
+
+    await page.goto("/");
+    await page.getByRole("link", { name: "問題の管理" }).click();
+    await expect(page).toHaveURL("/manage");
+
+    await page.goto("/");
+    await page.getByRole("link", { name: "設定" }).click();
+    await expect(page).toHaveURL("/settings");
   });
 
   test("home-streak-pending", async ({ page }) => {
     // 昨日まで12日続いていて、今日はまだ
     await resetWithAnswers(defaultSubjects(), daysAgo(1));
     await insertStreak(range(2, 12));
+    await answerPythonLast(daysAgo(1));
     await page.goto("/");
-    await expect(
-      page.getByText("answer today to keep the flame"),
-    ).toBeVisible();
+    await expect(page.getByText("12日連続・今日はまだ")).toBeVisible();
     await expect(page).toHaveScreenshot("home-streak-pending.png", {
       fullPage: true,
     });
@@ -133,9 +157,10 @@ test.describe("ログインした状態を保存したもので開く", () => {
   test("home-no-streak", async ({ page }) => {
     // 今週は月曜だけ答え、昨日も今日も答えていない
     await resetWithAnswers(defaultSubjects(), daysAgo(3));
+    await answerPythonLast(daysAgo(3));
     await page.goto("/");
     await expect(
-      page.getByText("answer a question to light the flame"),
+      page.getByText("今日解くと連続日数が始まります"),
     ).toBeVisible();
     await expect(page).toHaveScreenshot("home-no-streak.png", {
       fullPage: true,
@@ -146,8 +171,9 @@ test.describe("ログインした状態を保存したもので開く", () => {
     // 今日を含めて9999日続いている
     await resetWithAnswers(defaultSubjects());
     await insertStreak(range(1, 9998));
+    await answerPythonLast();
     await page.goto("/");
-    await expect(page.getByText("9999")).toBeVisible();
+    await expect(page.getByText("9,999日連続")).toBeVisible();
     await expect(page).toHaveScreenshot("home-long.png", { fullPage: true });
 
     await page.setViewportSize({ width: 390, height: 844 });
@@ -189,7 +215,7 @@ test.describe("ログインした状態を保存したもので開く", () => {
     );
     await page.goto("/");
     await expect(
-      page.getByRole("list", { name: "subjects" }).getByRole("link"),
+      page.getByRole("list", { name: "科目" }).getByRole("link"),
     ).toHaveCount(names.length);
     await expect(page).toHaveScreenshot("home-many.png", { fullPage: true });
   });
@@ -204,12 +230,12 @@ test("sign out すると Login に移り、戻っても中身は見えない", a
   await page.goto("/");
   await expect(page).toHaveURL("/");
 
-  await page.getByRole("button", { name: "sign out" }).click();
+  await page.getByRole("button", { name: "ログアウト" }).click();
   await expect(page).toHaveURL("/login");
 
   await page.goBack();
   await expect(page).toHaveURL(/^[^?]*\/login\?next=%2F$/);
   await expect(
-    page.getByRole("button", { name: "sign in with google" }),
+    page.getByRole("button", { name: "Google でログインする" }),
   ).toBeVisible();
 });

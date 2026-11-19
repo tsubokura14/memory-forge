@@ -10,17 +10,14 @@ import "prismjs/components/prism-sql";
 import "prismjs/components/prism-bash";
 import "prismjs/components/prism-json";
 
-export type CodeKind =
-  "keyword" | "string" | "function" | "builtin" | "decorator" | "comment";
+// md-leaf と同じ3色だけに分ける（docs/ui.md の「コードの色分け」）。ほかは null（code-text の色）
+export type CodeKind = "keyword" | "string" | "comment";
 
 export type Segment = { text: string; kind: CodeKind | null };
 
 const KINDS: readonly string[] = [
   "keyword",
   "string",
-  "function",
-  "builtin",
-  "decorator",
   "comment",
 ] satisfies CodeKind[];
 
@@ -65,7 +62,7 @@ function flatten(
   }
 }
 
-// Prism の種類（type）、なければ別名（alias）で、6つの種類に当てはめる
+// Prism の種類（type）、なければ別名（alias）で、3つの種類に当てはめる
 function kindOf(token: Prism.Token): CodeKind | null {
   const aliases =
     typeof token.alias === "string" ? [token.alias] : (token.alias ?? []);

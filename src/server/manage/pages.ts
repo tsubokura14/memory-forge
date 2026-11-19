@@ -24,9 +24,9 @@ export function pageItems(current: number, last: number): (number | "…")[] {
   return items;
 }
 
-// 「151–200 of 480」。最後のページは、全部の数で止める
+// 「480問中 151–200」。最後のページは、全部の数で止める
 export function rangeText(page: number, total: number): string {
   const first = (page - 1) * PAGE_SIZE + 1;
   const end = Math.min(page * PAGE_SIZE, total);
-  return `${first}–${end} of ${total}`;
+  return `${total}問中 ${first}–${end}`;
 }

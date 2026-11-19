@@ -58,7 +58,7 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
   - 画面（`src/app/(app)/manage/page.tsx`）は、cookie を読んで一覧をサーバーで組み立てる
   - 選び方を変えるアクション・消すアクション・印を外すアクション（`src/app/(app)/manage/actions.ts`）が cookie を書く。消すアクションは、消したあとに出す選び方を書く。cookie を書くと、Next.js が同じ画面をサーバーで組み立て直して返すので、一覧を読み直す処理を別に持たない
   - 読むときも書くときも `src/server/manage/selection.ts` の `parseSaved` で形を確かめ、なくなった Subject・Topic・ページは `resolveSelection` で今あるものに合わせる
-- 理由：読み込み直したときと、ほかの画面（Home の manage、Import の戻るリンク）から来たときに、同じ選び方のまま開くため。URL に持つと、リンクから来たときに選び方がなくなる
+- 理由：読み込み直したときと、ほかの画面（Home の「問題の管理」、Import の戻るリンク）から来たときに、同じ選び方のまま開くため。URL に持つと、リンクから来たときに選び方がなくなる
 - 前提（崩れたら見直す）：選び方を、ほかの端末と分け合わない。ブラウザの戻るで、ページを1つずつ戻らなくてよい。cookie はブラウザを閉じるまでのもの（期限を付けない）
 
 ## テーマ
@@ -123,9 +123,9 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 - 基準の画像は `docs/specs/screens/<画面>-<状態>.png`（OS 名を入れない）
 - 撮るたびに変わるものを止める
   - 日時：ブラウザの日時を `page.clock` で固定する（`e2e/fixtures.ts`）。画像を撮るテストは、ここの `test` を使う
-  - 書体：`next/font` でアプリから配り（`src/app/layout.tsx`）、イメージに入っている書体に頼らない
+  - 書体：`src/styles/tokens.css` の書体の並びは OS の書体（ヒラギノ・游ゴシック・ヒラギノ明朝・游明朝・ui-monospace など）を先に置き、最後に `next/font` でアプリから配る Noto Sans JP・Noto Serif JP・Geist Mono を置く（`src/app/layout.tsx`）。Docker のイメージには OS の書体がないので、配った書体で決まって撮れる。イメージに入っている書体に頼らない
   - サーバーの日時：サーバーで「今」を使うところ（Home の連続日数）は `src/server/clock.ts` の `now()` を呼ぶ。`now()` は環境変数 `FIXED_NOW` があればその日時を返す。`FIXED_NOW` は `playwright.config.ts` の `webServer.env` にだけ置き、値はブラウザの日時と同じ `e2e/fixtures.ts` の定数にする（ほかの環境変数のファイル・GitHub の Secret・Vercel には置かない）
-    - 理由：サーバーで組み立てる画面の日付（今日・今週）を、撮るたびに同じにするため
+    - 理由：サーバーで組み立てる画面の日付（今日）を、撮るたびに同じにするため
     - 答えを記録するとき（`src/server/solve/answer.ts`）は、今のままデータベースの `now()` で答えた日時を入れる。画面のテストで答えの日時を決めたいときは、`e2e/questions.ts` の `insertAnswers` で日時を指定して入れる
     - 前提（崩れたら見直す）：画面のテストの中で、Solve で答えてから Home の連続日数を見ることはしない（答えは今の日時、Home は固定した日時で数えるため合わない）
   - アニメーション：`toHaveScreenshot` の既定で止まる

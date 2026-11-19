@@ -3,9 +3,6 @@ import { highlight, type CodeKind } from "@/server/questions/highlight";
 const KIND_CLASS: Record<CodeKind, string> = {
   keyword: "text-code-keyword",
   string: "text-code-string",
-  function: "text-code-function",
-  builtin: "text-code-builtin",
-  decorator: "text-code-decorator",
   comment: "text-code-comment",
 };
 

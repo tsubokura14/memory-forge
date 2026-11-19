@@ -8,7 +8,6 @@ describe("tokyoDate", () => {
   });
 });
 
-// 2026-01-12 が月曜、2026-01-15 が木曜、2026-01-18 が日曜
 describe("dayStreak", () => {
   test("今日答えていれば、今日を含めて数え、done", () => {
     expect(
@@ -19,52 +18,22 @@ describe("dayStreak", () => {
     ).toEqual({
       days: 4,
       today: "done",
-      week: [
-        "answered",
-        "answered",
-        "answered",
-        "answered",
-        "upcoming",
-        "upcoming",
-        "upcoming",
-      ],
-      todayIndex: 3,
     });
   });
 
-  test("今日まだで昨日答えていれば、昨日までの日数で keep。今日は pending", () => {
+  test("今日まだで昨日答えていれば、昨日までの日数で keep", () => {
     expect(
       dayStreak(["2026-01-12", "2026-01-13", "2026-01-14"], "2026-01-15"),
     ).toEqual({
       days: 3,
       today: "keep",
-      week: [
-        "answered",
-        "answered",
-        "answered",
-        "pending",
-        "upcoming",
-        "upcoming",
-        "upcoming",
-      ],
-      todayIndex: 3,
     });
   });
 
-  test("今日も昨日もなければ0で none。今週答えた日は answered のまま、答えなかった日は missed", () => {
+  test("今日も昨日もなければ0で none", () => {
     expect(dayStreak(["2026-01-13"], "2026-01-15")).toEqual({
       days: 0,
       today: "none",
-      week: [
-        "missed",
-        "answered",
-        "missed",
-        "pending",
-        "upcoming",
-        "upcoming",
-        "upcoming",
-      ],
-      todayIndex: 3,
     });
   });
 
@@ -84,39 +53,5 @@ describe("dayStreak", () => {
         "2026-01-02",
       ).days,
     ).toBe(4);
-  });
-
-  test("今日が月曜なら、week の最初が今日で、前の週の日は入らない", () => {
-    expect(dayStreak(["2026-01-11"], "2026-01-12")).toEqual({
-      days: 1,
-      today: "keep",
-      week: [
-        "pending",
-        "upcoming",
-        "upcoming",
-        "upcoming",
-        "upcoming",
-        "upcoming",
-        "upcoming",
-      ],
-      todayIndex: 0,
-    });
-  });
-
-  test("今日が日曜なら、week の最後が今日", () => {
-    expect(dayStreak(["2026-01-18"], "2026-01-18")).toEqual({
-      days: 1,
-      today: "done",
-      week: [
-        "missed",
-        "missed",
-        "missed",
-        "missed",
-        "missed",
-        "missed",
-        "answered",
-      ],
-      todayIndex: 6,
-    });
   });
 });

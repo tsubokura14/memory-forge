@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/components/icons";
 import { useState, useTransition } from "react";
 import { Banner } from "@/components/banner";
 import { Button } from "@/components/button";
@@ -21,7 +22,7 @@ import {
 } from "./actions";
 import { ManageHeader } from "./manage-header";
 
-// Topic のプルダウンの、All topics の行の key（Topic の名前と重ならないように、名前には入らない空の文字にする）
+// Topic のプルダウンの、すべての Topic の行の key（Topic の名前と重ならないように、名前には入らない空の文字にする）
 const ALL_TOPICS = "";
 
 // 確認のダイアログを開いている、消すもの
@@ -40,16 +41,16 @@ export function ManageView({
   selected: NonNullable<Manage["selected"]>;
 }) {
   const [pending, startTransition] = useTransition();
-  // 読み込めなかった選び方。retry で、同じ選び方をもう一度送る
+  // 読み込めなかった選び方。「もう一度読み込む」で、同じ選び方をもう一度送る
   const [failed, setFailed] = useState<Saved | null>(null);
   // 書き出せなかった Subject の名前。もう一度書き出せたときと、選び方を変えたときに消す
   const [exportFailed, setExportFailed] = useState<string | null>(null);
   // 印を外せなかった問題の ID。もう一度外せたときと、選び方を変えたときに消す
   const [unflagFailed, setUnflagFailed] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<Deleting | null>(null);
-  // 消している間（返事が来て、組み立て直した一覧が出るまで）は、cancel と delete を押せず、Esc でも閉じない
+  // 消している間（返事が来て、組み立て直した一覧が出るまで）は、やめると削除するを押せず、Esc でも閉じない
   const [deletePending, startDelete] = useTransition();
-  // 「Couldn't delete.」の帯。開き直したときと、もう一度 delete を押したときに消す
+  // 「削除できませんでした。」の帯。開き直したときと、もう一度削除するを押したときに消す
   const [deleteFailed, setDeleteFailed] = useState(false);
 
   const subject = subjects.find((s) => s.id === selected.subjectId);
@@ -133,9 +134,6 @@ export function ManageView({
 
   const topicTotal = selected.topics.reduce((sum, t) => sum + t.count, 0);
   const flaggedTotal = subject?.flagged ?? 0;
-  const [first, ...rest] = rangeText(selected.page, selected.total).split(
-    " of ",
-  );
 
   return (
     <>
@@ -144,17 +142,17 @@ export function ManageView({
         {!(selected.flagged && flaggedTotal === 0) && (
           <Button variant="outline" onClick={exportSubject}>
             {selected.flagged
-              ? `export flagged · ${subjectName}`
-              : `export ${subjectName}`}
+              ? `${subjectName} の不備の印を書き出す`
+              : `${subjectName} を書き出す`}
           </Button>
         )}
       </ManageHeader>
       <div className="flex flex-col gap-3">
         {/* スマホの幅では、Subject と Topic を縦に並べる */}
         <div className="flex flex-col gap-3 rounded-md border border-border bg-surface p-3 sm:flex-row">
-          <Field label="subject">
+          <Field label="科目">
             <Dropdown
-              label="subject"
+              label="科目"
               className="min-w-0 flex-1"
               options={subjects.map((s) => ({
                 key: String(s.id),
@@ -173,18 +171,18 @@ export function ManageView({
               }
             />
             <DeleteIcon
-              label="delete subject"
+              label="科目を削除"
               onClick={() => openDelete({ kind: "subject" })}
             />
           </Field>
-          <Field label="topic">
+          <Field label="Topic">
             <Dropdown
-              label="topic"
+              label="Topic"
               className="min-w-0 flex-1"
               options={[
                 {
                   key: ALL_TOPICS,
-                  label: "All topics",
+                  label: "すべての Topic",
                   count: topicTotal,
                   flagged: flaggedTotal,
                   divider: true,
@@ -206,10 +204,10 @@ export function ManageView({
                 })
               }
             />
-            {/* All topics のときは、Topic の delete を出さない */}
+            {/* すべての Topic のときは、Topic の削除を出さない */}
             {selected.topic !== null && (
               <DeleteIcon
-                label="delete topic"
+                label="Topic を削除"
                 onClick={() =>
                   openDelete({
                     kind: "topic",
@@ -238,43 +236,41 @@ export function ManageView({
               })
             }
           >
-            <span aria-hidden className="icon text-base leading-none">
-              flag
-            </span>
-            flagged
+            <Icon name="flag" className="text-base leading-none" />
+            不備の印
           </Button>
         </div>
 
         {exportFailed !== null && (
-          <Banner>Couldn&apos;t export {exportFailed}.</Banner>
+          <Banner>{exportFailed} を書き出せませんでした。</Banner>
         )}
         {unflagFailed !== null && (
-          <Banner>Couldn&apos;t unflag {unflagFailed}.</Banner>
+          <Banner>{unflagFailed} の印を外せませんでした。</Banner>
         )}
 
-        {/* retry を押したあとも、返事が来るまでは読み込み中を出す */}
+        {/* もう一度読み込むを押したあとも、返事が来るまでは読み込み中を出す */}
         {pending ? (
           <QuestionsSkeleton />
         ) : failed ? (
           <Banner
             action={
               <Button variant="danger" onClick={() => select(failed)}>
-                retry
+                もう一度読み込む
               </Button>
             }
           >
-            Couldn&apos;t load questions.
+            問題を読み込めませんでした。
           </Banner>
         ) : selected.total === 0 ? (
           // 問題が0問の Subject はないので、0件になるのは flagged の一覧だけ
           <EmptyState
-            title={`No flagged questions in ${selected.topic ?? subjectName}.`}
+            title={`${selected.topic ?? subjectName} に不備の印の付いた問題はありません。`}
           />
         ) : (
           <>
             <div className="flex min-h-7 items-center justify-between gap-3">
-              <p className="font-mono text-xs">
-                {first} <span className="text-muted">of</span> {rest.join("")}
+              <p className="text-xs">
+                {rangeText(selected.page, selected.total)}
               </p>
               <Pagination
                 page={selected.page}
@@ -290,7 +286,7 @@ export function ManageView({
               />
             </div>
             <ul
-              aria-label="questions"
+              aria-label="問題"
               className="flex flex-col divide-y divide-border overflow-hidden rounded-md border border-border bg-surface"
             >
               {selected.questions.map((q) => (
@@ -330,28 +326,28 @@ export function ManageView({
               disabled={deletePending}
               onClick={closeDelete}
             >
-              cancel
+              やめる
             </Button>
             <Button
               variant="destructive"
               disabled={deletePending}
               onClick={confirmDelete}
             >
-              delete
+              削除する
             </Button>
           </>
         }
       >
-        {deleteFailed && <Banner>Couldn&apos;t delete.</Banner>}
+        {deleteFailed && <Banner>削除できませんでした。</Banner>}
       </Dialog>
     </>
   );
 }
 
 function deleteTitle(deleting: Deleting | null, subjectName: string) {
-  if (deleting?.kind === "question") return "Delete this question?";
+  if (deleting?.kind === "question") return "この問題を削除しますか？";
   const name = deleting?.kind === "topic" ? deleting.topic : subjectName;
-  return `Delete “${name}”?`;
+  return `「${name}」を削除しますか？`;
 }
 
 function deleteDescription(
@@ -359,26 +355,17 @@ function deleteDescription(
   topicCount: number,
   questionCount: number,
 ) {
-  const end = "This can't be undone.";
+  const end = "元に戻せません。";
   if (deleting?.kind === "question") {
-    return `Its records will be deleted too. ${end}`;
+    return `この問題の記録も削除します。${end}`;
   }
   if (deleting?.kind === "topic") {
-    return `${questionsText(deleting.count)} will be deleted. ${end}`;
+    return `${deleting.count}問と、その記録を削除します。${end}`;
   }
-  return `${plural(topicCount, "topic")}, ${questionsText(questionCount)} will be deleted. ${end}`;
+  return `${topicCount} の Topic と ${questionCount} 問、その記録を削除します。${end}`;
 }
 
-// 数が1のときは単数にする（1 topic、1 question and its records）
-function plural(count: number, word: string) {
-  return `${count} ${word}${count === 1 ? "" : "s"}`;
-}
-
-function questionsText(count: number) {
-  return `${plural(count, "question")} and ${count === 1 ? "its" : "their"} records`;
-}
-
-// Subject・Topic のプルダウンのすぐ右に置く、delete の印だけのボタン
+// Subject・Topic のプルダウンのすぐ右に置く、削除の印だけのボタン
 function DeleteIcon({
   label,
   onClick,
@@ -393,9 +380,7 @@ function DeleteIcon({
       aria-label={label}
       onClick={onClick}
     >
-      <span aria-hidden className="icon text-lg leading-none">
-        delete
-      </span>
+      <Icon name="trash-2" className="text-lg leading-none" />
     </Button>
   );
 }
@@ -413,7 +398,7 @@ function download(fileName: string, content: string) {
   setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
-// 見出しの下に、プルダウンと、そのすぐ右の delete を横に並べる
+// 見出しの下に、プルダウンと、そのすぐ右の削除を横に並べる
 function Field({
   label,
   children,
@@ -423,7 +408,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5 sm:w-64">
-      <span aria-hidden className="font-mono text-xs text-muted">
+      <span aria-hidden className="text-xs text-muted">
         {label}
       </span>
       <div className="flex gap-2">{children}</div>

@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { Button } from "./button";
 
-// ファイルを落とすか選ぶ、点線の枠（docs/ui.md の「0件」と同じ点線の枠）。busy の間は、選ぶボタンを出さず、落としても受け取らない
+// ファイルを落とすか選ぶ、実線の枠（docs/ui.md の「0件」と同じ実線の枠）。busy の間は、選ぶボタンを出さず、落としても受け取らない
 export function DropZone({
   accept,
   hint,
@@ -28,18 +28,18 @@ export function DropZone({
         const file = event.dataTransfer.files[0];
         if (!busy && file) onFile(file);
       }}
-      className="flex flex-col items-center gap-1 rounded-md border border-dashed border-border bg-surface px-4 py-10 text-center"
+      className="flex flex-col items-center gap-1 rounded-md border border-border bg-surface px-4 py-10 text-center"
     >
       {children ?? (
         <>
-          <p className="text-base">Drop a question file here</p>
-          <p className="font-mono text-xs text-muted">{hint}</p>
+          <p className="text-base">問題のファイルをここに置いてください</p>
+          <p className="text-xs text-muted">{hint}</p>
           <Button
             type="button"
             className="mt-3"
             onClick={() => input.current?.click()}
           >
-            choose file
+            ファイルを選ぶ
           </Button>
           <input
             ref={input}

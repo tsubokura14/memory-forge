@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/components/icons";
 import { unstable_rethrow } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Banner } from "@/components/banner";
@@ -58,16 +59,12 @@ export function GoogleAccounts({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-start gap-3">
-        <span className="w-20 shrink-0 pt-1 font-mono text-xs text-muted">
-          google
-        </span>
+        <span className="w-20 shrink-0 pt-1 text-xs text-muted">Google</span>
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <ul className="flex flex-col gap-2">
-            {/* unlink がなくても、ほかの行（md のボタンの高さ）とそろえる */}
-            <li className="flex min-h-9.5 min-w-0 items-center gap-1 font-mono text-sm">
-              <span aria-hidden className="icon text-base leading-none">
-                check
-              </span>
+            {/* 外すがなくても、ほかの行（md のボタンの高さ）とそろえる */}
+            <li className="flex min-h-9.5 min-w-0 items-center gap-1 text-sm">
+              <Icon name="check" className="text-base leading-none" />
               <span className="truncate">{owner}</span>
             </li>
             {accounts.map((account) => {
@@ -77,10 +74,8 @@ export function GoogleAccounts({
                   key={account.id}
                   className="flex items-center justify-between gap-3"
                 >
-                  <span className="flex min-w-0 items-center gap-1 font-mono text-sm">
-                    <span aria-hidden className="icon text-base leading-none">
-                      check
-                    </span>
+                  <span className="flex min-w-0 items-center gap-1 text-sm">
+                    <Icon name="check" className="text-base leading-none" />
                     <span className="truncate">{account.email}</span>
                   </span>
                   <Button
@@ -88,7 +83,7 @@ export function GoogleAccounts({
                     disabled={pending}
                     onClick={() => unlink(account.id)}
                   >
-                    {pending ? "unlinking…" : "unlink"}
+                    {pending ? "外しています…" : "外す"}
                   </Button>
                 </li>
               );
@@ -96,19 +91,23 @@ export function GoogleAccounts({
           </ul>
           <div>
             <Button variant="outline" disabled={linking} onClick={link}>
-              {linking ? "linking…" : "link google account"}
+              {linking ? "紐づけています…" : "Google アカウントを紐づける"}
             </Button>
           </div>
         </div>
       </div>
       <p className="text-xs text-muted">
-        Once linked, you can sign in with these Google accounts.
+        紐づけた Google アカウントでも、ログインできます。
       </p>
       {error === "link" && (
-        <Banner>Couldn&apos;t link your Google account. Try again.</Banner>
+        <Banner>
+          Google アカウントを紐づけられませんでした。もう一度試してください。
+        </Banner>
       )}
       {error === "unlink" && (
-        <Banner>Couldn&apos;t unlink your Google account. Try again.</Banner>
+        <Banner>
+          Google アカウントを外せませんでした。もう一度試してください。
+        </Banner>
       )}
     </div>
   );

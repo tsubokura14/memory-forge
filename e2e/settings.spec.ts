@@ -31,10 +31,15 @@ async function holdServerActions(page: Page, mode: "hold" | "abort") {
 
 test("settings-default", async ({ page }) => {
   await page.goto("/settings");
-  await expect(page.getByRole("radio", { name: "system" })).toBeChecked();
+  await expect(page.getByRole("heading", { name: "設定" })).toBeVisible();
+  await expect(
+    page.getByRole("radio", { name: "端末に合わせる" }),
+  ).toBeChecked();
   // 自分の Google アカウントがいちばん上に出て、外せない
   await expect(page.getByText(TEST_USER.email)).toBeVisible();
-  await expect(page.getByRole("button", { name: "unlink" })).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "外す", exact: true }),
+  ).toHaveCount(0);
   await expect(page).toHaveScreenshot("settings-default.png", {
     fullPage: true,
   });
@@ -42,7 +47,7 @@ test("settings-default", async ({ page }) => {
 
 test("settings-dark：dark を押すと、その場で暗くなる", async ({ page }) => {
   await page.goto("/settings");
-  await page.getByRole("radio", { name: "dark" }).click();
+  await page.getByRole("radio", { name: "ダーク" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect(page).toHaveScreenshot("settings-dark.png", { fullPage: true });
 });
@@ -50,7 +55,7 @@ test("settings-dark：dark を押すと、その場で暗くなる", async ({ pa
 test("light を押すと、OS が暗くても、その場で明るくなる", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("/settings");
-  await page.getByRole("radio", { name: "light" }).click();
+  await page.getByRole("radio", { name: "ライト" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 });
 
@@ -58,11 +63,11 @@ test("選んだ値を覚えていて、読み直しても暗く、dark が選ば
   page,
 }) => {
   await page.goto("/settings");
-  await page.getByRole("radio", { name: "dark" }).click();
+  await page.getByRole("radio", { name: "ダーク" }).click();
 
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await expect(page.getByRole("radio", { name: "dark" })).toBeChecked();
+  await expect(page.getByRole("radio", { name: "ダーク" })).toBeChecked();
 });
 
 test("settings-linked：unlink を押すとその行が消え、足したものを全部外すと自分の Google アカウントだけが残る", async ({
@@ -74,7 +79,7 @@ test("settings-linked：unlink を押すとその行が消え、足したもの�
     fullPage: true,
   });
 
-  const unlinks = page.getByRole("button", { name: "unlink" });
+  const unlinks = page.getByRole("button", { name: "外す", exact: true });
   await unlinks.first().click();
   await expect(page.getByText("me@gmail.com", { exact: true })).toBeHidden();
   await expect(page.getByText("me.work@gmail.com")).toBeVisible();
@@ -95,9 +100,11 @@ test("settings-unlinking：外している間は、押した行のボタンが u
   await resetGoogleAccounts(["me@gmail.com", "me.work@gmail.com"]);
   await holdServerActions(page, "hold");
   await page.goto("/settings");
-  await page.getByRole("button", { name: "unlink" }).first().click();
+  await page.getByRole("button", { name: "外す", exact: true }).first().click();
 
-  await expect(page.getByRole("button", { name: "unlinking…" })).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "外しています…" }),
+  ).toBeDisabled();
   await expect(page).toHaveScreenshot("settings-unlinking.png", {
     fullPage: true,
   });
@@ -109,10 +116,10 @@ test("settings-unlink-error：外せなかったら、行を残して帯を出�
   await resetGoogleAccounts(["me@gmail.com", "me.work@gmail.com"]);
   await holdServerActions(page, "abort");
   await page.goto("/settings");
-  await page.getByRole("button", { name: "unlink" }).first().click();
+  await page.getByRole("button", { name: "外す", exact: true }).first().click();
 
   await expect(banner(page)).toHaveText(
-    "Couldn't unlink your Google account. Try again.",
+    "Google アカウントを外せませんでした。もう一度試してください。",
   );
   await expect(page.getByText("me@gmail.com", { exact: true })).toBeVisible();
   await expect(page).toHaveScreenshot("settings-unlink-error.png", {
@@ -125,9 +132,13 @@ test("settings-linking：Google に移るまでの間は、link google account �
 }) => {
   await holdServerActions(page, "hold");
   await page.goto("/settings");
-  await page.getByRole("button", { name: "link google account" }).click();
+  await page
+    .getByRole("button", { name: "Google アカウントを紐づける" })
+    .click();
 
-  await expect(page.getByRole("button", { name: "linking…" })).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "紐づけています…" }),
+  ).toBeDisabled();
   await expect(page).toHaveScreenshot("settings-linking.png", {
     fullPage: true,
   });
@@ -140,7 +151,7 @@ test("settings-link-error：紐づけに失敗して戻ってくると、帯を�
   await page.goto("/settings?error=invalid_code");
 
   await expect(banner(page)).toHaveText(
-    "Couldn't link your Google account. Try again.",
+    "Google アカウントを紐づけられませんでした。もう一度試してください。",
   );
   await expect(page).toHaveScreenshot("settings-link-error.png", {
     fullPage: true,

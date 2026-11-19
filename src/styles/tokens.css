@@ -10,51 +10,73 @@
   --radius-*: initial;
   --shadow-*: initial;
 
-  --color-bg: #f7f5f0;
-  --color-surface: #ffffff;
-  --color-surface-raised: #f1eee6;
-  --color-border: #e4e0d6;
-  --color-text: #2b2a27;
-  --color-muted: #6f6b62;
-  --color-primary: #2f4f7f;
-  --color-primary-soft: #e8eef7;
+  /* 色の値は md-leaf に揃える。memory-forge だけのものは、差し色の江戸紫（primary）・炎の弁柄色（flame）・border-strong */
+  --color-bg: #fbf8f1;
+  --color-surface: #fbf8f1;
+  --color-surface-raised: #f2ede0;
+  --color-border: #e2dac7;
+  --color-border-strong: #c9c0ad;
+  --color-text: #2b2a26;
+  --color-muted: #77736a;
+  --color-primary: #6a4a8c;
   --color-on-primary: #ffffff;
-  --color-success: #2f7a4f;
-  --color-success-soft: #e6f2ea;
-  --color-danger: #b3412e;
-  --color-danger-soft: #f8e7e3;
-  --color-warning: #9a6210;
-  --color-warning-soft: #fbf0dc;
-  --color-flame: #e8590c;
-  --color-backdrop: rgb(43 42 39 / 0.4);
+  --color-success: #3f8a6a;
+  --color-danger: #b0453a;
+  --color-warning: #b07a1c;
+  --color-flame: #b5562b;
+  --color-backdrop: rgb(30 28 24 / 0.4);
+  /* -soft は元の色を地（bg）に混ぜて作る。割合は下の :root（ダークは [data-theme="dark"]） */
+  --color-primary-soft: color-mix(
+    in srgb,
+    var(--color-primary) var(--soft-primary),
+    var(--color-bg)
+  );
+  --color-success-soft: color-mix(
+    in srgb,
+    var(--color-success) var(--soft-success),
+    var(--color-bg)
+  );
+  --color-danger-soft: color-mix(
+    in srgb,
+    var(--color-danger) var(--soft-danger),
+    var(--color-bg)
+  );
+  --color-warning-soft: color-mix(
+    in srgb,
+    var(--color-warning) var(--soft-warning),
+    var(--color-bg)
+  );
 
-  --color-code-bg: #f1eee6;
-  --color-code-text: #2b2a27;
+  --color-code-bg: #f2ede0;
+  --color-code-text: #2b2a26;
   --color-code-line: #a9a395;
-  --color-code-keyword: #8a3b8f;
-  --color-code-string: #3f7a3a;
-  --color-code-function: #2f5fa0;
-  --color-code-builtin: #9a5b12;
-  --color-code-decorator: #b0522c;
-  --color-code-comment: #8b8678;
+  --color-code-keyword: #8a4f9e;
+  --color-code-string: #4f7a3a;
+  --color-code-comment: #8f8a7e;
 
   /*
-    英字は Geist / Geist Mono。日本語の文字はないので、Noto Sans JP で表示する
-    書体は next/font が配り、別の名前を付けるので、書体名ではなく src/app/layout.tsx で作る CSS 変数を指す
+    書体は md-leaf と同じ並び。OS の書体を先に、端末にないとき（画面の画像を撮る Docker の中など）は
+    next/font で配る Web フォントで出す。Web フォントは別の名前になるので、src/app/layout.tsx で作る CSS 変数を指す
   */
-  --font-sans: var(--font-geist), var(--font-noto-sans-jp), sans-serif;
-  --font-mono: var(--font-geist-mono), var(--font-noto-sans-jp), monospace;
-  /* 連続日数の数字だけに使う。数字しか出さないので、日本語の書体は要らない */
-  --font-display: var(--font-unbounded), var(--font-geist), sans-serif;
+  /* 画面の部品（md-leaf の font-ui） */
+  --font-sans:
+    "Hiragino Kaku Gothic ProN", "Yu Gothic UI", var(--font-noto-sans-jp),
+    sans-serif;
+  /* 読むもの（問題文・解説）。md-leaf の本文と同じ明朝 */
+  --font-body:
+    "Hiragino Mincho ProN", "Yu Mincho", var(--font-noto-serif-jp), serif;
+  /* コードだけに使う */
+  --font-mono:
+    ui-monospace, SFMono-Regular, Consolas, var(--font-geist-mono), monospace;
 
   --text-xs: 0.75rem;
   --text-xs--line-height: 1rem;
-  --text-sm: 0.8125rem;
+  --text-sm: 0.875rem;
   --text-sm--line-height: 1.25rem;
-  --text-base: 0.9375rem;
-  --text-base--line-height: 1.5rem;
-  --text-lg: 1.125rem;
-  --text-lg--line-height: 1.625rem;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.75rem;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.75rem;
   --text-xl: 1.75rem;
   --text-xl--line-height: 1;
   --text-display: 2.5rem;
@@ -65,43 +87,47 @@
   --container-md: 28rem;
   --container-page: 72rem;
 
-  --radius-sm: 3px;
+  --radius-sm: 2px;
   --radius-md: 4px;
 
   /* 浮かせて重ねるもの（プルダウンの中身、ダイアログ）だけに使う */
-  --shadow-popover: 0 8px 24px rgb(43 42 39 / 0.12);
+  --shadow-popover: 0 4px 16px rgb(0 0 0 / 0.12);
+}
+
+/* -soft の割合。Tailwind の値ではないので @theme の外に置く */
+:root {
+  --soft-primary: 10%;
+  --soft-success: 12%;
+  --soft-danger: 12%;
+  --soft-warning: 14%;
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --color-bg: #0f1115;
-  --color-surface: #161a21;
-  --color-surface-raised: #1d222b;
-  --color-border: #2a303b;
-  --color-text: #e6e9ef;
-  --color-muted: #8a93a3;
-  --color-primary: #82aaff;
-  --color-primary-soft: #1a2640;
-  --color-on-primary: #0f1115;
-  --color-success: #4fd1a5;
-  --color-success-soft: #12312a;
-  --color-danger: #f2777a;
-  --color-danger-soft: #3a1c1f;
-  --color-warning: #f0b75a;
-  --color-warning-soft: #3a2d14;
-  --color-flame: #ff8a3d;
-  --color-backdrop: rgb(0 0 0 / 0.6);
+  --color-bg: #1d1c19;
+  --color-surface: #1d1c19;
+  --color-surface-raised: #272520;
+  --color-border: #39362e;
+  --color-border-strong: #57534a;
+  --color-text: #e6e1d5;
+  --color-muted: #a19c8f;
+  --color-primary: #b9a0dc;
+  --color-on-primary: #1d1c19;
+  --color-success: #7fc4a4;
+  --color-danger: #e58a7f;
+  --color-warning: #e0b35e;
+  --color-flame: #d98656;
+  --color-backdrop: rgb(0 0 0 / 0.55);
+  --soft-primary: 14%;
+  --soft-success: 14%;
+  --soft-danger: 14%;
+  --soft-warning: 14%;
 
-  --color-code-bg: #0b0d11;
-  --color-code-text: #d6deeb;
-  --color-code-line: #4a5263;
-  --color-code-keyword: #c792ea;
-  --color-code-string: #c3e88d;
-  --color-code-function: #82aaff;
-  --color-code-builtin: #ffcb6b;
-  --color-code-decorator: #f78c6c;
-  --color-code-comment: #637083;
-
-  --shadow-popover: 0 8px 24px rgb(0 0 0 / 0.5);
+  --color-code-bg: #272520;
+  --color-code-text: #e6e1d5;
+  --color-code-line: #6b665a;
+  --color-code-keyword: #c79ad8;
+  --color-code-string: #9cc27f;
+  --color-code-comment: #7e796d;
 }

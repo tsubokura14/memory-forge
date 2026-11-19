@@ -13,20 +13,20 @@ import { getSession } from "@/server/auth/session";
 import { GoogleAccounts } from "./google-accounts";
 import { ThemePicker } from "./theme-picker";
 
-// Settings。戻るリンク・見出しの下に account の枠と appearance の枠
+// Settings。戻るリンク・見出しの下に アカウントの枠と見た目の枠
 export default function SettingsPage({ searchParams }: PageProps<"/settings">) {
   return (
     <main className="mx-auto flex max-w-page flex-col gap-6 px-4 pt-6 pb-10">
-      <PageHeader back={{ href: "/", label: "home" }} title="Settings" />
+      <PageHeader back={{ href: "/", label: "ホームへ戻る" }} title="設定" />
       <section className="flex flex-col gap-2">
-        <h2 className="font-mono text-xs text-muted">account</h2>
+        <h2 className="text-xs text-muted">アカウント</h2>
         {/* 仕様では読み込み中の別の表示はないので、読み終わるまで何も出さない */}
         <Suspense fallback={null}>
           <AccountCard searchParams={searchParams} />
         </Suspense>
       </section>
       <section className="flex flex-col gap-2">
-        <h2 className="font-mono text-xs text-muted">appearance</h2>
+        <h2 className="text-xs text-muted">見た目</h2>
         <div className="rounded-md border border-border bg-surface px-4 py-3">
           <ThemePicker />
         </div>
@@ -66,12 +66,12 @@ async function AccountCard({
           />
         ) : (
           <div className="flex items-start gap-3">
-            <span className="w-20 shrink-0 pt-2 font-mono text-xs text-muted">
-              google
+            <span className="w-20 shrink-0 pt-2 text-xs text-muted">
+              Google
             </span>
             <div className="min-w-0 flex-1">
               <Banner action={<RetryButton />}>
-                Couldn&apos;t load Google accounts.
+                Google アカウントを読み込めませんでした。
               </Banner>
             </div>
           </div>

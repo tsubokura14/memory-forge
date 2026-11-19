@@ -6,7 +6,7 @@ export function Segmented<T>({
   onChange,
 }: {
   label: string;
-  options: { value: T; label: string }[];
+  options: { value: T; label: React.ReactNode }[];
   value: T;
   onChange: (value: T) => void;
 }) {
@@ -20,12 +20,12 @@ export function Segmented<T>({
         const checked = option.value === value;
         return (
           <button
-            key={option.label}
+            key={String(option.value)}
             type="button"
             role="radio"
             aria-checked={checked}
             onClick={() => onChange(option.value)}
-            className={`flex-1 rounded-sm border py-1.5 font-mono text-sm ${checked ? "border-border bg-surface text-text" : "border-transparent text-muted"}`}
+            className={`flex-1 rounded-sm border py-1.5 text-sm ${checked ? "border-border bg-bg font-bold text-text" : "border-transparent text-muted"}`}
           >
             {option.label}
           </button>

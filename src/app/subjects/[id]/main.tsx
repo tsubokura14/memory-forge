@@ -1,6 +1,6 @@
 // Setup の中身の幅と、見出しの戻るリンク（page.tsx の読み込み中・エラーと、study.tsx の Setup で同じものを使う）
-export const BACK = { href: "/", label: "back" };
-export const KICKER = "study setup";
+export const BACK = { href: "/", label: "ホームへ戻る" };
+export const KICKER = "解く準備";
 
 export function Main({ children }: { children: React.ReactNode }) {
   return (

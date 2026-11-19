@@ -149,7 +149,7 @@ describe("previewImport", () => {
   test("誤りがあれば、誤りの一覧を返す", async () => {
     expect(await previewImport("{")).toEqual({
       ok: false,
-      errors: [{ id: "—", item: "file", message: "Not valid JSON." }],
+      errors: [{ id: "—", item: "file", message: "JSON として読めません。" }],
     });
   });
 });
@@ -238,7 +238,7 @@ describe("applyImport", () => {
     );
     expect(result).toEqual({
       ok: false,
-      errors: [{ id: "b2", item: "explanation", message: "Missing." }],
+      errors: [{ id: "b2", item: "explanation", message: "ありません。" }],
     });
     expect(await db.select().from(subjects)).toEqual([]);
   });
