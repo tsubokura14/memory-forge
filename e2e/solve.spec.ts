@@ -616,6 +616,66 @@ test("solve-review-skipped：飛ばした問題の見直しは、何も選んで
   });
 });
 
+test("solve-retry：「間違えた問題を解き直す」で、一覧の問題だけを同じ順に解き、記録し、その回の Result でまた解き直せる。全部正解すると「もう一度解く」で選び方の残った Setup に戻る", async ({
+  page,
+}) => {
+  await toResultWithMissed(page);
+  const before = await countAnswers();
+  await button(page, "間違えた問題を解き直す").click();
+  await expect(page.getByText("1 / 2", { exact: true })).toBeVisible();
+  await expect(page.getByText("k3f9a2", { exact: true })).toBeVisible();
+  await expect(page).toHaveScreenshot("solve-retry.png", { fullPage: true });
+
+  // k3f9a2 は正解し、p81xq0 はまた間違える
+  await answer(page, "B");
+  await next(page);
+  await expect(page.getByText("2 / 2", { exact: true })).toBeVisible();
+  await answer(page, "A");
+  await page.getByRole("button", { name: /^結果を見る/ }).click();
+  await expect(page.getByText("解き終わりました")).toBeVisible();
+  expect(await countAnswers()).toBe(before + 2);
+  await expect(page.getByRole("main")).toContainText("1 / 2問 正解");
+  await expect(missedRows(page)).toHaveCount(1);
+
+  // その回の間違えた問題で、また解き直せる
+  await button(page, "間違えた問題を解き直す").click();
+  await expect(page.getByText("1 / 1", { exact: true })).toBeVisible();
+  await answer(page, "A", "B");
+  await page.getByRole("button", { name: /^結果を見る/ }).click();
+  await expect(page.getByText("解き終わりました")).toBeVisible();
+  await expect(missedRows(page)).toHaveCount(0);
+  await button(page, "もう一度解く").click();
+  await expect(page.getByRole("radio", { name: "Decorators" })).toBeChecked();
+});
+
+test("解き直しの回をやめると、選び方の残った Setup に戻る", async ({
+  page,
+}) => {
+  await toResultWithMissed(page);
+  await button(page, "間違えた問題を解き直す").click();
+  await expect(page.getByText("1 / 2", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "やめる" }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "やめる" })
+    .click();
+  await expect(page.getByRole("radio", { name: "Decorators" })).toBeChecked();
+});
+
+test("解き直しの問題を読めなかったら、Result のまま帯を出す", async ({
+  page,
+}) => {
+  await toResultWithMissed(page);
+  await page.route(/\/subjects\/\d+$/, (route) =>
+    isServerAction(route.request()) ? route.abort() : route.continue(),
+  );
+  await button(page, "間違えた問題を解き直す").click();
+  await expect(page.getByRole("main").getByRole("alert")).toHaveText(
+    /問題を読み込めませんでした。/,
+  );
+  await expect(missedRows(page)).toHaveCount(2);
+});
+
 test("solve-many：問題が多いと、37 / 100 のように出す", async ({ page }) => {
   // 36問をスキップして進むので、ふつうの上限（30秒）では足りない
   test.setTimeout(90_000);
