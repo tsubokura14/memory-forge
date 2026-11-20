@@ -111,6 +111,29 @@
 
 ## 設計
 
+### 変えるファイル
+
+- `src/server/solve/answer.ts`：`skipQuestion` が、答え合わせと同じく正解と解説を返す（`{ answer, explanation }`）。飛ばした問題の見直しで、正解の地の色と帯・解説を出すため。`src/app/subjects/[id]/actions.ts` の `skipAction` もそれを返す
+- `src/server/solve/retry.ts`（新規）：`retryQuestions(ids: number[]): Promise<SolveQuestion[]>`。渡した `questions.id` の問題を、渡した順のまま返す。印の付いた問題と消えた問題は除く。`correctBefore` は `start.ts` と同じく、その時点の記録に正解があるか。`actions.ts` に `retryAction(ids)`（`requireSession()` を呼ぶ）を足す
+  - 理由：解き直しを始めるあいだに印を付けた・取り込み直した問題を、今の中身で受け取るため（「AIが決めたこと」）。正解はブラウザに先に送らない（`SolveQuestion` と同じ形）
+- `src/server/solve/result.ts`：`Outcome` に、見直しに使う `review`（問題 `SolveQuestion`・選んだ答え・正解・解説）を足す。`missedQuestions(outcomes)` を足し、`incorrect`・`skipped` の結果だけを、解いた順で返す（`flagged` に置き換わった問題は入らない）。データベースは使わない
+  - 理由：一覧に入れる決まり（印を除く・順番）を、画面に書かずに1か所で Vitest で確かめるため（`docs/design.md` の「決まりは `src/server/` に置く」）
+- `src/app/subjects/[id]/solve-view.tsx`：答え合わせと飛ばすのときに、`Outcome` に `review` を入れて渡す。結果の帯（`ResultBanner`）と選択肢の印の決め方（`markOf`）を、見直しでも使える形にして export する（飛ばしたときは「飛ばしました。答えは A, B」）
+- `src/app/subjects/[id]/review-view.tsx`（新規）：見直しの画面。上のバーは「結果に戻る」（arrow-left と文字、muted）だけ、問題の上の行は札・Topic・ID、中身は答えたあとの Solve と同じ、下は「解説を見る」/「問題に戻る」だけ。記録は送らない
+- `src/app/subjects/[id]/result-view.tsx`：得点の区切り線の下・Topic ごとの上に、「間違えた問題」の見出しと一覧（行を押すと `onReview(i)`）。間違えた問題が1問以上なら、下のボタンを「間違えた問題を解き直す」（`onRetry`）にする。解き直しを始められなかったら、一覧の上に danger の帯「問題を読み込めませんでした。」
+- `src/components/missed-row.tsx`（新規）：一覧の行（左に danger の x、問題文の1行目（明朝、折り返す）と Topic、右に chevron-right。指を乗せると surface-raised）
+- `src/app/subjects/[id]/study.tsx`：`Phase` に `{ kind: "review"; result; missed; index }` を足し、`result` に `missed` と `retryFailed` を持たせる。解き直しは `retryAction` を呼び、読み込み中は今の `loading`（数は一覧の数）、受け取ったら `solving`。やめる・もう一度解くは今と同じく Setup（選び方は `choices` に残っている）
+  - 理由：`docs/design.md` の「解く画面の状態」のとおり、一覧と解き直しの回はブラウザの状態だけに持つ。データベースも URL も変えない
+
+### データの変更
+
+なし（`answers` に1行ずつ足すのは今のまま）。
+
+### 残す場所
+
+- `retry.ts` の除き方の理由と、`Outcome.review` の意味は、そのファイルのコメントに書く
+- `docs/design.md` の「解く画面の状態」に、Result・見直し・解き直しも同じくブラウザにだけ持つことを1行足す
+
 ## AIが決めたこと
 
 - 解き直しの回を始めるときに、一覧の問題を受け取り直す。そのあいだに印を付けた・消した問題は除く。1問も残らなければ、Result のまま danger の帯「問題を読み込めませんでした。」を出す（Setup で読めなかったときと同じ文言）
@@ -119,8 +142,20 @@
 
 ## 確かめ方
 
--
+| 受け入れ条件 | 確かめ方 |
+| --- | --- |
+| 一覧に入れる問題（不正解・飛ばした、印を除く、解いた順） | テスト：`src/server/solve/result.test.ts`（`missedQuestions`）と `e2e/solve.spec.ts`（解いてから Result の一覧） |
+| 一覧の位置と行の見た目、0問で出さない | テスト：`e2e/solve.spec.ts` の画像（result-default・result-perfect・result-all-flagged・result-many） |
+| 行を押すと見直し、結果に戻る | テスト：`e2e/solve.spec.ts`（solve-review・solve-review-skipped） |
+| 見直しで記録を増やさない | テスト：`e2e/solve.spec.ts`（見直しの前後で `answers` の行の数が同じ） |
+| 下のボタンの出し分け | テスト：`e2e/solve.spec.ts` |
+| 解き直しの回（同じ順番、ふつうの解き方、記録する、その回の Result、また解き直せる） | テスト：`src/server/solve/retry.test.ts` と `e2e/solve.spec.ts`（solve-retry） |
+| 解き直しの Result の「もう一度解く」とやめるで、選び方の残った Setup | テスト：`e2e/solve.spec.ts` |
+| 解き直しの読み込み中の枠 | コードを見て確かめる：`study.tsx` で `loading` を使う（今の solve-loading と同じ部品） |
+| 読み込み直すと Setup の最初から | 触って確かめる：Result・見直し・解き直しの途中で読み込み直す（ブラウザの状態だけなので今と同じ） |
 
 ## タスク
 
-- [ ]
+- [ ] 飛ばすが正解と解説を返し、`retryQuestions` と `retryAction` で解き直す問題を受け取れたら完了（Vitest。画面は変えない）
+- [ ] Result に間違えた問題の一覧が出て、行から見直しの画面を開けたら完了（画面：result-default.png・result-perfect.png・result-all-flagged.png・result-many.png・solve-review.png・solve-review-skipped.png）
+- [ ] 「間違えた問題を解き直す」で解き直しの回を解けたら完了（画面：solve-retry.png）
