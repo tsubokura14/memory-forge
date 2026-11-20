@@ -61,8 +61,17 @@ describe("answerQuestion", () => {
 });
 
 describe("skipQuestion", () => {
-  test("不正解として記録する", async () => {
-    await skipQuestion(questionId);
+  test("不正解として記録し、正解の記号と解説を返す", async () => {
+    expect(await skipQuestion(questionId)).toEqual({
+      answer: ["A", "C"],
+      explanation: "デコレータは関数を返す。",
+    });
     expect(await recorded()).toEqual([{ correct: false }]);
+  });
+
+  test("問題が消えていたら失敗し、何も記録しない", async () => {
+    await db.delete(questions);
+    await expect(skipQuestion(questionId)).rejects.toThrow();
+    expect(await db.select().from(answers)).toEqual([]);
   });
 });
