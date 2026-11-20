@@ -562,6 +562,8 @@ test("result-many：間違えた問題が多いと、一覧の行が続く", asy
 
 // 4問目（k3f9a2）を A で間違え、5問目（p81xq0）を飛ばし、残りは正解して Result まで進める
 async function toResultWithMissed(page: Page) {
+  // CI ではここまでで25秒ほどかかり、ふつうの上限（30秒）に近いので、使うテストの上限を延ばす（先に延ばしたテストは縮めない）
+  test.setTimeout(Math.max(test.info().timeout, 60_000));
   await startDecorators(page);
   for (const letters of [["A"], ["A"], ["A"], ["A"]]) {
     await answer(page, ...letters);
