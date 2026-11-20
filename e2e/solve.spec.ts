@@ -619,6 +619,8 @@ test("solve-review-skipped：飛ばした問題の見直しは、何も選んで
 test("solve-retry：「間違えた問題を解き直す」で、一覧の問題だけを同じ順に解き、記録し、その回の Result でまた解き直せる。全部正解すると「もう一度解く」で選び方の残った Setup に戻る", async ({
   page,
 }) => {
+  // 10問を解いて Result に移ってから、解き直しを2回するので、ふつうの上限（30秒）では足りない
+  test.setTimeout(90_000);
   await toResultWithMissed(page);
   const before = await countAnswers();
   await button(page, "間違えた問題を解き直す").click();
