@@ -431,7 +431,7 @@ test("答えるたびに数と番号が進み、正解・不正解の帯と、�
   });
 });
 
-test("飛ばすと次に進み、不正解として数える。最後の問題は「結果を見る」で Result に移り、「もう一度解く」で選び方の残った Setup に戻り、答えた分が具合に入る", async ({
+test("飛ばすと次に進み、不正解として数える。最後の問題は「結果を見る」で Result に移る", async ({
   page,
 }) => {
   await startDecorators(page);
@@ -450,12 +450,8 @@ test("飛ばすと次に進み、不正解として数える。最後の問題�
 
   await page.getByRole("button", { name: /^結果を見る/ }).click();
   await expect(page.getByText("解き終わりました")).toBeVisible();
-  await button(page, "もう一度解く").click();
-  await expect(page.getByRole("radio", { name: "Decorators" })).toBeChecked();
-  await expect(start(page)).toHaveText("10問を解きはじめる");
-  await expect(page.getByRole("radio", { name: "Decorators" })).toContainText(
-    "正解 1 · 不正解 9 · まだ 0",
-  );
+  await expect(page.getByRole("main")).toContainText("不正解 0");
+  await expect(page.getByRole("main")).toContainText("飛ばした 9");
 });
 
 test("最後の問題で飛ばしても、Result に移る", async ({ page }) => {
@@ -514,10 +510,14 @@ function missedRows(page: Page) {
   return page.getByRole("list", { name: "間違えた問題" }).getByRole("button");
 }
 
-test("result-perfect：全部正解すると、間違えた問題の一覧を出さず、「もう一度解く」を出す", async ({
+test("result-perfect：全部正解すると、間違えた問題の一覧を出さず、「もう一度解く」を出す。押すと選び方の残った Setup に戻り、答えた分が具合に入る", async ({
   page,
 }) => {
-  await openSetup(page, topicQuestions("Decorators", 3));
+  await openSetup(page, [
+    ...topicQuestions("Decorators", 3),
+    ...topicQuestions("Generators", 1),
+  ]);
+  await page.getByRole("radio", { name: "Decorators" }).click();
   await start(page).click();
   for (let i = 0; i < 3; i++) {
     await answer(page, "C");
@@ -530,6 +530,13 @@ test("result-perfect：全部正解すると、間違えた問題の一覧を出
   await expect(button(page, "もう一度解く")).toBeVisible();
   await expect(button(page, "間違えた問題を解き直す")).toHaveCount(0);
   await expect(page).toHaveScreenshot("result-perfect.png", { fullPage: true });
+
+  await button(page, "もう一度解く").click();
+  await expect(page.getByRole("radio", { name: "Decorators" })).toBeChecked();
+  await expect(start(page)).toHaveText("3問を解きはじめる");
+  await expect(page.getByRole("radio", { name: "Decorators" })).toContainText(
+    "正解 3 · 不正解 0 · まだ 0",
+  );
 });
 
 test("result-many：間違えた問題が多いと、一覧の行が続く", async ({ page }) => {

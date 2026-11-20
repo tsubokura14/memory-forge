@@ -1,7 +1,7 @@
 "use client";
 
 import { unstable_rethrow, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signOutAction } from "@/app/(app)/actions";
 import { AppBar } from "@/components/app-bar";
 import { PageHeader } from "@/components/page-header";
@@ -52,6 +52,11 @@ export function Study({
     count: 10,
   });
   const [phase, setPhase] = useState<Phase>({ kind: "setup", failed: false });
+
+  // 画面を切り替えたら、一番上から見せる（同じ URL のままなので、ブラウザはスクロールを戻さない）
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [phase.kind]);
 
   async function start() {
     const { topic, order, count } = choices;
