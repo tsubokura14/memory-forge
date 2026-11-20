@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { signOutAction } from "@/app/(app)/actions";
 import { AppBar } from "@/components/app-bar";
+import { Banner } from "@/components/banner";
 import { Button, buttonClass } from "@/components/button";
 import { PageHeader } from "@/components/page-header";
 import { TopicResultRow } from "@/components/topic-result-row";
@@ -15,6 +16,7 @@ export function ResultView({
   name,
   result,
   missed,
+  retryFailed,
   onTryAgain,
   onRetry,
   onReview,
@@ -22,6 +24,8 @@ export function ResultView({
   name: string;
   result: SessionResult;
   missed: MissedQuestion[];
+  // 解き直しの問題を読めなかったら、一覧の上に帯を出す
+  retryFailed: boolean;
   onTryAgain: () => void;
   onRetry: () => void;
   onReview: (index: number) => void;
@@ -56,6 +60,7 @@ export function ResultView({
         </section>
         {missed.length > 0 && (
           <section className="flex flex-col gap-2">
+            {retryFailed && <Banner>問題を読み込めませんでした。</Banner>}
             <h2 id="missed-heading" className="text-xs font-bold text-muted">
               間違えた問題
             </h2>

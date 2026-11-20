@@ -15,7 +15,7 @@ import {
 } from "@/server/solve/result";
 import type { Setup } from "@/server/solve/setup";
 import type { SolveQuestion } from "@/server/solve/start";
-import { startSessionAction } from "./actions";
+import { retryAction, startSessionAction } from "./actions";
 import { BACK, KICKER, Main } from "./main";
 import { ResultView } from "./result-view";
 import { ReviewView } from "./review-view";
@@ -29,8 +29,14 @@ type Phase =
   // expected は、start に添えた数（読み込み中の上のバーに出す）
   | { kind: "loading"; expected: number }
   | { kind: "solving"; questions: SolveQuestion[] }
-  // missed は Result の「間違えた問題」。見直しから戻っても同じ Result を出すため、review にも持ったままにする
-  | { kind: "result"; result: SessionResult; missed: MissedQuestion[] }
+  // missed は Result の「間違えた問題」。見直しから戻っても同じ Result を出すため、review にも持ったままにする。
+  // retryFailed は、解き直しの問題を読めなかったあと
+  | {
+      kind: "result";
+      result: SessionResult;
+      missed: MissedQuestion[];
+      retryFailed?: boolean;
+    }
   | {
       kind: "review";
       result: SessionResult;
@@ -74,6 +80,23 @@ export function Study({
     // Setup を開いたあとに記録が変わり、出せる問題がなくなったときも、読めなかったときと同じにする
     if (questions.length === 0) {
       setPhase({ kind: "setup", failed: true });
+      return;
+    }
+    setPhase({ kind: "solving", questions });
+  }
+
+  // 一覧の問題だけを、一覧の順で解き直す。読めなかったら、同じ Result のまま帯を出す
+  async function retry(result: SessionResult, missed: MissedQuestion[]) {
+    setPhase({ kind: "loading", expected: missed.length });
+    let questions: SolveQuestion[];
+    try {
+      questions = await retryAction(missed.map((m) => m.review.question.id));
+    } catch (error) {
+      unstable_rethrow(error);
+      questions = [];
+    }
+    if (questions.length === 0) {
+      setPhase({ kind: "result", result, missed, retryFailed: true });
       return;
     }
     setPhase({ kind: "solving", questions });
@@ -132,9 +155,9 @@ export function Study({
         name={setup.name}
         result={result}
         missed={missed}
+        retryFailed={phase.retryFailed ?? false}
         onTryAgain={backToSetup}
-        // 解き直しの回は次のタスクで作る
-        onRetry={() => {}}
+        onRetry={() => retry(result, missed)}
         onReview={(index) =>
           setPhase({ kind: "review", result, missed, index })
         }
