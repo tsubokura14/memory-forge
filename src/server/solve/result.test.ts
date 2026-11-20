@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { type Outcome, summarizeSession } from "./result";
+import { missedQuestions, type Outcome, summarizeSession } from "./result";
 
 function outcome(
   topic: string,
@@ -113,5 +113,40 @@ describe("summarizeSession", () => {
       accuracy: null,
       topics: [],
     });
+  });
+});
+
+describe("missedQuestions", () => {
+  function reviewed(id: number, kind: Outcome["outcome"]): Outcome {
+    return {
+      topic: "Decorators",
+      outcome: kind,
+      correctBefore: false,
+      review: {
+        question: {
+          id,
+          questionId: `q${id}`,
+          topic: "Decorators",
+          type: "single",
+          text: "問題",
+          choices: ["a", "b"],
+          correctBefore: false,
+        },
+        selected: kind === "skipped" ? [] : ["B"],
+        answer: ["A"],
+        explanation: "解説",
+      },
+    };
+  }
+
+  test("不正解と飛ばした問題だけを、解いた順で返す。正解と印を付けた問題は入れない", () => {
+    const missed = missedQuestions([
+      reviewed(1, "skipped"),
+      reviewed(2, "correct"),
+      reviewed(3, "flagged"),
+      reviewed(4, "incorrect"),
+      { topic: "Decorators", outcome: "flagged", correctBefore: false },
+    ]);
+    expect(missed.map((m) => m.review.question.id)).toEqual([1, 4]);
   });
 });
