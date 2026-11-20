@@ -533,12 +533,14 @@ test("result-perfect：全部正解すると、間違えた問題の一覧を出
 });
 
 test("result-many：間違えた問題が多いと、一覧の行が続く", async ({ page }) => {
+  // 20問を飛ばして進むので、ふつうの上限（30秒）では足りない
+  test.setTimeout(90_000);
   await openSetup(page, [
     ...topicQuestions("Decorators", 10),
     ...topicQuestions("Generators", 10),
   ]);
   await page.getByRole("radio", { name: "すべて", exact: true }).click();
-  await page.getByRole("radio", { name: "20", exact: true }).click();
+  await page.getByRole("radio", { name: "20問", exact: true }).click();
   await start(page).click();
   for (let i = 1; i <= 20; i++) {
     await button(page, "飛ばす").click();

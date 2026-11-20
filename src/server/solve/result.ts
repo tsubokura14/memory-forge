@@ -1,12 +1,39 @@
 // 解き終わりの結果の数え方。データベースは使わない（解く画面がブラウザで数える）
+import type { SolveQuestion } from "./start";
+
+// 見直しの画面に出す、答えたときの中身。selected は選んだ答え（飛ばしたときは空）、answer と explanation は答え合わせ・飛ばすで返ってきたもの。
+// 見直しは記録を送らずに、これだけで答えたあとの Solve の見た目を出す
+export type Review = {
+  question: SolveQuestion;
+  selected: string[];
+  answer: string[];
+  explanation: string;
+};
 
 // 1問ずつの結果。correctBefore は SolveQuestion のもの。
-// flagged は印を付けた問題（答える前でも答えたあとでも）で、得点・%・数・by topic に入れない
+// flagged は印を付けた問題（答える前でも答えたあとでも）で、得点・%・数・by topic に入れない。
+// review は答えた（submit・飛ばす）問題にだけ付ける。答える前に印を付けた問題にはない
 export type Outcome = {
   topic: string;
   outcome: "correct" | "incorrect" | "skipped" | "flagged";
   correctBefore: boolean;
+  review?: Review;
 };
+
+export type MissedQuestion = Outcome & {
+  outcome: "incorrect" | "skipped";
+  review: Review;
+};
+
+// Result の「間違えた問題」。不正解と飛ばした問題を、解いた順のまま返す。
+// 答えたあとに印を付けた問題は outcome が flagged に置き換わっているので入らない
+export function missedQuestions(outcomes: Outcome[]): MissedQuestion[] {
+  return outcomes.filter(
+    (o): o is MissedQuestion =>
+      (o.outcome === "incorrect" || o.outcome === "skipped") &&
+      o.review !== undefined,
+  );
+}
 
 // slipped は、前は正解したのに今回間違えた（不正解かスキップ）問題。wrong はそれ以外の不正解（スキップを含む）
 export type TopicResult = {
