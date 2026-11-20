@@ -158,5 +158,5 @@
 ## タスク
 
 - [x] 飛ばすが正解と解説を返し、`retryQuestions` と `retryAction` で解き直す問題を受け取れたら完了（Vitest。画面は変えない）
-- [ ] Result に間違えた問題の一覧が出て、行から見直しの画面を開けたら完了（画面：result-default.png・result-perfect.png・result-all-flagged.png・result-many.png・solve-review.png・solve-review-skipped.png）
+- [x] Result に間違えた問題の一覧が出て、行から見直しの画面を開けたら完了（画面：result-default.png・result-perfect.png・result-all-flagged.png・result-many.png・solve-review.png・solve-review-skipped.png）
 - [ ] 「間違えた問題を解き直す」で解き直しの回を解けたら完了（画面：solve-retry.png）
