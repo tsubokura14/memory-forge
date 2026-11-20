@@ -48,10 +48,10 @@
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 通常（間違えた問題あり） | 得点の下に間違えた問題の一覧、Topic ごと、下にホームへ戻ると間違えた問題を解き直す | （合意したときに撮る） |
-| 全部正解 | 一覧なし、下にホームへ戻るともう一度解く | （合意したときに撮る） |
-| 全部に印 | 今の「—」の表示。一覧なし、もう一度解く | （合意したときに撮る） |
-| 間違えた問題が多い | 一覧の行が続き、ページごとスクロールする | （合意したときに撮る） |
+| 通常（間違えた問題あり） | 得点の下に間違えた問題の一覧、Topic ごと、下にホームへ戻ると間違えた問題を解き直す | ![result-default](2026-11-20-retry-missed-questions/result-default.png) |
+| 全部正解 | 一覧なし、下にホームへ戻るともう一度解く | ![result-perfect](2026-11-20-retry-missed-questions/result-perfect.png) |
+| 全部に印 | 今の「—」の表示。一覧なし、もう一度解く | ![result-all-flagged](2026-11-20-retry-missed-questions/result-all-flagged.png) |
+| 間違えた問題が多い | 一覧の行が続き、ページごとスクロールする | ![result-many](2026-11-20-retry-missed-questions/result-many.png) |
 
 ### 見直し（review）
 
@@ -64,8 +64,8 @@
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 不正解の問題 | 結果に戻る、不正解の帯、解説を見る | （合意したときに撮る） |
-| 飛ばした問題 | 何も選んでいない選択肢、正解が緑、「飛ばしました。答えは A, B」 | （合意したときに撮る） |
+| 不正解の問題 | 結果に戻る、不正解の帯、解説を見る | ![solve-review](2026-11-20-retry-missed-questions/solve-review.png) |
+| 飛ばした問題 | 何も選んでいない選択肢、正解が緑、「飛ばしました。答えは A, B」 | ![solve-review-skipped](2026-11-20-retry-missed-questions/solve-review-skipped.png) |
 
 ### 解き直し（retry）
 
@@ -73,7 +73,7 @@
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| 解き直しの1問目 | ふつうの Solve の答える前。1 / 3 | （合意したときに撮る） |
+| 解き直しの1問目 | ふつうの Solve の答える前。1 / 3 | ![solve-retry](2026-11-20-retry-missed-questions/solve-retry.png) |
 
 ## やらないこと
 
