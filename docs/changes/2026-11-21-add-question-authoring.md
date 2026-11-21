@@ -89,17 +89,17 @@
 
 ### Import（`/manage/import`）
 
-今の状態のすべてで、画面の下（中身の下、間を空けて）に、作り方のドキュメントへのリンクを出す。リンクの見た目は `docs/ui.md` の「外のページへのリンク」のとおり。ほかは変えない。
+今の状態のすべてで（取り込み中も）、画面の下（中身の下、間を空けて）に、作り方のドキュメントへのリンクを出す。リンクの見た目は `docs/ui.md` の「外のページへのリンク」のとおり。ほかは変えない。
 
 | 状態 | 表示 | スクリーンショット |
 | --- | --- | --- |
-| ファイルを選ぶ | 今の表示の下に、リンク | |
-| 確かめ中 | 今の表示の下に、リンク | |
-| 誤り | 今の表示の下に、リンク | |
-| 取り込む前の確認 | 今の表示の下に、リンク | |
-| 取り込む前の確認（まだない Subject） | 今の表示の下に、リンク | |
-| 取り込んだ | 今の表示の下に、リンク | |
-| サーバーのエラー | 今の表示の下に、リンク | |
+| ファイルを選ぶ | 今の表示の下に、リンク | ![](2026-11-21-add-question-authoring/import-select.png) |
+| 確かめ中 | 今の表示の下に、リンク | ![](2026-11-21-add-question-authoring/import-checking.png) |
+| 誤り | 今の表示の下に、リンク | ![](2026-11-21-add-question-authoring/import-errors.png) |
+| 取り込む前の確認 | 今の表示の下に、リンク | ![](2026-11-21-add-question-authoring/import-preview.png) |
+| 取り込む前の確認（まだない Subject） | 今の表示の下に、リンク | ![](2026-11-21-add-question-authoring/import-preview-new.png) |
+| 取り込んだ | 今の表示の下に、リンク | ![](2026-11-21-add-question-authoring/import-done.png) |
+| サーバーのエラー | 今の表示の下に、リンク | ![](2026-11-21-add-question-authoring/import-error.png) |
 
 ## やらないこと
 
@@ -114,12 +114,12 @@
 
 ## 決まっていないこと
 
-- [ ] 問題づくりのスキルを、どこに置く？ スキルの置き場所 `.claude/skills/` は、`docs/template-files.md` で「テンプレートのもの」になっている
+- [x] 問題づくりのスキルを、どこに置く？ スキルの置き場所 `.claude/skills/` は、`docs/template-files.md` で「テンプレートのもの」になっている → 推す答えのとおり。`.claude/skills/make-questions/` に置き、`CLAUDE.project.md` にこのプロジェクトのスキルだと書く
   - 推す答え：`.claude/skills/make-questions/` に置き、`CLAUDE.project.md` に「`make-questions` はこのプロジェクトのスキル」と書く。テンプレートに集める（`/template-harvest`）ときは、このスキルを外す
   - 良い点：Claude Code が `/make-questions` として見つける、決まった場所に置ける。テンプレートから取り込む（`/template-sync`）ときは、テンプレートにないフォルダなので、ぶつからない
   - 悪い点：`docs/template-files.md` の分け方と食い違う。集めるたびに、人が外す
   - 比べた案：テンプレートの `docs/template-files.md` に、「テンプレートにないスキルはプロジェクトのもの」と足す（テンプレートを変えるので、この PR の範囲外。テンプレートのリポジトリで別に直す）
-- [ ] 資料（手元のファイルや URL）を渡されたら、それをもとに作るのでよい？
+- [x] 資料（手元のファイルや URL）を渡されたら、それをもとに作るのでよい？ → よい。渡されなければ Claude の知っていることから作る
   - 推す答え：よい。渡されなければ Claude の知っていることから作る
   - 良い点：試験の範囲や教科書に沿った問題にでき、事実の誤りを減らせる
   - 悪い点：資料の読み方（PDF・Web のページ）で、Claude Code に確認の出る操作が増える
@@ -138,7 +138,7 @@
 | 新しいライブラリ | なし（スクリプトは Node.js で TypeScript をそのまま動かし、`src/server/import/validate.ts` を使う） | AI |
 | 取り消せない操作 | なし（スキルは同じ名前のファイルを上書きしない。直すときは、頼まれたファイルだけを書き換える） | AI |
 | 共通の部品・トークン | なし（`docs/ui.md` の「外のページへのリンク」と、今ある book-open・external-link の印を使う） | AI |
-| `docs/design.md` の決まり | 足す：作業場所の `questions/` と、確かめ・ID のスクリプトが `src/server/import/validate.ts` を使うこと（決まりは1か所） | AI |
+| `docs/design.md` の決まり | 足す：作業場所の `questions/` と、確かめ・ID のスクリプトが `src/server/import/validate.ts` を使うこと（決まりは1か所）。スキルの置き場所（テンプレートの `.claude/skills/` の中に、プロジェクトのスキルを置く）は「決まっていないこと」で人が決めた | AI・人 |
 
 ## 調べたこと
 
