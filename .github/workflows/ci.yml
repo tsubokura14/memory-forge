@@ -48,6 +48,9 @@ jobs:
       options: --ipc=host
     steps:
       - uses: actions/checkout@v7
+      # 画像の比べが失敗したときに、どの CPU の機械だったかを突き合わせる（docs/design.md の「CPU による描き方の違い」）
+      - name: CPU を出す
+        run: grep -m1 "model name" /proc/cpuinfo; grep -m1 "^flags" /proc/cpuinfo
       - run: npm ci
       # 基準の画像は、CI では作らない・更新しない
       - run: npx playwright test --update-snapshots=none
