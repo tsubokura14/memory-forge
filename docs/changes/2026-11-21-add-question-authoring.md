@@ -221,4 +221,4 @@
 - [x] 確かめるスクリプト：`.gitignore` に `/questions/`、`src/server/authoring/workspace.ts`・`check.ts` とテスト、`scripts/questions-check.ts`、`npm run questions:check` ができたら完了
 - [x] ID を付けるスクリプト：`src/server/authoring/ids.ts` とテスト、`scripts/questions-ids.ts`、`npm run questions:ids` ができたら完了（`workspace.ts` を使う）
 - [x] スキルとドキュメント：`.claude/skills/make-questions/SKILL.md`、`docs/questions.md`、`CLAUDE.project.md`（技術・コマンド・このプロジェクトのスキル）、`docs/design.md`（問題づくりの節）が書けたら完了
-- [ ] Import の画面のリンク：`src/components/external-link.tsx` と `import-flow.tsx` の変更、`e2e/import.spec.ts` のテスト、画像の撮り直しができたら完了。合わせる画像：`import-select.png`・`import-checking.png`・`import-errors.png`・`import-preview.png`・`import-preview-new.png`・`import-done.png`・`import-error.png`（このファイルと同じ名前のフォルダ）
+- [x] Import の画面のリンク：`src/components/external-link.tsx` と `import-flow.tsx` の変更、`e2e/import.spec.ts` のテスト、画像の撮り直しができたら完了。合わせる画像：`import-select.png`・`import-checking.png`・`import-errors.png`・`import-preview.png`・`import-preview-new.png`・`import-done.png`・`import-error.png`（このファイルと同じ名前のフォルダ）
