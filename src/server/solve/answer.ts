@@ -33,8 +33,20 @@ export async function answerQuestion(
   };
 }
 
+export type SkipResult = Omit<AnswerResult, "correct">;
+
 // スキップは不正解として記録する（たまたま正解して記録に残るのを避けるため。docs/overview.md）。
-// 問題が消えていたら、外部キーの決まりで失敗する
-export async function skipQuestion(id: number): Promise<void> {
+// 正解と解説を返すのは、飛ばした問題の見直しで正解の地の色と解説を出すため。問題が消えていたら失敗にする
+export async function skipQuestion(id: number): Promise<SkipResult> {
+  const [question] = await db
+    .select({
+      correct: questions.correct,
+      explanation: questions.explanation,
+    })
+    .from(questions)
+    .where(eq(questions.id, id));
+  if (!question) throw new Error(`Question ${id} not found.`);
+
   await db.insert(answers).values({ questionId: id, correct: false });
+  return { answer: question.correct, explanation: question.explanation };
 }

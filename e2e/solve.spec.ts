@@ -431,7 +431,7 @@ test("答えるたびに数と番号が進み、正解・不正解の帯と、�
   });
 });
 
-test("飛ばすと次に進み、不正解として数える。最後の問題は「結果を見る」で Result に移り、「もう一度解く」で選び方の残った Setup に戻り、答えた分が具合に入る", async ({
+test("飛ばすと次に進み、不正解として数える。最後の問題は「結果を見る」で Result に移る", async ({
   page,
 }) => {
   await startDecorators(page);
@@ -450,12 +450,8 @@ test("飛ばすと次に進み、不正解として数える。最後の問題�
 
   await page.getByRole("button", { name: /^結果を見る/ }).click();
   await expect(page.getByText("解き終わりました")).toBeVisible();
-  await button(page, "もう一度解く").click();
-  await expect(page.getByRole("radio", { name: "Decorators" })).toBeChecked();
-  await expect(start(page)).toHaveText("10問を解きはじめる");
-  await expect(page.getByRole("radio", { name: "Decorators" })).toContainText(
-    "正解 1 · 不正解 9 · まだ 0",
-  );
+  await expect(page.getByRole("main")).toContainText("不正解 0");
+  await expect(page.getByRole("main")).toContainText("飛ばした 9");
 });
 
 test("最後の問題で飛ばしても、Result に移る", async ({ page }) => {
@@ -498,7 +494,190 @@ test("result-default：解き終わりの結果。得点を大きく出し、正
   await expect(main).toContainText("不備の印（数えない） 1");
   await expect(main).toContainText("Decorators3/4");
   await expect(page.getByRole("link", { name: "ホームへ戻る" })).toBeVisible();
+  // 間違えた問題は、不正解と飛ばした問題を解いた順に並べ、印を付けた dec5 は入れない
+  await expect(missedRows(page)).toHaveText([
+    /Decorators$/,
+    /Generators$/,
+    /Async$/,
+  ]);
+  await expect(button(page, "間違えた問題を解き直す")).toBeVisible();
+  await expect(button(page, "もう一度解く")).toHaveCount(0);
   await expect(page).toHaveScreenshot("result-default.png", { fullPage: true });
+});
+
+// Result の「間違えた問題」の行
+function missedRows(page: Page) {
+  return page.getByRole("list", { name: "間違えた問題" }).getByRole("button");
+}
+
+test("result-perfect：全部正解すると、間違えた問題の一覧を出さず、「もう一度解く」を出す。押すと選び方の残った Setup に戻り、答えた分が具合に入る", async ({
+  page,
+}) => {
+  await openSetup(page, [
+    ...topicQuestions("Decorators", 3),
+    ...topicQuestions("Generators", 1),
+  ]);
+  await page.getByRole("radio", { name: "Decorators" }).click();
+  await start(page).click();
+  for (let i = 0; i < 3; i++) {
+    await answer(page, "C");
+    await page
+      .getByRole("button", { name: /^(次の問題へ|結果を見る)/ })
+      .click();
+  }
+  await expect(page.getByText("解き終わりました")).toBeVisible();
+  await expect(page.getByText("間違えた問題", { exact: true })).toHaveCount(0);
+  await expect(button(page, "もう一度解く")).toBeVisible();
+  await expect(button(page, "間違えた問題を解き直す")).toHaveCount(0);
+  await expect(page).toHaveScreenshot("result-perfect.png", { fullPage: true });
+
+  await button(page, "もう一度解く").click();
+  await expect(page.getByRole("radio", { name: "Decorators" })).toBeChecked();
+  await expect(start(page)).toHaveText("3問を解きはじめる");
+  await expect(page.getByRole("radio", { name: "Decorators" })).toContainText(
+    "正解 3 · 不正解 0 · まだ 0",
+  );
+});
+
+test("result-many：間違えた問題が多いと、一覧の行が続く", async ({ page }) => {
+  // 20問を飛ばして進むので、ふつうの上限（30秒）では足りない
+  test.setTimeout(90_000);
+  await openSetup(page, [
+    ...topicQuestions("Decorators", 10),
+    ...topicQuestions("Generators", 10),
+  ]);
+  await page.getByRole("radio", { name: "すべて", exact: true }).click();
+  await page.getByRole("radio", { name: "20問", exact: true }).click();
+  await start(page).click();
+  for (let i = 1; i <= 20; i++) {
+    await button(page, "飛ばす").click();
+    if (i < 20)
+      await expect(
+        page.getByText(`${i + 1} / 20`, { exact: true }),
+      ).toBeVisible();
+  }
+  await expect(missedRows(page)).toHaveCount(20);
+  await expect(page).toHaveScreenshot("result-many.png", { fullPage: true });
+});
+
+// 4問目（k3f9a2）を A で間違え、5問目（p81xq0）を飛ばし、残りは正解して Result まで進める
+async function toResultWithMissed(page: Page) {
+  // CI ではここまでで25秒ほどかかり、ふつうの上限（30秒）に近いので、使うテストの上限を延ばす（先に延ばしたテストは縮めない）
+  test.setTimeout(Math.max(test.info().timeout, 60_000));
+  await startDecorators(page);
+  for (const letters of [["A"], ["A"], ["A"], ["A"]]) {
+    await answer(page, ...letters);
+    await next(page);
+  }
+  await button(page, "飛ばす").click();
+  for (const letters of [["B"], ["A"], ["A"], ["A"], ["B"]]) {
+    await answer(page, ...letters);
+    await page
+      .getByRole("button", { name: /^(次の問題へ|結果を見る)/ })
+      .click();
+  }
+  await expect(page.getByText("解き終わりました")).toBeVisible();
+}
+
+test("solve-review：間違えた問題の行を押すと、答えたあとの見た目で見直せ、記録は増えない。「結果に戻る」で Result に戻る", async ({
+  page,
+}) => {
+  await toResultWithMissed(page);
+  const before = await countAnswers();
+  await missedRows(page).first().click();
+  await expect(page.getByText("不正解。答えは B")).toBeVisible();
+  await expect(choice(page, "A")).toHaveAccessibleName(/選んだ答え・不正解/);
+  await expect(choice(page, "B")).toHaveAccessibleName(/正解/);
+  await expect(button(page, "不備の印")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /^次の問題へ/ })).toHaveCount(
+    0,
+  );
+  await expect(page).toHaveScreenshot("solve-review.png", { fullPage: true });
+
+  await button(page, "解説を見る").click();
+  await expect(
+    page.getByText("functools.wraps", { exact: false }).first(),
+  ).toBeVisible();
+  await button(page, "問題に戻る").click();
+  await page.getByRole("button", { name: "結果に戻る" }).click();
+  await expect(page.getByText("解き終わりました")).toBeVisible();
+  await expect(missedRows(page)).toHaveCount(2);
+  expect(await countAnswers()).toBe(before);
+});
+
+test("solve-review-skipped：飛ばした問題の見直しは、何も選んでいない選択肢に正解の色を付け、「飛ばしました。答えは A, B」を出す", async ({
+  page,
+}) => {
+  await toResultWithMissed(page);
+  await missedRows(page).nth(1).click();
+  await expect(page.getByText("飛ばしました。答えは A, B")).toBeVisible();
+  await expect(choice(page, "A")).toHaveAccessibleName(/正解/);
+  await expect(choice(page, "C")).not.toHaveAccessibleName(/正解/);
+  await expect(page).toHaveScreenshot("solve-review-skipped.png", {
+    fullPage: true,
+  });
+});
+
+test("solve-retry：「間違えた問題を解き直す」で、一覧の問題だけを同じ順に解き、記録し、その回の Result でまた解き直せる。全部正解すると「もう一度解く」で選び方の残った Setup に戻る", async ({
+  page,
+}) => {
+  // 10問を解いて Result に移ってから、解き直しを2回するので、ふつうの上限（30秒）では足りない
+  test.setTimeout(90_000);
+  await toResultWithMissed(page);
+  const before = await countAnswers();
+  await button(page, "間違えた問題を解き直す").click();
+  await expect(page.getByText("1 / 2", { exact: true })).toBeVisible();
+  await expect(page.getByText("k3f9a2", { exact: true })).toBeVisible();
+  await expect(page).toHaveScreenshot("solve-retry.png", { fullPage: true });
+
+  // k3f9a2 は正解し、p81xq0 はまた間違える
+  await answer(page, "B");
+  await next(page);
+  await expect(page.getByText("2 / 2", { exact: true })).toBeVisible();
+  await answer(page, "A");
+  await page.getByRole("button", { name: /^結果を見る/ }).click();
+  await expect(page.getByText("解き終わりました")).toBeVisible();
+  expect(await countAnswers()).toBe(before + 2);
+  await expect(page.getByRole("main")).toContainText("1 / 2問 正解");
+  await expect(missedRows(page)).toHaveCount(1);
+
+  // その回の間違えた問題で、また解き直せる
+  await button(page, "間違えた問題を解き直す").click();
+  await expect(page.getByText("1 / 1", { exact: true })).toBeVisible();
+  await answer(page, "A", "B");
+  await page.getByRole("button", { name: /^結果を見る/ }).click();
+  await expect(page.getByText("解き終わりました")).toBeVisible();
+  await expect(missedRows(page)).toHaveCount(0);
+  await button(page, "もう一度解く").click();
+  await expect(page.getByRole("radio", { name: "Decorators" })).toBeChecked();
+});
+
+test("解き直しの回をやめると、選び方の残った Setup に戻る", async ({
+  page,
+}) => {
+  await toResultWithMissed(page);
+  await button(page, "間違えた問題を解き直す").click();
+  await expect(page.getByText("1 / 2", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "やめる" }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "やめる" })
+    .click();
+  await expect(page.getByRole("radio", { name: "Decorators" })).toBeChecked();
+});
+
+test("解き直しの問題を読めなかったら、Result のまま帯を出す", async ({
+  page,
+}) => {
+  await toResultWithMissed(page);
+  await page.route(/\/subjects\/\d+$/, (route) =>
+    isServerAction(route.request()) ? route.abort() : route.continue(),
+  );
+  await button(page, "間違えた問題を解き直す").click();
+  await expect(page.getByRole("main").getByRole("alert")).toHaveText(
+    /問題を読み込めませんでした。/,
+  );
+  await expect(missedRows(page)).toHaveCount(2);
 });
 
 test("solve-many：問題が多いと、37 / 100 のように出す", async ({ page }) => {
@@ -641,6 +820,8 @@ test("result-all-flagged：全部の問題に印を付けると、最後は Resu
   ).toBeVisible();
   await expect(page.getByRole("main")).toContainText("—");
   await expect(page.getByText("Topic ごと")).toHaveCount(0);
+  await expect(page.getByText("間違えた問題", { exact: true })).toHaveCount(0);
+  await expect(button(page, "もう一度解く")).toBeVisible();
   await expect(page).toHaveScreenshot("result-all-flagged.png", {
     fullPage: true,
   });

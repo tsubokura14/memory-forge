@@ -3,20 +3,32 @@
 import Link from "next/link";
 import { signOutAction } from "@/app/(app)/actions";
 import { AppBar } from "@/components/app-bar";
+import { Banner } from "@/components/banner";
 import { Button, buttonClass } from "@/components/button";
 import { PageHeader } from "@/components/page-header";
 import { TopicResultRow } from "@/components/topic-result-row";
-import type { SessionResult } from "@/server/solve/result";
+import { MissedRow } from "@/components/missed-row";
+import type { MissedQuestion, SessionResult } from "@/server/solve/result";
 
-// 解き終わりの結果。戻るリンクは置かず、下の「ホームへ戻る」と「もう一度解く」で移る
+// 解き終わりの結果。戻るリンクは置かず、下の「ホームへ戻る」と「もう一度解く」（間違えた問題があれば「間違えた問題を解き直す」）で移る。
+// 間違えた問題の行を押すと onReview（何番目か）
 export function ResultView({
   name,
   result,
+  missed,
+  retryFailed,
   onTryAgain,
+  onRetry,
+  onReview,
 }: {
   name: string;
   result: SessionResult;
+  missed: MissedQuestion[];
+  // 解き直しの問題を読めなかったら、一覧の上に帯を出す
+  retryFailed: boolean;
   onTryAgain: () => void;
+  onRetry: () => void;
+  onReview: (index: number) => void;
 }) {
   const counted = result.accuracy !== null;
   return (
@@ -46,6 +58,27 @@ export function ResultView({
             <Count label="不備の印（数えない）" count={result.flagged} />
           </p>
         </section>
+        {missed.length > 0 && (
+          <section className="flex flex-col gap-2">
+            {retryFailed && <Banner>問題を読み込めませんでした。</Banner>}
+            <h2 id="missed-heading" className="text-xs font-bold text-muted">
+              間違えた問題
+            </h2>
+            <ul
+              aria-labelledby="missed-heading"
+              className="divide-y divide-border overflow-hidden rounded-md border border-border"
+            >
+              {missed.map((m, i) => (
+                <MissedRow
+                  key={m.review.question.id}
+                  text={m.review.question.text}
+                  topic={m.topic}
+                  onClick={() => onReview(i)}
+                />
+              ))}
+            </ul>
+          </section>
+        )}
         {counted && (
           <section className="flex flex-col gap-2">
             <h2 className="text-xs font-bold text-muted">Topic ごと</h2>
@@ -68,9 +101,15 @@ export function ResultView({
             </Link>
           </div>
           <div className="flex-1">
-            <Button size="lg" onClick={onTryAgain}>
-              もう一度解く
-            </Button>
+            {missed.length > 0 ? (
+              <Button size="lg" onClick={onRetry}>
+                間違えた問題を解き直す
+              </Button>
+            ) : (
+              <Button size="lg" onClick={onTryAgain}>
+                もう一度解く
+              </Button>
+            )}
           </div>
         </div>
       </div>

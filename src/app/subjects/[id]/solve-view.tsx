@@ -11,7 +11,7 @@ import { RichText } from "@/components/rich-text";
 import { SolveBar } from "@/components/solve-bar";
 import { choiceLetter } from "@/server/import/validate";
 import type { AnswerResult } from "@/server/solve/answer";
-import type { Outcome } from "@/server/solve/result";
+import type { Outcome, Review } from "@/server/solve/result";
 import type { SolveQuestion } from "@/server/solve/start";
 import { answerAction, flagAction, skipAction } from "./actions";
 
@@ -89,7 +89,12 @@ export function SolveView({
       setResult(answered);
       setOutcomes([
         ...outcomes,
-        outcomeOf(question, answered.correct ? "correct" : "incorrect"),
+        outcomeOf(question, answered.correct ? "correct" : "incorrect", {
+          question,
+          selected: answer,
+          answer: answered.answer,
+          explanation: answered.explanation,
+        }),
       ]);
       setCounts((c) =>
         answered.correct
@@ -108,10 +113,13 @@ export function SolveView({
     setNotice(null);
     setBusy(true);
     try {
-      await skipAction(question.id);
+      const skipped = await skipAction(question.id);
       setFailed(null);
       setCounts((c) => ({ ...c, wrong: c.wrong + 1 }));
-      const done = [...outcomes, outcomeOf(question, "skipped")];
+      const done = [
+        ...outcomes,
+        outcomeOf(question, "skipped", { question, selected: [], ...skipped }),
+      ];
       setOutcomes(done);
       advance(done);
     } catch (error) {
@@ -152,14 +160,6 @@ export function SolveView({
     if (failed?.kind === "submit") submit(failed.selected);
     else if (failed?.kind === "flag") flag();
     else skip();
-  }
-
-  function markOf(letter: string): ChoiceMark | undefined {
-    if (!result) return undefined;
-    const isAnswer = result.answer.includes(letter);
-    const isSelected = selected.includes(letter);
-    if (isAnswer) return isSelected ? "hit" : "missed";
-    return isSelected ? "wrong" : null;
   }
 
   const failedBanner = failed && (
@@ -228,7 +228,12 @@ export function SolveView({
             <div className="font-body text-lg">
               <RichText text={question.text} lineNumbers />
             </div>
-            {result && <ResultBanner result={result} />}
+            {result && (
+              <ResultBanner
+                outcome={result.correct ? "correct" : "incorrect"}
+                answer={result.answer}
+              />
+            )}
             <div className="flex items-center gap-3 text-xs text-muted">
               <span>
                 {multiple
@@ -247,7 +252,11 @@ export function SolveView({
                     text={text}
                     multiple={multiple}
                     selected={selected.includes(letter)}
-                    mark={markOf(letter)}
+                    mark={
+                      result
+                        ? markOf(letter, result.answer, selected)
+                        : undefined
+                    }
                     disabled={result !== null || busy}
                     onClick={() => toggle(letter)}
                   />
@@ -337,24 +346,49 @@ export function SolveView({
 function outcomeOf(
   question: SolveQuestion,
   outcome: Outcome["outcome"],
+  review?: Review,
 ): Outcome {
   return {
     topic: question.topic,
     outcome,
     correctBefore: question.correctBefore,
+    review,
   };
 }
 
-// 正解は success の「正解」、不正解は danger の「不正解。答えは B」（複数選択は「A, B」）
-function ResultBanner({ result }: { result: AnswerResult }) {
+// 答えたあとの選択肢の見え方。Solve と見直し（review-view.tsx）で使う
+export function markOf(
+  letter: string,
+  answer: string[],
+  selected: string[],
+): ChoiceMark {
+  const isAnswer = answer.includes(letter);
+  const isSelected = selected.includes(letter);
+  if (isAnswer) return isSelected ? "hit" : "missed";
+  return isSelected ? "wrong" : null;
+}
+
+// 正解は success の「正解」、不正解は danger の「不正解。答えは B」（複数選択は「A, B」）。
+// 飛ばした問題（見直しだけで出す）は danger の「飛ばしました。答えは A, B」
+export function ResultBanner({
+  outcome,
+  answer,
+}: {
+  outcome: "correct" | "incorrect" | "skipped";
+  answer: string[];
+}) {
+  const correct = outcome === "correct";
+  const answers = answer.join(", ");
   return (
-    <Banner tone={result.correct ? "success" : "danger"}>
+    <Banner tone={correct ? "success" : "danger"}>
       <span className="flex items-center gap-1">
-        <Icon name={result.correct ? "check" : "x"} className="text-base" />
+        <Icon name={correct ? "check" : "x"} className="text-base" />
         <span>
-          {result.correct
+          {correct
             ? "正解"
-            : `不正解。答えは ${result.answer.join(", ")}`}
+            : outcome === "skipped"
+              ? `飛ばしました。答えは ${answers}`
+              : `不正解。答えは ${answers}`}
         </span>
       </span>
     </Banner>
