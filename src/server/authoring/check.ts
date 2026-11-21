@@ -1,5 +1,4 @@
 // 問題のファイルを1つ確かめ、端末に出す文にする（npm run questions:check。docs/design.md の「問題づくり」）。
-// scripts/ から node が型を外して直接動かすので、データベースもファイルも読まず、読み込みは拡張子付きの相対パスにする
 import {
   countProblems,
   type FileError,

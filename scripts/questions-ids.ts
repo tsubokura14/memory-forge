@@ -1,8 +1,6 @@
 // 問題のファイルの、ID が空かない問題に ID を付けて書き戻す。questions/ の同じ Subject のほかのファイルの ID とも重ねない。
 // 使い方：npm run questions:ids -- <ファイル>
-// 決まりと出力の文は src/server/authoring/ids.ts。ここは、ファイルを読んで書き戻し、出力と終わりのコードを決めるだけ。
-//
-// node が型を外して直接動かすので、ここから読み込むプロジェクトのファイルは、拡張子付きで書き、`@/` の別名を使わない
+// 決まりと出力の文は src/server/authoring/ids.ts。ここは、ファイルを読んで書き戻し、出力と終わりのコードを決めるだけ（docs/design.md の「問題づくり」）。
 import { writeFileSync } from "node:fs";
 import path from "node:path";
 import { assignIds } from "../src/server/authoring/ids.ts";

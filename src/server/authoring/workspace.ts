@@ -1,5 +1,4 @@
 // 作業場所（questions/）のほかのファイルから、同じ Subject の ID を集める（docs/design.md の「問題づくり」）。
-// scripts/ から node が型を外して直接動かすので、データベースもファイルも読まず、読み込みは拡張子付きの相対パスにする
 
 export type WorkspaceFile = {
   // 同じファイルかを比べるためのパス（scripts/ が絶対パスにそろえて渡す）

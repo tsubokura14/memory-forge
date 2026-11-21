@@ -18,7 +18,7 @@ AGENTS.md と CLAUDE.md はテンプレートのものなので、このプロ�
 - ESLint（`eslint-config-next`、`eslint-plugin-better-tailwindcss`）と Prettier（整形）。編集したファイルは、フック（`scripts/format-on-edit.mjs`）が自動で整形する
 - GitHub Actions（PR ごとの CI）、Vercel（公開）
 - パッケージの管理は npm
-- `scripts/` の TypeScript のスクリプト（`create-user.ts`・`questions-*.ts`）は、node（24）が型を外して直接動かす。ここから読み込むファイルは拡張子付きで書き、`@/` の別名を使わない
+- `scripts/` の TypeScript のスクリプト（`create-user.ts`・`questions-*.ts`）は、node（24）が型を外して直接動かす
 - 選んだ理由は `docs/overview.md` の「技術」
 
 ## よく使うコマンド

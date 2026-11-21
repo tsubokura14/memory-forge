@@ -1,8 +1,6 @@
 // 問題のファイルを、Import と同じ決まりで確かめる。questions/ の同じ Subject のほかのファイルとの ID の重なりも見る。
 // 使い方：npm run questions:check -- <ファイル...>
-// 決まりと出力の文は src/server/authoring/check.ts。ここは、ファイルを読んで出力し、終わりのコードを決めるだけ。
-//
-// node が型を外して直接動かすので、ここから読み込むプロジェクトのファイルは、拡張子付きで書き、`@/` の別名を使わない
+// 決まりと出力の文は src/server/authoring/check.ts。ここは、ファイルを読んで出力し、終わりのコードを決めるだけ（docs/design.md の「問題づくり」）。
 import path from "node:path";
 import { checkQuestionFile } from "../src/server/authoring/check.ts";
 import { readText, readWorkspace } from "./questions-workspace.ts";

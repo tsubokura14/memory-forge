@@ -1,5 +1,4 @@
 // 問題のファイルの、ID が空（""）かない問題に ID を付ける（npm run questions:ids。docs/design.md の「問題づくり」）。
-// scripts/ から node が型を外して直接動かすので、データベースもファイルも読まず、読み込みは拡張子付きの相対パスにする
 import { randomInt } from "node:crypto";
 import { collectWorkspaceIds, type WorkspaceFile } from "./workspace.ts";
 

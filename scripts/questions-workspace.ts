@@ -1,6 +1,4 @@
-// questions:check と questions:ids が使う、ファイルの読み方（作業場所の questions/ と、指定したファイル）。
-//
-// node が型を外して直接動かすので、ここから読み込むプロジェクトのファイルは、拡張子付きで書き、`@/` の別名を使わない
+// questions:check と questions:ids が使う、ファイルの読み方（作業場所の questions/ と、指定したファイル。docs/design.md の「問題づくり」）。
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import type { WorkspaceFile } from "../src/server/authoring/workspace.ts";
