@@ -144,6 +144,9 @@ questions/      問題づくりの作業場所。Git に入れない（下の「
     - 答えを記録するとき（`src/server/solve/answer.ts`）は、今のままデータベースの `now()` で答えた日時を入れる。画面のテストで答えの日時を決めたいときは、`e2e/questions.ts` の `insertAnswers` で日時を指定して入れる
     - 前提（崩れたら見直す）：画面のテストの中で、Solve で答えてから Home の連続日数を見ることはしない（答えは今の日時、Home は固定した日時で数えるため合わない）
   - アニメーション：`toHaveScreenshot` の既定で止まる
+  - CPU による描き方の違い：Playwright の Chromium に `--disable-skia-runtime-opts` を付ける（`playwright.config.ts`）。Skia が CPU を見て速い描き方を選ぶのを止め、どの機械でも同じ描き方にする。CI の `screens` のジョブは、最初に CPU の名前とフラグを出す（`ci.yml`）
+    - 理由：CI の機械によっては、太字（Noto Sans JP は可変書体で、700 は 400 と同じファイルを太くして描く）の文字だけが、決まった形でわずかに違って描かれ、多くの画面の比べが失敗するため。書体の読み込みの遅れではない（Playwright は撮る前に `document.fonts.ready` を待ち、差のある文字も太さは同じ）
+    - 前提（崩れたら見直す）：違いが Skia の CPU ごとの描き方から来ている（確かめきれていない）。フラグを付けても同じ失敗が出たら、出した CPU を通った回と比べ、太字を固定の太さの書体のファイルにするか決め直す
 - 状態（0件など）は、テストの前に `test` のデータベースに決まったデータを入れて作る（screenshots スキル）
   - Subject と問題は、テストごとに `e2e/questions.ts` の `resetQuestions` で入れ直す
   - 画面のテストは、ファイルを並べずに1つずつ動かす（`playwright.config.ts` の `workers: 1`）。並べると、ほかのファイルのテストが入れ直したデータで、撮っている画面が変わるため

@@ -22,7 +22,16 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:3000",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    {
+      name: "chromium",
+      use: {
+        ...devices["Desktop Chrome"],
+        // docs/design.md の「画面の画像を撮る・比べる仕組み」の「CPU による描き方の違い」
+        launchOptions: { args: ["--disable-skia-runtime-opts"] },
+      },
+    },
+  ],
   webServer: {
     command: "npm run build && npm run start",
     url: "http://localhost:3000",
