@@ -34,6 +34,7 @@ drizzle/        形の変更（マイグレーション）のファイル。driz
 e2e/            Playwright のテスト（*.spec.ts）。画像を比べるテストもここ
 docs/specs/screens/  基準の画像（<画面>-<状態>.png）
 scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリプト
+questions/      問題づくりの作業場所。Git に入れない（下の「問題づくり」）
 ```
 
 - 決まり（入力の確かめ、出し分け、計算）は `src/server/` に置き、画面（`src/app/`、`src/components/`）には書かない
@@ -69,6 +70,19 @@ scripts/        npm のコマンドとフックから呼ぶ Node.js のスクリ
 - 値を読み書きし `data-theme` を付ける処理は、`src/components/theme.ts` にだけ書く。`<head>` のスクリプトも、そこの関数を文字列にして作る
 - 理由：開いた瞬間から選んだ明るさで出すため（サーバーは値を知らないので、描く前にブラウザで付ける）。cookie にしてサーバーで読むと、Cache Components でルートから下の全画面が開くたびに組み立てる画面になる
 - 前提（崩れたら見直す）：選んだテーマを、ほかの端末と分け合わない（アカウントに持つなら、サーバーで読む作りに変える）。直に書いたスクリプトを CSP で止めるようにしたら、nonce が要る
+
+## 問題づくり
+
+- 問題のファイルは、Claude Code のスキル（`.claude/skills/make-questions/`）が、リポジトリの `questions/` に作る・直す。`questions/` は Git に入れない（`.gitignore` の `/questions/`）。人が読む作り方は `docs/questions.md`
+  - 理由：作った問題は公開しない（`docs/overview.md` の「問題づくり」）。Claude Code の作業ディレクトリの中なので、確認なしで読み書きでき、スクリプトから同じ Subject のほかのファイルを探せる
+  - 前提（崩れたら見直す）：問題の元はアプリの中身で、`questions/` は作業場所にすぎない。アプリには Import の画面からだけ取り込み、スクリプトやスキルからは取り込まない
+- 確かめる `npm run questions:check` と ID を付ける `npm run questions:ids` は、決まりを `src/server/authoring/` に置き、`scripts/questions-check.ts`・`questions-ids.ts`・`questions-workspace.ts` はファイルを読み書きして、出力と終わりのコードを決めるだけにする
+- 確かめは、Import と同じ `src/server/import/validate.ts` をそのまま使い、誤りの文言も同じにする
+  - 理由：Import で止まるものを、作る時点ですべて見つけるため。決まりを1か所にし、Import の決まりを変えたら、スクリプトも何もしなくてもそろう
+  - 前提（崩れたら見直す）：スクリプトは、node が型を外して直接動かす（`scripts/create-user.ts` と同じ）。そのため `scripts/questions-*.ts`・`src/server/authoring/` と、そこから読み込むファイル（`validate.ts`）は、データベース・サーバーだけの仕組み・`@/` の別名を読み込まず、読み込みを拡張子付きの相対パスで書く。崩れると `questions:check` が動かなくなるので気づける
+- 確かめと ID を付けるときは、`questions/` の直下の、同じ Subject のほかのファイルの ID とも重ならないようにする（`src/server/authoring/workspace.ts`）。確かめでは、重なりを `id` の誤りにする
+  - 理由：書き出したファイルを直して取り込み直すファイルと、新しく作ったファイルが、同じ Subject で `questions/` にあることがある。ID が重なると、新しい問題が Import で今ある問題を「置き換える」ことになるため
+  - 前提（崩れたら見直す）：アプリに取り込み済みの問題の ID は、スクリプトから読まない（問題を取り出す API は、あとで作る機能）。`questions/` にない今の問題との重なりは、Import の取り込む前の確認（置き換わる数）で見る。API を作ったら、取り込み済みの ID とも比べる
 
 ## データベースのつながり方
 

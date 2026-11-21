@@ -18,6 +18,7 @@ AGENTS.md と CLAUDE.md はテンプレートのものなので、このプロ�
 - ESLint（`eslint-config-next`、`eslint-plugin-better-tailwindcss`）と Prettier（整形）。編集したファイルは、フック（`scripts/format-on-edit.mjs`）が自動で整形する
 - GitHub Actions（PR ごとの CI）、Vercel（公開）
 - パッケージの管理は npm
+- `scripts/` の TypeScript のスクリプト（`create-user.ts`・`questions-*.ts`）は、node（24）が型を外して直接動かす
 - 選んだ理由は `docs/overview.md` の「技術」
 
 ## よく使うコマンド
@@ -39,6 +40,16 @@ AGENTS.md と CLAUDE.md はテンプレートのものなので、このプロ�
 | `npm run db:generate` | 表の定義（`src/server/db/schema.ts`）から、形の変更のファイルを `drizzle/` に作る |
 | `npm run db:migrate` | 形の変更を、`dev`（`.env.local`）と `test`（`.env.test`）のデータベースに当てる |
 | `npm run user:create -- --env-file=<接続先の .env のファイル>` | 自分のアカウントを作る、または自分の Google アカウント（ファイルの `OWNER_GOOGLE_EMAIL`）に合わせる |
+| `npm run questions:check -- <ファイル...>` | 問題のファイルを、Import と同じ決まりで確かめる。`questions/` の同じ Subject のほかのファイルとの ID の重なりも見る。誤りがあれば 0 以外で終わる |
+| `npm run questions:ids -- <ファイル>` | 問題のファイルの、ID が空かない問題に ID を付けて書き戻す |
+
+## このプロジェクトのスキル
+
+`.claude/skills/` はテンプレートのもの（`docs/template-files.md`）だが、次のスキルはこのプロジェクトのもの。テンプレートに集める（`/template-harvest`）ときは外す。
+
+| スキル | すること |
+| --- | --- |
+| `make-questions` | 問題のファイルを `questions/` に作る・直す（`/make-questions`。`docs/design.md` の「問題づくり」） |
 
 ## うまくいかなかったことから追加したルール
 

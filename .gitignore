@@ -30,3 +30,6 @@ Thumbs.db
 
 # Claude Code の個人設定
 .claude/settings.local.json
+
+# 問題づくりの作業場所（docs/design.md の「問題づくり」）。頭の / で src/server/questions/ を外さない
+/questions/

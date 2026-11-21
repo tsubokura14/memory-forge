@@ -10,6 +10,7 @@ import { ChangeRow } from "@/components/change-row";
 import { CountBox } from "@/components/count-box";
 import { DropZone } from "@/components/drop-zone";
 import { ErrorList } from "@/components/error-list";
+import { ExternalLink } from "@/components/external-link";
 import { PageHeader } from "@/components/page-header";
 import type { ImportCounts, ImportPreview } from "@/server/import/import";
 import {
@@ -21,6 +22,10 @@ import {
 import { applyImportAction, previewImportAction } from "./actions";
 
 type Preview = Extract<ImportPreview, { ok: true }>;
+
+// 作り方のドキュメント（docs/questions.md）。公開しているリポジトリの main を開く
+const AUTHORING_DOC_URL =
+  "https://github.com/tsubokura14/memory-forge/blob/main/docs/questions.md";
 
 // 画面は、読んだファイルの中身を持っておき、すべて取り込むで同じ中身をもう一度送る（サーバーで確かめ直してから書く）
 type Phase =
@@ -239,6 +244,14 @@ export function ImportFlow() {
           </Link>
         </div>
       )}
+
+      <ExternalLink
+        href={AUTHORING_DOC_URL}
+        icon="book-open"
+        title="問題のファイルの作り方"
+        description="ファイルの形式、確かめること、Claude Code のスキル · GitHub"
+        className="mt-4"
+      />
     </>
   );
 }

@@ -88,6 +88,18 @@ test("import-select", async ({ page }) => {
   await expect(page).toHaveScreenshot("import-select.png", { fullPage: true });
 });
 
+test("作り方のリンクは、main の docs/questions.md を別のタブで開く", async ({
+  page,
+}) => {
+  await openImport(page);
+  const link = page.getByRole("link", { name: /問題のファイルの作り方/ });
+  await expect(link).toHaveAttribute(
+    "href",
+    "https://github.com/tsubokura14/memory-forge/blob/main/docs/questions.md",
+  );
+  await expect(link).toHaveAttribute("target", "_blank");
+});
+
 test("確かめている間は、ファイル名と checking… を出し、ファイルを選べない", async ({
   page,
 }) => {
