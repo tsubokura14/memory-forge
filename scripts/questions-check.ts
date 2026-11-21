@@ -3,35 +3,9 @@
 // 決まりと出力の文は src/server/authoring/check.ts。ここは、ファイルを読んで出力し、終わりのコードを決めるだけ。
 //
 // node が型を外して直接動かすので、ここから読み込むプロジェクトのファイルは、拡張子付きで書き、`@/` の別名を使わない
-import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { checkQuestionFile } from "../src/server/authoring/check.ts";
-import type { WorkspaceFile } from "../src/server/authoring/workspace.ts";
-
-const WORKSPACE_DIR = path.resolve(import.meta.dirname, "..", "questions");
-
-function readText(file: string): string | null {
-  try {
-    return readFileSync(file, "utf8");
-  } catch {
-    return null;
-  }
-}
-
-// questions/ の直下の *.json。フォルダがなければ、ほかのファイルはないとする
-function readWorkspace(): WorkspaceFile[] {
-  let names: string[];
-  try {
-    names = readdirSync(WORKSPACE_DIR).filter((name) => name.endsWith(".json"));
-  } catch {
-    return [];
-  }
-  return names.flatMap((name) => {
-    const file = path.join(WORKSPACE_DIR, name);
-    const content = readText(file);
-    return content === null ? [] : [{ path: file, name, content }];
-  });
-}
+import { readText, readWorkspace } from "./questions-workspace.ts";
 
 function main() {
   const args = process.argv.slice(2);
