@@ -146,6 +146,42 @@
 
 ## 設計
 
+### 変えるファイル
+
+| ファイル | 変えること |
+| --- | --- |
+| `.gitignore` | `/questions/` を足す（頭の `/` を付け、`src/server/questions/` を外さないようにする） |
+| `src/server/authoring/workspace.ts`（新規） | `questions/` のほかのファイルの中身（名前と文字列）の並びから、指定した Subject の ID とそのファイル名を集める。データベースもファイルも読まない |
+| `src/server/authoring/check.ts`（新規） | 1つのファイルの中身を `validateQuestionFile` で確かめ、通ったら、ほかのファイルとの ID の重なりを `id` の誤りとして足す。結果を出力の文（誤りの行、誤りがないときの文）にする |
+| `src/server/authoring/ids.ts`（新規） | ID が空かない問題に ID を付けた中身を作る。でたらめな文字を作る関数は引数で受け取る（テストで決まった値にするため）。書き戻す文字は `JSON.stringify(…, null, 2)` と終わりの改行 |
+| `scripts/questions-check.ts`・`scripts/questions-ids.ts`（新規） | 引数のファイルと `questions/*.json` を読み、上の関数を呼んで、出力と終わりのコードを決める・ファイルに書き戻すだけ。`scripts/create-user.ts` と同じく node が型を外して動かす（読み込むのは拡張子付き、`@/` を使わない） |
+| `package.json` | `questions:check`・`questions:ids` を足す |
+| `.claude/skills/make-questions/SKILL.md`（新規） | 問題づくりのスキル：作る・直すの手順、作り方のルール、ファイル名の決め方、スクリプトの使い方 |
+| `docs/questions.md`（新規） | 人が読む作り方 |
+| `src/components/external-link.tsx`（新規） | `docs/ui.md` の「外のページへのリンク」の部品（印・題・説明・href を受け取る） |
+| `src/app/(app)/manage/import/import-flow.tsx` | どの状態でも、中身の下にリンクを出す |
+| `e2e/import.spec.ts` | リンクの行き先と別のタブで開くことを確かめる。7つの画像を撮り直す |
+| `CLAUDE.project.md`・`docs/design.md` | コマンド、`make-questions` がこのプロジェクトのスキルであること、`questions/` とスクリプトの決まり |
+
+### データ
+
+- アプリのデータベースは変えない
+- 確かめと ID のスクリプトは、`src/server/import/validate.ts` をそのまま使う（決まりを1か所にする）。`src/server/authoring/` のファイルは、データベースとサーバーだけの仕組みを読み込まない（スクリプトから node で直接動かすため）。読み込みは拡張子付きの相対パスで書く
+- ほかのファイルとの重なりは、`questions/` の直下の `*.json` のうち、確かめるファイル自身（同じパス）を除き、JSON として読めて `subject` が文字で、確かめるファイルと Subject が同じもの。読めないファイルは飛ばす（そのファイル自身の誤りは、そのファイルを確かめたときに出る）
+- ほかのファイルとの重なりは、ファイルそのものの誤りがなくなってから確かめる（誤りのあるファイルは Subject や ID が決まらないため）
+- 出力の形（AIが決めた）
+  - 誤りがあるとき：1行目に「python.json：2 件の不備があります。」、その下に誤りごとに「  k3f9a2  correct  選択肢にありません（E）。」（ID・項目・内容を2つの空白で区切る）
+  - 誤りがないとき：「python-decorators.json：誤りはありません（Python・10問）。」
+  - ファイルが読めないとき（ない、など）：「python.json：ファイルを読めません。」を誤りとして出す
+  - ID を付けたとき：「python-decorators.json：3問に ID を付けました。」。付ける問題がなければ「python-decorators.json：ID のない問題はありません。」。JSON として読めない、`questions` が並びでないときは、書き戻さずに誤りの文を出して 0 以外で終わる
+- ID を付けた問題は、`id` をいちばん前の項目にする（書き出しのファイルと同じ並び）
+
+### 理由と前提の残し場所
+
+- `questions/` の扱い、スクリプトが `validate.ts` を使うこと、ほかのファイルとの重なりを見ること：`docs/design.md` に「問題づくり」の節を足す
+- 出力の形、ID の文字と長さ：`src/server/authoring/` のコメント
+- スキルがこのプロジェクトのものであること：`CLAUDE.project.md`
+
 ## AIが決めたこと
 
 - 作り方のドキュメントは `docs/questions.md` に置く。理由：プロトタイプのリンク先と同じで、`docs/` の中の人が読む文書と並ぶ。ファイルの項目と確かめることの全部は `docs/specs/import.md` にだけ書き、`docs/questions.md` からはリンクする（同じ決まりを2か所に書かない）
@@ -157,10 +193,32 @@
 - 作ったファイルの名前は、書き出しのファイル名（`exportFileName`）と同じ決まりで、Subject と Topic を「-」でつないで作る
 - 問題の言葉は、言われなければ日本語にする（`docs/overview.md` の「用語」で、データは日本語で書くこともあるとしているため）
 
+- リンクの部品は、ほかの画面でも使えるように `src/components/external-link.tsx` に分ける。比べた案：`import-flow.tsx` の中に書く（`docs/ui.md` の決まった見せ方なので、部品にしておくほうが揃う）
+- スクリプトの出力の形は、上の「データ」のとおり。比べた案：Import の表と同じく表の形で出す（端末では列が揃わず、スキルが読むにも1行ずつのほうが扱いやすい）
+- 確かめるファイルに誤りがあるときは、ほかのファイルとの重なりを見ない。比べた案：読めた ID だけで重なりも見る（誤りを直す前に Subject が変わることがあり、出した重なりが外れることがある）
+- 作るファイルの名前を決めるスクリプトは作らない（仕様にないため）。スキルに、`exportFileName` と同じ決まりで名前を作ることを書き、そのファイルの場所を示す
+
 ## 確かめ方
 
--
+| 受け入れ条件 | 確かめ方 |
+| --- | --- |
+| Import のどの状態でもリンクを出す・見た目 | テスト（画像を比べるテスト。7つの状態の画像） |
+| リンクが main の `docs/questions.md` を別のタブで開く | テスト（`e2e/import.spec.ts`：href と `target="_blank"`） |
+| 作り方のドキュメントの中身 | コードを見て確かめる（`docs/questions.md`） |
+| `questions/` が Git に入らない | コードを見て確かめる（`.gitignore`） |
+| スキルが `questions/` を作る・聞く・資料を使う・ファイル名・上書きしない・ID をスクリプトに付けさせる・確かめを繰り返す・伝える・作り方のルール | コードを見て確かめる（`.claude/skills/make-questions/SKILL.md`）と、触って確かめる（`/make-questions` で作らせ、Import で取り込む） |
+| 書き出したファイルを直す（ID・Subject を変えない、ほかは変えない、伝える、足した問題だけに ID） | コードを見て確かめる（SKILL.md）と、触って確かめる |
+| 確かめるスクリプトが Import と同じ誤りを同じ文言で出す | テスト（`src/server/authoring/check.test.ts`：validate の誤りがそのまま行になる。代表を1つ） |
+| ほかのファイルと ID が重なると `id` の誤り（同じ Subject だけ、自分自身は除く、読めないファイルは飛ばす） | テスト（`check.test.ts`・`workspace.test.ts`） |
+| 誤りがないときの文、誤りがあるときの見出しの文 | テスト（`check.test.ts`） |
+| 誤りがあれば終わりのコードが 0 以外 | コードを見て確かめる（`scripts/questions-check.ts`）と、触って確かめる |
+| 1つ以上のファイルを確かめる | コードを見て確かめる（`scripts/questions-check.ts`） |
+| ID が空・ない問題にだけ ID を付ける、6文字の英小文字と数字、同じファイルとほかのファイルの ID と重ならない | テスト（`src/server/authoring/ids.test.ts`。重なる値を返す乱数を渡して、作り直すこと） |
+| 書き戻す形（2文字の字下げ、終わりに改行、`id` が先頭） | テスト（`ids.test.ts`） |
 
 ## タスク
 
-- [ ]
+- [ ] 確かめるスクリプト：`.gitignore` に `/questions/`、`src/server/authoring/workspace.ts`・`check.ts` とテスト、`scripts/questions-check.ts`、`npm run questions:check` ができたら完了
+- [ ] ID を付けるスクリプト：`src/server/authoring/ids.ts` とテスト、`scripts/questions-ids.ts`、`npm run questions:ids` ができたら完了（`workspace.ts` を使う）
+- [ ] スキルとドキュメント：`.claude/skills/make-questions/SKILL.md`、`docs/questions.md`、`CLAUDE.project.md`（技術・コマンド・このプロジェクトのスキル）、`docs/design.md`（問題づくりの節）が書けたら完了
+- [ ] Import の画面のリンク：`src/components/external-link.tsx` と `import-flow.tsx` の変更、`e2e/import.spec.ts` のテスト、画像の撮り直しができたら完了。合わせる画像：`import-select.png`・`import-checking.png`・`import-errors.png`・`import-preview.png`・`import-preview-new.png`・`import-done.png`・`import-error.png`（このファイルと同じ名前のフォルダ）
