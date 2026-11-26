@@ -5,7 +5,7 @@ export function ErrorList({
   errors: { id: string; item: string; message: string }[];
 }) {
   return (
-    <ul className="divide-y divide-border rounded-md border border-border bg-surface">
+    <ul className="divide-y divide-border rounded-md border border-border bg-bg">
       {errors.map((error, index) => (
         <li
           // 同じ問題の同じ項目に、誤りが2つ出ることもあるので、並び順も入れる

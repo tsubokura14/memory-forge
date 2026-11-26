@@ -55,7 +55,7 @@ function SetupSkeleton() {
           back={BACK}
           kicker={KICKER}
           title={
-            <span className="block h-7 w-32 animate-pulse rounded-sm bg-surface-raised" />
+            <span className="block h-7 w-32 animate-pulse rounded-sm bg-surface" />
           }
         />
         <div
@@ -65,7 +65,7 @@ function SetupSkeleton() {
           {Array.from({ length: 6 }, (_, i) => (
             <div
               key={i}
-              className="h-14 rounded-md border border-border bg-surface-raised"
+              className="h-14 rounded-md border border-border bg-surface"
             />
           ))}
         </div>

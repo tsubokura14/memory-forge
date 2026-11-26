@@ -5,17 +5,17 @@
 // flag は解く画面の問題に印を付ける操作（size は sm）、flagged は印を付けたあとの同じボタン。
 // unflag は Manage の一覧の行の印を外す操作（size は sm）。filter は Manage の絞り込みの flagged（size は filter）、filterActive は押している間の同じボタン
 const VARIANTS = {
-  primary: "bg-primary text-on-primary",
+  primary: "bg-accent text-on-accent",
   outline: "border border-border bg-bg",
   danger: "border border-danger text-danger",
-  destructive: "bg-danger text-on-primary",
+  destructive: "bg-danger text-on-accent",
   deleteIcon:
-    "border border-border bg-surface hover:border-danger hover:text-danger",
+    "border border-border bg-bg hover:border-danger hover:text-danger",
   deleteText: "hover:bg-danger-soft hover:text-danger",
   flag: "hover:bg-warning-soft hover:text-warning",
   flagged: "bg-warning-soft text-warning",
   unflag: "text-warning",
-  filter: "border border-border bg-surface",
+  filter: "border border-border bg-bg",
   filterActive: "border border-warning bg-warning-soft text-warning",
 };
 

@@ -17,7 +17,7 @@ export function SolveBar({
 }) {
   const progress = total === 0 ? 0 : (answered / total) * 100;
   return (
-    <header className="bg-surface">
+    <header className="bg-bg">
       <div className="mx-auto flex max-w-page items-center justify-between px-4 py-2">
         <button
           type="button"
@@ -43,7 +43,7 @@ export function SolveBar({
         </div>
       </div>
       <div className="h-0.5 bg-border">
-        <div className="h-full bg-primary" style={{ width: `${progress}%` }} />
+        <div className="h-full bg-accent" style={{ width: `${progress}%` }} />
       </div>
     </header>
   );

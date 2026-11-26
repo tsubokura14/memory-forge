@@ -1,7 +1,7 @@
 import { Icon } from "@/components/icons";
 import { pageItems } from "@/server/manage/pages";
 
-// ページの前後のボタンと番号（docs/ui.md の「ページ」）。今のページは primary の地。
+// ページの前後のボタンと番号（docs/ui.md の「ページ」）。今のページは accent の地。
 // スマホの幅では番号を出さず、前後のボタンの間に「4 / 10」を出す。1ページで収まるときは何も出さない
 export function Pagination({
   page,
@@ -45,7 +45,7 @@ export function Pagination({
             onClick={() => item !== page && onPage(item)}
             className={`${box} hidden sm:flex ${
               item === page
-                ? "border-primary bg-primary text-on-primary"
+                ? "border-accent bg-accent text-on-accent"
                 : "border-border bg-bg"
             }`}
           >

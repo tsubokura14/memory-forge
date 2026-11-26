@@ -34,11 +34,11 @@ export function RadioList<T>({
             role="radio"
             aria-checked={checked}
             onClick={() => onChange(option.value)}
-            className={`flex items-center gap-3 px-4 py-3 text-left text-sm ${checked ? "bg-primary-soft" : "hover:bg-surface-raised"}`}
+            className={`flex items-center gap-3 px-4 py-3 text-left text-sm ${checked ? "bg-accent-soft" : "hover:bg-surface"}`}
           >
             <span
               aria-hidden
-              className={`size-4 shrink-0 rounded-full border-2 ${checked ? "border-primary bg-primary" : "border-muted"}`}
+              className={`size-4 shrink-0 rounded-full border-2 ${checked ? "border-accent bg-accent" : "border-muted"}`}
             />
             <span className="flex min-w-0 flex-1 flex-col gap-1.5">
               <span
