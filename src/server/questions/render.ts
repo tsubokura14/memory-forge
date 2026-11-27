@@ -1,5 +1,5 @@
 // 問題文・選択肢・解説の Markdown を、kinari-md で HTML にする。
-// サーバーでだけ呼ぶ（unified・highlight.js・KaTeX をブラウザに送らないため。画面の部品から読み込まない）
+// サーバーでだけ呼び、画面の部品から読み込まない（docs/design.md の「問題文・選択肢・解説の表示」）
 import { renderMarkdown } from "kinari-md/markdown";
 
 export type RenderedChoice = { html: string; hasCode: boolean };

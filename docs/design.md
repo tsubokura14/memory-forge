@@ -56,7 +56,6 @@ questions/      問題づくりの作業場所。Git に入れない（下の「
 - 変換はサーバーで行う。問題を画面に渡すサーバーの関数（`src/server/solve/start.ts`・`retry.ts`・`answer.ts`、`src/server/import/import.ts`）が、元の文字に加えて、`src/server/questions/render.ts` で変換した HTML を返す。Result の見直しは、答えたときに受け取った解説の HTML を持つ（`src/server/solve/result.ts`）。画面の部品は HTML を入れるだけにする
   - 理由：kinari-md の中の unified・highlight.js・KaTeX は、ブラウザに送ると大きい（数百 KB）。スマホでも解くので、ブラウザには HTML だけを送る。そのため `render.ts` は画面の部品から読み込まない
   - 前提（崩れたら見直す）：開くたびに変換しても重くない（1回に最大100問）。重くなったら、変換した HTML をデータベースに持つかを決め直す
-- Manage の一覧や削除の確認のダイアログに出す問題文の1行目は、変換せずに元の文字のまま出す
 
 ## 解く画面の状態
 

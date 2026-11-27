@@ -29,7 +29,7 @@
   font-size: 1em;
 }
 
-/* 選択肢のカードの地（surface）と code-bg が同じ色なので、枠でコードブロックの境目を見せる */
+/* 選択肢の中のコードブロックの枠（docs/ui.md の「選択肢の中のコードブロック」） */
 .kinari-body[data-body="choice"] pre {
   border: thin solid var(--color-border);
 }

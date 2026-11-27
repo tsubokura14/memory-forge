@@ -1,5 +1,5 @@
 import { Icon } from "@/components/icons";
-import { RichText } from "@/components/rich-text";
+import { RichText } from "./rich-text";
 
 // 置き換わる問題の、開閉する行。行に ID と問題文の1行目（印が付いていたら、右に印と記録が消えること）、開くと変わった項目ごとに前（danger）と後（success）を並べる。
 // スマホの幅では、前と後を縦に並べる

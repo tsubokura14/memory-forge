@@ -17,7 +17,7 @@ export type SolveQuestion = {
   type: QuestionType;
   text: string;
   choices: string[];
-  // 画面に出す HTML（render.ts）。変換はサーバーで済ませ、ブラウザに変換の仕組みを送らない
+  // 画面に出す HTML（render.ts。docs/design.md の「問題文・選択肢・解説の表示」）
   textHtml: string;
   choicesHtml: RenderedChoice[];
   // start の時点の記録に、一度でも正解があるか（解き終わりの結果で「前は正解したのに今回間違えた」を見分ける）。
