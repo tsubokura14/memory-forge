@@ -38,8 +38,8 @@ export function Choice({
       : mark === "wrong"
         ? "bg-danger-soft"
         : before && selected
-          ? "bg-primary-soft"
-          : `bg-surface-raised ${before && !disabled ? "hover:bg-primary-soft" : ""}`;
+          ? "bg-accent-soft"
+          : `bg-surface ${before && !disabled ? "hover:bg-accent-soft" : ""}`;
   const badge =
     mark === "hit"
       ? "bg-success/30 text-success"
@@ -48,7 +48,7 @@ export function Choice({
         : mark === "wrong"
           ? "bg-danger/30 text-danger"
           : before && selected
-            ? "bg-primary text-on-primary"
+            ? "bg-accent text-on-accent"
             : "bg-bg text-muted";
   // コードブロックのある選択肢は、スマホの幅では記号を上の行に置き、コードを幅いっぱいに出す
   const hasCode = parseMarkup(text).some((block) => block.kind === "code");

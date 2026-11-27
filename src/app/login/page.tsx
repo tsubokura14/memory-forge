@@ -38,7 +38,7 @@ async function SignInFormWithNext({
 function SignInFormSkeleton() {
   return (
     <div className="animate-pulse">
-      <div className="h-9 rounded-md bg-surface-raised" />
+      <div className="h-9 rounded-md bg-surface" />
     </div>
   );
 }

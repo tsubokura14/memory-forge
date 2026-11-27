@@ -14,7 +14,7 @@ export type DropdownOption = {
 };
 
 // プルダウン（docs/ui.md の「プルダウン」）。押すと下に一覧を開き、選ぶ・Esc・外側を押すと閉じる。
-// 開いている間は枠を primary にし、右の印を上向きにする。一覧の高さは止めて、中をスクロールさせる
+// 開いている間は枠を accent にし、右の印を上向きにする。一覧の高さは止めて、中をスクロールさせる
 export function Dropdown({
   label,
   options,
@@ -59,7 +59,7 @@ export function Dropdown({
         aria-controls={listId}
         onClick={() => setOpen(!open)}
         className={`flex w-full items-center justify-between gap-2 rounded-md border px-3 py-1.5 text-left text-sm ${
-          open ? "border-primary bg-bg" : "border-border bg-bg"
+          open ? "border-accent bg-bg" : "border-border bg-bg"
         }`}
       >
         <span className="truncate">{current?.label}</span>
@@ -92,8 +92,8 @@ export function Dropdown({
                   }}
                   className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm ${
                     isSelected
-                      ? "bg-primary-soft text-primary"
-                      : "hover:bg-surface-raised"
+                      ? "bg-accent-soft text-accent"
+                      : "hover:bg-surface"
                   }`}
                 >
                   <span aria-hidden className="flex w-4 text-base">

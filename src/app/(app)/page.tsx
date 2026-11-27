@@ -142,7 +142,7 @@ function Subjects({
   return (
     <ul
       aria-label="科目"
-      className="flex flex-col divide-y divide-border overflow-hidden rounded-md border border-border bg-surface"
+      className="flex flex-col divide-y divide-border overflow-hidden rounded-md border border-border bg-bg"
     >
       {subjects.map((subject) => {
         const m = mastery(subject);
@@ -151,7 +151,7 @@ function Subjects({
             {/* 長い名前は折り返し、% と印は縦の真ん中のまま */}
             <Link
               href={`/subjects/${subject.id}`}
-              className="flex items-center gap-4 px-4 py-3 text-base hover:bg-surface-raised"
+              className="flex items-center gap-4 px-4 py-3 text-base hover:bg-surface"
             >
               <span className="flex min-w-0 flex-1 flex-col gap-1.5">
                 <span className="break-words">{subject.name}</span>
@@ -182,7 +182,7 @@ function SubjectsSkeleton() {
       {Array.from({ length: 4 }, (_, i) => (
         <div
           key={i}
-          className="h-20 rounded-md border border-border bg-surface-raised"
+          className="h-20 rounded-md border border-border bg-surface"
         />
       ))}
     </div>

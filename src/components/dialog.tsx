@@ -40,7 +40,7 @@ export function Dialog({
         event.preventDefault();
         onCancel();
       }}
-      className="m-auto w-full max-w-sm rounded-md border border-border bg-bg p-5 text-text shadow-popover backdrop:bg-backdrop"
+      className="m-auto w-full max-w-sm rounded-md border border-border bg-bg p-5 text-text shadow-popover backdrop:bg-overlay"
     >
       <h2 id={titleId} className="text-lg font-bold">
         {title}

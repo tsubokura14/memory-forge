@@ -19,7 +19,7 @@ export function ChangeRow({
   return (
     <details
       open={defaultOpen}
-      className="group rounded-md border border-border bg-surface"
+      className="group rounded-md border border-border bg-bg"
     >
       <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5 text-sm">
         <span aria-hidden className="flex text-base text-muted">

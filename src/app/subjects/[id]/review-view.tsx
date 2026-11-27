@@ -37,14 +37,14 @@ export function ReviewView({
       </header>
       <main className="mx-auto flex w-full max-w-page flex-1 flex-col gap-4 px-4 pt-5 pb-8">
         <div className="flex items-center gap-2 text-xs text-muted">
-          <span className="rounded-sm bg-surface-raised px-1.5 py-0.5">
+          <span className="rounded-sm bg-surface px-1.5 py-0.5">
             {multiple ? "すべて選ぶ" : "1つ選ぶ"}
           </span>
           <span>{question.topic}</span>
           <span>{question.questionId}</span>
         </div>
         {view === "explanation" ? (
-          <section className="flex flex-col gap-2 rounded-md border border-border bg-surface p-4">
+          <section className="flex flex-col gap-2 rounded-md border border-border bg-bg p-4">
             <h2 className="text-xs text-muted">解説</h2>
             <div className="font-body text-base leading-loose">
               <RichText text={explanation} />
