@@ -1,5 +1,6 @@
 import { Icon } from "@/components/icons";
-import { RichText } from "./rich-text";
+import { parseMarkup } from "@/server/questions/markup";
+import { CodeBlock } from "./code-block";
 
 // 置き換わる問題の、開閉する行。行に ID と問題文の1行目（印が付いていたら、右に印と記録が消えること）、開くと変わった項目ごとに前（danger）と後（success）を並べる。
 // スマホの幅では、前と後を縦に並べる
@@ -65,7 +66,7 @@ export function ChangeRow({
 
 type Look = "plain" | "prose" | "choice";
 
-// 問題文・選択肢・解説は Solve と同じ見せ方（RichText。選択肢は Solve の選択肢と同じ等幅の文字）にする。
+// 問題文・選択肢・解説は Solve と同じ見せ方（MarkupText。選択肢は Solve の選択肢と同じ等幅の文字）にする。
 // topic・type・correct は文字のまま出す。Topic の名前に ` があっても、文の中のコードにしないため
 function lookOf(item: string): Look {
   if (item.startsWith("choice ")) return "choice";
@@ -95,10 +96,38 @@ function Side({
       <span className={`text-xs ${colors.label}`}>{label}</span>
       {look !== "plain" ? (
         <div className="text-sm">
-          <RichText text={value} />
+          <MarkupText text={value} />
         </div>
       ) : (
         <span className="text-sm break-words whitespace-pre-wrap">{value}</span>
+      )}
+    </div>
+  );
+}
+
+// 文の中のコードは code-bg で囲み、``` のところはコードブロックにする（docs/ui.md の「文の中のコード」）
+function MarkupText({ text }: { text: string }) {
+  return (
+    <div className="flex min-w-0 flex-col gap-3">
+      {parseMarkup(text).map((block, i) =>
+        block.kind === "code" ? (
+          <CodeBlock key={i} code={block.code} language={block.language} />
+        ) : (
+          <p key={i} className="whitespace-pre-wrap">
+            {block.inlines.map((inline, j) =>
+              inline.kind === "code" ? (
+                <code
+                  key={j}
+                  className="rounded-sm bg-code-bg px-1 font-mono text-sm text-code-text"
+                >
+                  {inline.text}
+                </code>
+              ) : (
+                inline.text
+              ),
+            )}
+          </p>
+        ),
       )}
     </div>
   );

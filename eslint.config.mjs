@@ -16,7 +16,11 @@ const eslintConfig = defineConfig([
     },
     // トークンにない値を止める（理由と前提は docs/design.md の「トークンにない値は、ESLint で止める」）
     rules: {
-      "better-tailwindcss/no-unknown-classes": "error",
+      // kinari-body は Tailwind のクラスではなく、kinari-md/body.css の本文の入れ物のクラス
+      "better-tailwindcss/no-unknown-classes": [
+        "error",
+        { ignore: ["^kinari-body$"] },
+      ],
       "better-tailwindcss/no-restricted-classes": [
         "error",
         {

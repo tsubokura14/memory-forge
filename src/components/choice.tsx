@@ -1,4 +1,3 @@
-import { parseMarkup } from "@/server/questions/markup";
 import { RichText } from "./rich-text";
 
 // 答え合わせのあとの選択肢の見え方（docs/ui.md の「答え合わせのあと」）。
@@ -15,7 +14,8 @@ const MARK_LABELS = {
 // 選択肢のカード（docs/ui.md の「選択肢」）。枠線を付けず、状態は地の色で出す。単一選択は丸い記号、複数選択は四角い記号
 export function Choice({
   letter,
-  text,
+  html,
+  hasCode,
   multiple,
   selected,
   mark,
@@ -23,7 +23,9 @@ export function Choice({
   onClick,
 }: {
   letter: string;
-  text: string;
+  // 選択肢の HTML と、コードブロックがあるか（src/server/questions/render.ts の renderChoice）
+  html: string;
+  hasCode: boolean;
   multiple: boolean;
   selected: boolean;
   // 答える前は undefined
@@ -51,7 +53,6 @@ export function Choice({
             ? "bg-accent text-on-accent"
             : "bg-bg text-muted";
   // コードブロックのある選択肢は、スマホの幅では記号を上の行に置き、コードを幅いっぱいに出す
-  const hasCode = parseMarkup(text).some((block) => block.kind === "code");
   return (
     <button
       type="button"
@@ -68,7 +69,7 @@ export function Choice({
       <span
         className={`min-w-0 flex-1 ${hasCode ? "self-stretch sm:self-center" : "self-center"}`}
       >
-        <RichText text={text} />
+        <RichText html={html} body="choice" />
       </span>
       {mark && <span className="sr-only">{` ${MARK_LABELS[mark]}`}</span>}
     </button>

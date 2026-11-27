@@ -19,7 +19,7 @@ export function ReviewView({
   onBack: () => void;
 }) {
   const [view, setView] = useState<"question" | "explanation">("question");
-  const { question, selected, answer, explanation } = missed.review;
+  const { question, selected, answer, explanationHtml } = missed.review;
   const multiple = question.type === "multiple";
   return (
     <div className="flex min-h-screen flex-col">
@@ -46,15 +46,11 @@ export function ReviewView({
         {view === "explanation" ? (
           <section className="flex flex-col gap-2 rounded-md border border-border bg-bg p-4">
             <h2 className="text-xs text-muted">解説</h2>
-            <div className="font-body text-base leading-loose">
-              <RichText text={explanation} />
-            </div>
+            <RichText html={explanationHtml} body="explanation" />
           </section>
         ) : (
           <>
-            <div className="font-body text-lg">
-              <RichText text={question.text} lineNumbers />
-            </div>
+            <RichText html={question.textHtml} body="question" />
             <ResultBanner outcome={missed.outcome} answer={answer} />
             <div className="flex items-center gap-3 text-xs text-muted">
               <span>
@@ -65,13 +61,14 @@ export function ReviewView({
               <span className="h-px flex-1 bg-border" />
             </div>
             <div className="flex flex-col gap-2">
-              {question.choices.map((text, i) => {
+              {question.choicesHtml.map(({ html, hasCode }, i) => {
                 const letter = choiceLetter(i);
                 return (
                   <Choice
                     key={letter}
                     letter={letter}
-                    text={text}
+                    html={html}
+                    hasCode={hasCode}
                     multiple={multiple}
                     selected={selected.includes(letter)}
                     mark={markOf(letter, answer, selected)}

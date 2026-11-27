@@ -93,7 +93,7 @@ export function SolveView({
           question,
           selected: answer,
           answer: answered.answer,
-          explanation: answered.explanation,
+          explanationHtml: answered.explanationHtml,
         }),
       ]);
       setCounts((c) =>
@@ -118,7 +118,12 @@ export function SolveView({
       setCounts((c) => ({ ...c, wrong: c.wrong + 1 }));
       const done = [
         ...outcomes,
-        outcomeOf(question, "skipped", { question, selected: [], ...skipped }),
+        outcomeOf(question, "skipped", {
+          question,
+          selected: [],
+          answer: skipped.answer,
+          explanationHtml: skipped.explanationHtml,
+        }),
       ];
       setOutcomes(done);
       advance(done);
@@ -217,17 +222,13 @@ export function SolveView({
           <>
             <section className="flex flex-col gap-2 rounded-md border border-border bg-bg p-4">
               <h2 className="text-xs text-muted">解説</h2>
-              <div className="font-body text-base leading-loose">
-                <RichText text={result.explanation} />
-              </div>
+              <RichText html={result.explanationHtml} body="explanation" />
             </section>
             {failedBanner}
           </>
         ) : (
           <>
-            <div className="font-body text-lg">
-              <RichText text={question.text} lineNumbers />
-            </div>
+            <RichText html={question.textHtml} body="question" />
             {result && (
               <ResultBanner
                 outcome={result.correct ? "correct" : "incorrect"}
@@ -243,13 +244,14 @@ export function SolveView({
               <span className="h-px flex-1 bg-border" />
             </div>
             <div className="flex flex-col gap-2">
-              {question.choices.map((text, i) => {
+              {question.choicesHtml.map(({ html, hasCode }, i) => {
                 const letter = choiceLetter(i);
                 return (
                   <Choice
                     key={letter}
                     letter={letter}
-                    text={text}
+                    html={html}
+                    hasCode={hasCode}
                     multiple={multiple}
                     selected={selected.includes(letter)}
                     mark={

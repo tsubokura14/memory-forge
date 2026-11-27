@@ -1,2 +1,6 @@
 @import "tailwindcss";
 @import "./tokens.css";
+/* kinari-md の本文の CSS は、memory-forge のトークンを読むので、tokens.css のあとに読み込む */
+@import "kinari-md/tokens.css";
+@import "kinari-md/body.css";
+@import "./question-body.css";

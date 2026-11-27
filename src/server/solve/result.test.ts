@@ -139,7 +139,7 @@ describe("missedQuestions", () => {
         },
         selected: kind === "skipped" ? [] : ["B"],
         answer: ["A"],
-        explanation: "解説",
+        explanationHtml: "<p>解説</p>",
       },
     };
   }

@@ -22,6 +22,8 @@
   --color-success: #3f8a6a;
   --color-danger: #b0453a;
   --color-warning: #b07a1c;
+  /* kinari-md のコールアウト（note・info）の中だけで使う。値は md-leaf と同じ */
+  --color-info: #3d6ea8;
   --color-flame: #b5562b;
   --color-overlay: rgb(30 28 24 / 0.4);
   /* -soft は元の色を地（bg）に混ぜて作る。割合は下の :root（ダークは [data-theme="dark"]） */
@@ -99,6 +101,8 @@
   --soft-success: 12%;
   --soft-danger: 12%;
   --soft-warning: 14%;
+  /* kinari-md の本文の文字の大きさ。問題文・選択肢などの入れ物ごとに上書きする（src/styles/question-body.css） */
+  --reading-size: var(--text-base);
 }
 
 [data-theme="dark"] {
@@ -115,6 +119,7 @@
   --color-success: #7fc4a4;
   --color-danger: #e58a7f;
   --color-warning: #e0b35e;
+  --color-info: #86aee0;
   --color-flame: #d98656;
   --color-overlay: rgb(0 0 0 / 0.55);
   --soft-accent: 14%;
