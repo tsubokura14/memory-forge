@@ -73,7 +73,7 @@
 | ログイン | Better Auth | Google でのログインと紐づけ、DB に持つセッションを、同じ仕組みで扱える |
 | テスト | Vitest、Playwright | Vitest で中の決まりを速く確かめ、Playwright で画面を通したテストと画像の比べをする |
 | 見た目 | Tailwind CSS 4 | トークンを Tailwind の値として登録して部品にそのまま書け、トークンにない値を Lint で見つけやすい |
-| コードの色分け | Prism（`prismjs`） | 待たずに色を決められるので最初の表示から色が付き、言葉の種類がコードの色の6つのトークンにそのまま合う |
+| 問題文・選択肢・解説の表示 | kinari-md（シリーズで共通の Markdown の変換と本文の見た目。中で highlight.js が色分けする） | md-leaf と同じ見た目・同じ色分けで出せ、表示を直すときにシリーズのアプリをまとめて直せる。サーバーで変換するので、最初の表示から色が付く |
 | 整形・Lint | Prettier、ESLint（`eslint-config-next`） | Next.js の公式のルールと、Tailwind のクラスを調べるルールが使える |
 | デプロイ先 | Vercel | main は本番に、PR は確かめ用の URL に自動で公開される |
 

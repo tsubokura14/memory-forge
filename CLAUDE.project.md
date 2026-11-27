@@ -11,7 +11,7 @@ AGENTS.md と CLAUDE.md はテンプレートのものなので、このプロ�
 
 - Next.js 16（App Router、TypeScript、Cache Components を有効）、React 19
 - Tailwind CSS 4（トークンは `src/styles/tokens.css`）
-- Prism（`prismjs`。コードブロックの色分け。`src/server/questions/highlight.ts`）
+- kinari-md（`github:tsubokura14/kinari-md#v0.2.0`。問題文・選択肢・解説の Markdown の変換・コードの色分けと本文の見た目。`src/server/questions/render.ts`・`src/styles/question-body.css`）
 - Neon（PostgreSQL）と Drizzle ORM（drizzle-kit で形の変更を管理）
 - Better Auth（Google アカウントでのログイン。`src/server/auth/`）
 - Vitest（中の決まりのテスト）、Playwright（画面を通したテストと、Docker の中での画像の比べ）

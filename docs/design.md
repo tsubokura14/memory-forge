@@ -28,7 +28,8 @@ src/
     <機能>/     機能ごとの読み書きと決まり（例：server/import/）。計算は、データベースを使わない関数に分ける
   styles/
     tokens.css  トークン（色・余白・文字の値はここにだけ書く）
-    globals.css Tailwind の読み込みと、トークンの登録
+    globals.css Tailwind の読み込みと、トークンの登録。kinari-md のトークンと本文の CSS も読み込む
+    question-body.css  問題文・選択肢・解説の入れ物ごとに、kinari-md の本文の見た目を上書きする（下の「問題文・選択肢・解説の表示」）
   **/*.test.ts  Vitest のテスト。確かめるファイルの横に置く
 drizzle/        形の変更（マイグレーション）のファイル。drizzle-kit が作る
 e2e/            Playwright のテスト（*.spec.ts）。画像を比べるテストもここ
@@ -44,6 +45,18 @@ questions/      問題づくりの作業場所。Git に入れない（下の「
 - `src/server/` のうち、データベースを使わない決まり（上限の値や文言など）は、ブラウザで動く画面の部品から読み込んでよい（例：Import が、送る前に大きさを確かめるため `src/server/import/validate.ts` を読む）
   - 理由：同じ決まりを、画面とサーバーの2か所に書き分けないため
   - 前提（崩れたら見直す）：読み込むファイルが、データベースやサーバーだけの仕組み（`next/headers` など）を読み込まない。読み込むようになったら、画面が使う部分を別のファイルに分ける
+  - 例外：`src/server/questions/render.ts`（問題文・選択肢・解説を HTML にする）は、データベースを使わないが、画面の部品から読み込まない（下の「問題文・選択肢・解説の表示」）
+
+## 問題文・選択肢・解説の表示
+
+- Markdown の変換と本文の見た目は、シリーズで共通のパッケージ kinari-md（`docs/libraries/kinari-md.md`）に任せる。表示を直すときは、memory-forge に変換や上書きを足さず、kinari-md で直す
+  - memory-forge で上書きするのは、入れ物ごとの文字の大きさ・書体と、選択肢の中のコードブロックの枠だけ（`src/styles/question-body.css`。入れ物は `src/components/rich-text.tsx` の `data-body` で分ける）
+  - 理由：md-leaf と同じ見た目・同じ色分けを、アプリごとに書き分けずに保つため
+  - 前提（崩れたら見直す）：kinari-md の本文の CSS が読むトークン（`--color-surface`・`--font-ui`・`--reading-size`・`--color-info` など）を、memory-forge の `tokens.css` が同じ名前で持つ。kinari-md の版を上げて読むトークンが増えたら、`tokens.css` に足す
+- 変換はサーバーで行う。問題を画面に渡すサーバーの関数（`src/server/solve/start.ts`・`retry.ts`・`answer.ts`、`src/server/import/import.ts`）が、元の文字に加えて、`src/server/questions/render.ts` で変換した HTML を返す。Result の見直しは、答えたときに受け取った解説の HTML を持つ（`src/server/solve/result.ts`）。画面の部品は HTML を入れるだけにする
+  - 理由：kinari-md の中の unified・highlight.js・KaTeX は、ブラウザに送ると大きい（数百 KB）。スマホでも解くので、ブラウザには HTML だけを送る。そのため `render.ts` は画面の部品から読み込まない
+  - 前提（崩れたら見直す）：開くたびに変換しても重くない（1回に最大100問）。重くなったら、変換した HTML をデータベースに持つかを決め直す
+- Manage の一覧や削除の確認のダイアログに出す問題文の1行目は、変換せずに元の文字のまま出す
 
 ## 解く画面の状態
 
