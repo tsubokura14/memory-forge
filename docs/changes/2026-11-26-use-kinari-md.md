@@ -137,6 +137,7 @@
 - 画面に問題を渡すサーバーの関数が、元の文字に加えて、変換した HTML を返す
   - `src/server/solve/start.ts`・`retry.ts` の `SolveQuestion`：`textHtml: string`、`choicesHtml: { html: string; hasCode: boolean }[]` を足す
   - `src/server/solve/answer.ts` の `AnswerResult`・`SkipResult`：`explanationHtml: string` を足す
+  - `src/server/solve/result.ts` の見直し用のデータ（`review`）：解説の HTML（`explanationHtml`）も持たせ、Result の見直しで使う（Solve の画面のタスクで行う）
   - `src/server/import/` の取り込む前の確認のデータ（`previewImport` が返す置き換わる問題の `changes`）：項目が text・choice・explanation のときは、前と後の HTML（`beforeHtml`・`afterHtml`）を足す。text と choice は `syntax: "code"`（行番号なし）、explanation は `"all"`。topic・type・correct は今と同じく文字のまま
   - 元の文字（`text`・`choices`・`explanation`・`before`・`after`）は、画面で使わなくなったら外してよい（ほかに使っているところが残るなら残す）
 - 理由：unified・highlight.js・KaTeX はブラウザに送ると大きい（数百 KB）。スマホでも解くので、変換はサーバーで済ませ、ブラウザには HTML だけを送る。`render.ts` は画面の部品から読み込まない。残す場所：`docs/design.md`（「全体の構成」に足す）
@@ -211,7 +212,7 @@
 ## タスク
 
 - [x] kinari-md を入れ、問題文・選択肢・解説を HTML に変換する関数を作る：`src/server/questions/render.ts` とテスト、`next.config.ts`、`docs/libraries/kinari-md.md` の下書き（画面は変えない）
-- [ ] 問題を画面に渡すサーバーの関数が、変換した HTML も返す：`SolveQuestion`・`AnswerResult`・`SkipResult`・取り込む前の確認の `changes`（画面は変えない）
+- [x] 問題を画面に渡すサーバーの関数が、変換した HTML も返す：`SolveQuestion`・`AnswerResult`・`SkipResult`・取り込む前の確認の `changes`（画面は変えない）
 - [ ] Solve と Result の見直しを kinari-md の見た目にする：トークン（`info`・`reading-size`）、kinari-md の CSS の読み込み、`question-body.css`、`RichText`・`Choice`・solve-view・review-view、画面のテストのデータと画像（`solve-question.png`・`solve-code-choices.png`・`solve-answered-code-choices.png`・`solve-explanation.png`・`solve-no-language.png`・`solve-code-choices-dark.png`・`solve-code-choices-mobile.png` に合わせる。ほかの `solve-*` は撮り直して差を確かめる）。取り込む前の確認は、このタスクでは古い変換のまま動かす
 - [ ] 取り込む前の確認を kinari-md の見た目にし、古い変換と Prism を消す：`ChangeRow`、`import-preview.png` に合わせる（`import-preview-new.png` も撮り直して確かめる）、`markup.ts`・`highlight.ts`・`code-block.tsx`・`prismjs`・`@types/prismjs`・`docs/libraries/prismjs.md`・トークンの `code-*` を消す
 - [ ] 文書を今の作りに合わせる：`docs/specs/solve.md`・`import.md`・`question-authoring.md`、`docs/questions.md`、`.claude/skills/make-questions/SKILL.md`（解説ではすべての書き方、問題文と選択肢は文の中のコードとコードブロックだけ）、`docs/ui.md`、`docs/design.md`、`docs/overview.md` の「技術」、`CLAUDE.project.md` の「技術」
