@@ -226,10 +226,10 @@ const decorators: TestQuestion[] = [
       "print(add.__name__)",
       fence,
     ].join("\n"),
-    choices: ["add", "wrapper", "logger", "None"],
+    choices: ["`add`", "`wrapper`", "`logger`", "`None`"],
     correct: ["B"],
     explanation: [
-      '`@logger` を付けると、`add` は `logger` が返した `wrapper` に置き換わる。そのため `add.__name__` は `"wrapper"` になる。元の名前を残したいときは、`functools.wraps` を使う：',
+      '`@logger` を付けると、`add` は `logger` が返した `wrapper` に**置き換わる**。そのため `add.__name__` は `"wrapper"` になる。元の名前を残したいときは、`functools.wraps` を使う：',
       `${fence}python`,
       "from functools import wraps",
       "",
@@ -238,6 +238,9 @@ const decorators: TestQuestion[] = [
       "    def wrapper(*args, **kwargs):",
       "        # ...",
       fence,
+      "",
+      "> [!tip] 覚え方",
+      "> デコレータを書くときは、内側のラッパーに `@wraps(func)` を付けると覚える。",
     ].join("\n"),
   }),
   testQuestion("p81xq0", {
@@ -392,6 +395,11 @@ test("答えるたびに数と番号が進み、正解・不正解の帯と、�
 
   await button(page, "解説を見る").click();
   await expect(page.getByText("解説", { exact: true })).toBeVisible();
+  // 解説はすべての書き方で出す（強調とコールアウト）
+  await expect(
+    page.locator("strong").filter({ hasText: "置き換わる" }),
+  ).toBeVisible();
+  await expect(page.getByText("覚え方", { exact: true })).toBeVisible();
   await expect(page).toHaveScreenshot("solve-explanation.png", {
     fullPage: true,
   });
@@ -423,6 +431,19 @@ test("答えるたびに数と番号が進み、正解・不正解の帯と、�
   await expect(page).toHaveScreenshot("solve-code-choices.png", {
     fullPage: true,
   });
+  await page.emulateMedia({ colorScheme: "dark" });
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page).toHaveScreenshot("solve-code-choices-dark.png", {
+    fullPage: true,
+  });
+  await page.emulateMedia({ colorScheme: "light" });
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  const viewport = page.viewportSize();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page).toHaveScreenshot("solve-code-choices-mobile.png", {
+    fullPage: true,
+  });
+  if (viewport) await page.setViewportSize(viewport);
   await choice(page, "D").click();
   await button(page, "答え合わせする").click();
   await expect(page.getByText("不正解。答えは B")).toBeVisible();
@@ -598,6 +619,7 @@ test("solve-review：間違えた問題の行を押すと、答えたあとの�
   await expect(
     page.getByText("functools.wraps", { exact: false }).first(),
   ).toBeVisible();
+  await expect(page.getByText("覚え方", { exact: true })).toBeVisible();
   await button(page, "問題に戻る").click();
   await page.getByRole("button", { name: "結果に戻る" }).click();
   await expect(page.getByText("解き終わりました")).toBeVisible();
