@@ -128,7 +128,50 @@
 
 ## 設計
 
-<!-- /dev-build で書く -->
+### 変換はサーバーで行い、HTML を画面に渡す
+
+- `src/server/questions/render.ts`（データベースは使わない）に、kinari-md の `renderMarkdown` を呼ぶ3つの関数を置く
+  - `renderQuestionText(text)`：`syntax: "code"`・`lineNumbers: true`。HTML の文字を返す
+  - `renderChoice(text)`：`syntax: "code"`。`{ html, hasCode }` を返す（`hasCode` はコードブロックがあるか。選択肢をスマホの幅で縦に並べるかに使う）
+  - `renderExplanation(text)`：`syntax: "all"`。HTML の文字を返す。`drawMermaid` は呼ばない（```` ```mermaid ```` はコードブロックのまま出る）
+- 画面に問題を渡すサーバーの関数が、元の文字に加えて、変換した HTML を返す
+  - `src/server/solve/start.ts`・`retry.ts` の `SolveQuestion`：`textHtml: string`、`choicesHtml: { html: string; hasCode: boolean }[]` を足す
+  - `src/server/solve/answer.ts` の `AnswerResult`・`SkipResult`：`explanationHtml: string` を足す
+  - `src/server/import/` の取り込む前の確認のデータ（`previewImport` が返す置き換わる問題の `changes`）：項目が text・choice・explanation のときは、前と後の HTML（`beforeHtml`・`afterHtml`）を足す。text と choice は `syntax: "code"`（行番号なし）、explanation は `"all"`。topic・type・correct は今と同じく文字のまま
+  - 元の文字（`text`・`choices`・`explanation`・`before`・`after`）は、画面で使わなくなったら外してよい（ほかに使っているところが残るなら残す）
+- 理由：unified・highlight.js・KaTeX はブラウザに送ると大きい（数百 KB）。スマホでも解くので、変換はサーバーで済ませ、ブラウザには HTML だけを送る。`render.ts` は画面の部品から読み込まない。残す場所：`docs/design.md`（「全体の構成」に足す）
+- 前提（崩れたら見直す）：開くたびに変換しても重くない（1回に最大100問）。残す場所：`docs/design.md`
+
+### 画面
+
+- `src/components/rich-text.tsx` を、HTML を受け取って `.kinari-body` の入れ物に `dangerouslySetInnerHTML` で入れる部品にする。入れ物の種類（`question`・`choice`・`explanation`・`preview`）で、下の CSS のクラスを付ける
+  - HTML は kinari-md がいつも安全にしたもの（タグは文字、危ないリンクと画像は通さない）なので、そのまま入れてよい。残す場所：部品のコメント
+- `src/components/choice.tsx`：`text` の代わりに `html` と `hasCode` を受け取る。`parseMarkup` を使わない
+- `src/components/change-row.tsx`：text・choice・explanation は HTML で出す。問題文の1行目（行の見出し）は今と同じく元の文字
+- `src/app/subjects/[id]/solve-view.tsx`・`review-view.tsx`：HTML の項目を渡す。問題文・解説の入れ物の `font-body text-lg` などの大きさは、入れ物の CSS の `--reading-size` に置き換える
+- 消すもの：`src/server/questions/markup.ts`・`highlight.ts` とそのテスト、`src/components/code-block.tsx`、`prismjs`・`@types/prismjs`、`docs/libraries/prismjs.md`
+
+### トークンと CSS
+
+- `npm install github:tsubokura14/kinari-md#v0.2.0`。`next.config.ts` に `transpilePackages: ["kinari-md"]`
+- `src/styles/globals.css`：`kinari-md/tokens.css`・`kinari-md/body.css` を、memory-forge の `tokens.css` のあとに読み込む。Tailwind が kinari-md の中のトークンの使い方も見つけられるよう、必要なら `@source "../../node_modules/kinari-md/src"` を足す（md-leaf と同じ）
+- `src/styles/tokens.css`
+  - `--color-code-*` の6つを消す（kinari-md の `tokens.css` が持つ。`code-text` は kinari-md では `--color-text`）。Prism の部品を消すタスクで消す
+  - `--color-info` を md-leaf と同じ値で足す（ライト `#3d6ea8`、ダーク `#86aee0`）。コールアウトの中だけで使う
+  - `--reading-size` を足す（既定は base の大きさ。入れ物ごとに上書きする）
+  - kinari-md が読むトークン（`--leading-tight`・`--leading-normal`・`--leading-relaxed`・`--font-weight-bold`・`--spacing`・`--default-transition-duration`・`--default-transition-timing-function`）が、memory-forge で値を持つか、ブラウザで確かめる。値がなければ md-leaf と同じ値で足し、「AIが決めたこと」に書く
+- 入れ物ごとの上書きは、`src/styles/question-body.css`（globals.css から読み込む）に、トークンの値だけで書く。Tailwind の `[&_pre]` のような書き方は ESLint で止まるため（`docs/design.md` の「トークンにない値は、ESLint で止める」）
+  - `question`：`--reading-size` を lg。コードブロックの文字を sm
+  - `explanation`：`--reading-size` を base。ほかは kinari-md のまま
+  - `choice`：`--reading-size` を sm。`--font-body` を `--font-ui` に当てる。コードブロックと文の中のコードの文字を 1em（文と同じ sm）。コードブロックに `border` の色の枠（thin solid）
+  - `preview`：`--reading-size` を sm。コードブロックと文の中のコードの文字を 1em。choice の項目は `choice` と同じ書体の上書きをする（枠は付けない。前と後の地は code-bg と違う色のため）
+  - 理由は CSS のコメントに書く（1か所だけに関わるため）
+- 見た目の決まりは `docs/ui.md` の「コードブロック」「文の中のコード」「選択肢の中のコードブロック」「コードの色分け」と色の表を、kinari-md に任せる形に書き直す（`code-*` の行は「kinari-md の `tokens.css` が持つ」にする。`info` を足し、コールアウトの中だけで使うと書く）
+
+### 画面のテストのデータ
+
+- `e2e/questions.ts` の Decorators の問題の解説に、強調（`**`）と `> [!tip]` のコールアウトと文の中のコードを入れ、`solve-explanation.png` で見えるようにする。ほかのテストが文言で探しているところを壊さない
+- 新しい画像：`solve-code-choices-dark.png`（ダークで選択肢がコード）、`solve-code-choices-mobile.png`（スマホの幅で選択肢がコード）
 
 ## AIが決めたこと
 
@@ -137,13 +180,38 @@
 - 行番号の見た目（番号の列と区切り線がなくなる）は kinari-md のまま受け入れる。kinari-md を直さない範囲で、写したときに番号が入らない作りを持てるため
 - コードの文字の大きさは今と同じ sm にそろえる：問題文のコードブロックは sm（kinari-md の 0.82em のままだと lg の文の中で大きく、スマホの幅で横にはみ出しやすい）。選択肢と取り込む前の確認のコード（ブロックも文の中も）は、文と同じ大きさ（sm。0.82em のままだと小さくなりすぎる）。解説のコードは kinari-md のまま（base の 0.82em で、今の sm とほぼ同じ）
 - 選択肢のコードブロックの内側の余白は kinari-md のまま（今より少し広い）
+- 変換はサーバーで行い、問題を渡すサーバーの関数が HTML も返す（`src/server/questions/render.ts`）。理由：unified・highlight.js・KaTeX をブラウザに送らずに済む。比べた案：今の `RichText` のようにブラウザの部品の中で `renderMarkdown` を呼ぶ（変える場所は少ないが、Solve を開くたびに数百 KB を送る）
+- 入れ物ごとの上書きは、Tailwind のクラスではなく CSS のファイル（`src/styles/question-body.css`）に書く。理由：`pre` や `code` の中まで変えるには `[&_pre]` のような書き方が要り、ESLint の `no-restricted-classes` で止まるため
 
 ## 確かめ方
 
-<!-- /dev-build で書く -->
+| 受け入れ条件 | 確かめ方 |
+| --- | --- |
+| どこでも kinari-md の見た目 | テスト（画像を比べる：`solve-*`・`import-preview*` を撮り直し、仕様の画像と見比べる） |
+| 問題文は段落・改行・文の中のコード・コードブロックだけ。ほかは書いたまま | テスト（Vitest：`render.test.ts` の `renderQuestionText`） |
+| 問題文のコードブロックに行番号。写すと入らない | テスト（Vitest：行番号のクラスが付き、HTML の文字に番号が入らない）＋テスト（画像：`solve-question.png`） |
+| 選択肢は問題文と同じ書き方。行番号なし | テスト（Vitest：`renderChoice`） |
+| 選択肢の文は sans | テスト（画像：`solve-question.png`）＋コードを見て確かめる（`question-body.css` の `choice`） |
+| 選択肢の中のコードブロックがカードの地と見分けられる | テスト（画像：`solve-code-choices.png`・`solve-answered-code-choices.png`・`solve-code-choices-dark.png`） |
+| スマホの幅で記号が上の行、コードが幅いっぱい | テスト（画像：`solve-code-choices-mobile.png`）＋テスト（Vitest：`renderChoice` の `hasCode`） |
+| 解説はすべての書き方 | テスト（Vitest：`renderExplanation` で強調・リスト・表・引用・コールアウト・数式・リンクが出る）＋テスト（画像：`solve-explanation.png`） |
+| 解説の mermaid はコードブロックのまま | テスト（Vitest：`pre` のまま出る）＋コードを見て確かめる（`drawMermaid` を呼んでいない） |
+| コールアウトの色は md-leaf と同じ（note は info） | コードを見て確かめる（`tokens.css` の `--color-info`）＋テスト（画像：`solve-explanation.png` の tip） |
+| 問題の作り方とスキルに書ける書き方を書く | コードを見て確かめる（`docs/questions.md`・`.claude/skills/make-questions/SKILL.md`） |
+| 言語に合わせて3色。言語名は出さない | テスト（Vitest：`hljs-keyword` などのクラスが付く）＋テスト（画像：`solve-question.png`） |
+| 今の6つと短い名前を含む一般的な言語に色 | テスト（Vitest：python・py・typescript・ts・javascript・js・sql・bash・sh・shell・json で色のクラスが付く） |
+| 言語なし・知らない言語は1色 | テスト（Vitest）＋テスト（画像：`solve-no-language.png`） |
+| 開いたときから色。ライトとダーク | テスト（画像：`solve-code-choices.png`・`solve-code-choices-dark.png`） |
+| HTML のタグは文字のまま。リンクと画像は決まった形だけ | テスト（Vitest：`<script>` が文字で出る、`javascript:` のリンクが通らない） |
+| 文字の大きさは今と同じ | テスト（画像）＋コードを見て確かめる（`question-body.css` の `--reading-size`） |
+| ファイルの形と取り込みの確かめは変えない。今の問題は取り込み直さなくても新しい見た目 | テスト（今の `validate.test.ts` が通る）＋コードを見て確かめる（データベースの形を変えず、表示のときに変換する） |
+| Manage の一覧と削除のダイアログの1行目は文字のまま | テスト（今の画像：`manage-*` が変わらない） |
+| `prismjs` を外す | コードを見て確かめる（`package.json`） |
 
 ## タスク
 
-<!-- /dev-build で書く -->
-
-- [ ]
+- [ ] kinari-md を入れ、問題文・選択肢・解説を HTML に変換する関数を作る：`src/server/questions/render.ts` とテスト、`next.config.ts`、`docs/libraries/kinari-md.md` の下書き（画面は変えない）
+- [ ] 問題を画面に渡すサーバーの関数が、変換した HTML も返す：`SolveQuestion`・`AnswerResult`・`SkipResult`・取り込む前の確認の `changes`（画面は変えない）
+- [ ] Solve と Result の見直しを kinari-md の見た目にする：トークン（`info`・`reading-size`）、kinari-md の CSS の読み込み、`question-body.css`、`RichText`・`Choice`・solve-view・review-view、画面のテストのデータと画像（`solve-question.png`・`solve-code-choices.png`・`solve-answered-code-choices.png`・`solve-explanation.png`・`solve-no-language.png`・`solve-code-choices-dark.png`・`solve-code-choices-mobile.png` に合わせる。ほかの `solve-*` は撮り直して差を確かめる）。取り込む前の確認は、このタスクでは古い変換のまま動かす
+- [ ] 取り込む前の確認を kinari-md の見た目にし、古い変換と Prism を消す：`ChangeRow`、`import-preview.png` に合わせる（`import-preview-new.png` も撮り直して確かめる）、`markup.ts`・`highlight.ts`・`code-block.tsx`・`prismjs`・`@types/prismjs`・`docs/libraries/prismjs.md`・トークンの `code-*` を消す
+- [ ] 文書を今の作りに合わせる：`docs/specs/solve.md`・`import.md`・`question-authoring.md`、`docs/questions.md`、`.claude/skills/make-questions/SKILL.md`（解説ではすべての書き方、問題文と選択肢は文の中のコードとコードブロックだけ）、`docs/ui.md`、`docs/design.md`、`docs/overview.md` の「技術」、`CLAUDE.project.md` の「技術」
