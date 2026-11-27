@@ -2,6 +2,11 @@ import { and, count as countRows, eq, sql } from "drizzle-orm";
 import { db } from "@/server/db/client";
 import { answers, questions } from "@/server/db/schema";
 import type { QuestionType } from "@/server/import/validate";
+import {
+  type RenderedChoice,
+  renderChoice,
+  renderQuestionText,
+} from "@/server/questions/render";
 import { type Count, type Order, pickQuestions } from "./pick";
 
 // 解く画面に渡す問題。正解と解説は、答え合わせのあとに返す（answer.ts）。選択肢はファイルの順のまま
@@ -12,6 +17,9 @@ export type SolveQuestion = {
   type: QuestionType;
   text: string;
   choices: string[];
+  // 画面に出す HTML（render.ts）。変換はサーバーで済ませ、ブラウザに変換の仕組みを送らない
+  textHtml: string;
+  choicesHtml: RenderedChoice[];
   // start の時点の記録に、一度でも正解があるか（解き終わりの結果で「前は正解したのに今回間違えた」を見分ける）。
   // 1つの回に同じ問題は2回出ないので、解いている間に足した記録はこの問題の判定に混ざらない
   correctBefore: boolean;
@@ -55,7 +63,19 @@ export async function startSession(
       type,
       text,
       choices,
+      ...renderQuestion(text, choices),
       correctBefore: correctCount > 0,
     }),
   );
+}
+
+// 問題文と選択肢を、画面に出す HTML にする（retry.ts も使う）
+export function renderQuestion(
+  text: string,
+  choices: string[],
+): Pick<SolveQuestion, "textHtml" | "choicesHtml"> {
+  return {
+    textHtml: renderQuestionText(text),
+    choicesHtml: choices.map(renderChoice),
+  };
 }
