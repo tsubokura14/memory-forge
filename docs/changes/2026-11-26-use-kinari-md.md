@@ -183,6 +183,9 @@
 - 選択肢のコードブロックの内側の余白は kinari-md のまま（今より少し広い）
 - 変換はサーバーで行い、問題を渡すサーバーの関数が HTML も返す（`src/server/questions/render.ts`）。理由：unified・highlight.js・KaTeX をブラウザに送らずに済む。比べた案：今の `RichText` のようにブラウザの部品の中で `renderMarkdown` を呼ぶ（変える場所は少ないが、Solve を開くたびに数百 KB を送る）
 - 入れ物ごとの上書きは、Tailwind のクラスではなく CSS のファイル（`src/styles/question-body.css`）に書く。理由：`pre` や `code` の中まで変えるには `[&_pre]` のような書き方が要り、ESLint の `no-restricted-classes` で止まるため
+- 入れ物の種類は、クラスではなく `data-body` の属性（`question`・`choice`・`explanation`）で分ける。`kinari-body` のクラスは ESLint の `no-unknown-classes` の `ignore` に足す（Tailwind のクラスではないため。ほかの名前のクラスを増やさずに済む）
+- kinari-md が読む `--leading-*`・`--font-weight-bold`・`--spacing`・`--default-transition-*` は、Tailwind の既定の値（md-leaf と同じ）がビルドした CSS に出ていることを確かめたので、`tokens.css` には足さない
+- 画面のテストの k3f9a2 の選択肢を文の中のコード（`` `add` `` など）にし、解説に強調と `> [!tip] 覚え方` のコールアウトを足す（`solve-question.png`・`solve-explanation.png` のスクリーンショットに合わせるため。データは `e2e/questions.ts` ではなく `e2e/solve.spec.ts` の `decorators` にある）
 
 ## 確かめ方
 
