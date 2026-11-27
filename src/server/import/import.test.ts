@@ -2,6 +2,7 @@ import { asc, count, eq, inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test } from "vitest";
 import { db } from "@/server/db/client";
 import { answers, questions, subjects } from "@/server/db/schema";
+import { renderChoice, renderExplanation } from "@/server/questions/render";
 import { applyImport, previewImport } from "./import";
 import type { FileQuestion } from "./validate";
 
@@ -117,6 +118,8 @@ describe("previewImport", () => {
               item: "explanation",
               before: "デコレータは関数を返す。",
               after: "新しい解説",
+              beforeHtml: renderExplanation("デコレータは関数を返す。"),
+              afterHtml: renderExplanation("新しい解説"),
             },
           ],
         },
@@ -126,6 +129,45 @@ describe("previewImport", () => {
       "デコレータは関数を返す。",
       "デコレータは関数を返す。",
       "デコレータは関数を返す。",
+    ]);
+  });
+
+  test("問題文・選択肢・解説の前と後は HTML も出し、ほかの項目は文字だけを出す", async () => {
+    await applyImport(file([question({ id: "a1" })]));
+    const after = question({
+      id: "a1",
+      topic: "Generators",
+      text: "新しい問題文\n\n```python\nprint(1)\n```",
+      choices: ["`call add`", "add", "None"],
+      explanation: "**新しい**解説",
+    });
+    const before = question({ id: "a1" });
+    const preview = await previewImport(file([after]));
+    expect(preview).toMatchObject({ ok: true });
+    if (!preview.ok) return;
+    expect(preview.replaced[0].changes).toEqual([
+      { item: "topic", before: before.topic, after: after.topic },
+      {
+        item: "text",
+        before: before.text,
+        after: after.text,
+        beforeHtml: renderChoice(before.text).html,
+        afterHtml: renderChoice(after.text).html,
+      },
+      {
+        item: "choice A",
+        before: before.choices[0],
+        after: after.choices[0],
+        beforeHtml: renderChoice(before.choices[0]).html,
+        afterHtml: renderChoice(after.choices[0]).html,
+      },
+      {
+        item: "explanation",
+        before: before.explanation,
+        after: after.explanation,
+        beforeHtml: renderExplanation(before.explanation),
+        afterHtml: renderExplanation(after.explanation),
+      },
     ]);
   });
 
