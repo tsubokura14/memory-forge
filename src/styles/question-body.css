@@ -33,3 +33,23 @@
 .kinari-body[data-body="choice"] pre {
   border: thin solid var(--color-border);
 }
+
+/*
+  取り込む前の確認の前と後（src/components/change-row.tsx）。前と後の箱は sm の文字なので、本文もコードも sm にする。
+  選択肢の項目は Solve の選択肢と同じ書体（sans）にする。前と後の地は code-bg と違う色なので、コードブロックに枠は付けない
+*/
+.kinari-body[data-body="preview"],
+.kinari-body[data-body="preview-choice"] {
+  --reading-size: var(--text-sm);
+}
+
+.kinari-body[data-body="preview-choice"] {
+  --font-body: var(--font-ui);
+}
+
+.kinari-body[data-body="preview"] pre,
+.kinari-body[data-body="preview"] :not(pre) > code,
+.kinari-body[data-body="preview-choice"] pre,
+.kinari-body[data-body="preview-choice"] :not(pre) > code {
+  font-size: 1em;
+}

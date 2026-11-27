@@ -48,13 +48,6 @@
     var(--color-bg)
   );
 
-  --color-code-bg: #f2ede0;
-  --color-code-text: #2b2a26;
-  --color-code-line: #a9a395;
-  --color-code-keyword: #8a4f9e;
-  --color-code-string: #4f7a3a;
-  --color-code-comment: #8f8a7e;
-
   /*
     書体は md-leaf と同じ並び。OS の書体を先に、端末にないとき（画面の画像を撮る Docker の中など）は
     next/font で配る Web フォントで出す。Web フォントは別の名前になるので、src/app/layout.tsx で作る CSS 変数を指す
@@ -126,11 +119,4 @@
   --soft-success: 14%;
   --soft-danger: 14%;
   --soft-warning: 14%;
-
-  --color-code-bg: #272520;
-  --color-code-text: #e6e1d5;
-  --color-code-line: #6b665a;
-  --color-code-keyword: #c79ad8;
-  --color-code-string: #9cc27f;
-  --color-code-comment: #7e796d;
 }

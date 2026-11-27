@@ -6,7 +6,7 @@ export function RichText({
   body,
 }: {
   html: string;
-  body: "question" | "choice" | "explanation";
+  body: "question" | "choice" | "explanation" | "preview" | "preview-choice";
 }) {
   return (
     <div

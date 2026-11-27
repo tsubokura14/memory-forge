@@ -19,3 +19,5 @@
   - 解説：`syntax: "all"`（すべての書き方）
 - `resolve`（リンクと画像の書き換え）と、戻り値の `title`・`headings`・`brokenLinks`・`brokenImages` は使わない
 - `kinari-md/mermaid`（`drawMermaid`）は使わない。```` ```mermaid ```` はコードブロックのまま出る
+- 本文の見た目は、`src/styles/globals.css` で `kinari-md/tokens.css`（コードの色など）と `kinari-md/body.css`（`.kinari-body` の中の見た目）を、memory-forge の `tokens.css` のあとに読み込む。`body.css` は memory-forge のトークン（`--color-surface`・`--font-ui`・`--reading-size` など）を読むため
+  - HTML は `src/components/rich-text.tsx` が `.kinari-body` の入れ物に入れる。入れ物ごとの文字の大きさ・書体・枠の上書きは `src/styles/question-body.css`（`data-body` で分ける）

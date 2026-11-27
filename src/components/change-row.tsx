@@ -1,6 +1,5 @@
 import { Icon } from "@/components/icons";
-import { parseMarkup } from "@/server/questions/markup";
-import { CodeBlock } from "./code-block";
+import { RichText } from "@/components/rich-text";
 
 // 置き換わる問題の、開閉する行。行に ID と問題文の1行目（印が付いていたら、右に印と記録が消えること）、開くと変わった項目ごとに前（danger）と後（success）を並べる。
 // スマホの幅では、前と後を縦に並べる
@@ -14,7 +13,13 @@ export function ChangeRow({
   id: string;
   text: string;
   flagged: boolean;
-  changes: { item: string; before: string; after: string }[];
+  changes: {
+    item: string;
+    before: string;
+    after: string;
+    beforeHtml?: string;
+    afterHtml?: string;
+  }[];
   defaultOpen?: boolean;
 }) {
   return (
@@ -47,13 +52,15 @@ export function ChangeRow({
               <Side
                 label="前"
                 value={change.before}
-                look={lookOf(change.item)}
+                html={change.beforeHtml}
+                item={change.item}
                 tone="danger"
               />
               <Side
                 label="後"
                 value={change.after}
-                look={lookOf(change.item)}
+                html={change.afterHtml}
+                item={change.item}
                 tone="success"
               />
             </div>
@@ -64,25 +71,19 @@ export function ChangeRow({
   );
 }
 
-type Look = "plain" | "prose" | "choice";
-
-// 問題文・選択肢・解説は Solve と同じ見せ方（MarkupText。選択肢は Solve の選択肢と同じ等幅の文字）にする。
-// topic・type・correct は文字のまま出す。Topic の名前に ` があっても、文の中のコードにしないため
-function lookOf(item: string): Look {
-  if (item.startsWith("choice ")) return "choice";
-  if (item === "text" || item === "explanation") return "prose";
-  return "plain";
-}
-
+// 問題文・選択肢・解説は、サーバーで変換した HTML（src/server/import/import.ts）を Solve と同じ kinari-md の見た目で出す。
+// 選択肢は Solve の選択肢と同じ書体にする。topic・type・correct は HTML がないので文字のまま出す
 function Side({
   label,
   value,
-  look,
+  html,
+  item,
   tone,
 }: {
   label: string;
   value: string;
-  look: Look;
+  html: string | undefined;
+  item: string;
   tone: "danger" | "success";
 }) {
   const colors = {
@@ -91,43 +92,16 @@ function Side({
   }[tone];
   return (
     <div
-      className={`flex flex-col gap-1 rounded-md border px-3 py-2 ${colors.box}`}
+      className={`flex min-w-0 flex-col gap-1 rounded-md border px-3 py-2 ${colors.box}`}
     >
       <span className={`text-xs ${colors.label}`}>{label}</span>
-      {look !== "plain" ? (
-        <div className="text-sm">
-          <MarkupText text={value} />
-        </div>
+      {html !== undefined ? (
+        <RichText
+          html={html}
+          body={item.startsWith("choice ") ? "preview-choice" : "preview"}
+        />
       ) : (
         <span className="text-sm break-words whitespace-pre-wrap">{value}</span>
-      )}
-    </div>
-  );
-}
-
-// 文の中のコードは code-bg で囲み、``` のところはコードブロックにする（docs/ui.md の「文の中のコード」）
-function MarkupText({ text }: { text: string }) {
-  return (
-    <div className="flex min-w-0 flex-col gap-3">
-      {parseMarkup(text).map((block, i) =>
-        block.kind === "code" ? (
-          <CodeBlock key={i} code={block.code} language={block.language} />
-        ) : (
-          <p key={i} className="whitespace-pre-wrap">
-            {block.inlines.map((inline, j) =>
-              inline.kind === "code" ? (
-                <code
-                  key={j}
-                  className="rounded-sm bg-code-bg px-1 font-mono text-sm text-code-text"
-                >
-                  {inline.text}
-                </code>
-              ) : (
-                inline.text
-              ),
-            )}
-          </p>
-        ),
       )}
     </div>
   );

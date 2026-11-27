@@ -25,7 +25,6 @@
     "kinari-md": "github:tsubokura14/kinari-md#v0.2.0",
     "next": "16.4.3",
     "pg": "^8.23.1",
-    "prismjs": "^1.30.0",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
@@ -34,7 +33,6 @@
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^24.19.2",
     "@types/pg": "^8.23.1",
-    "@types/prismjs": "^1.26.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "drizzle-kit": "^0.31.11",
