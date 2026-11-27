@@ -16,7 +16,7 @@ export function MissedRow({
       <button
         type="button"
         onClick={onClick}
-        className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-surface-raised"
+        className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-surface"
       >
         <Icon name="x" className="mt-1 shrink-0 text-base text-danger" />
         <span className="flex min-w-0 flex-1 flex-col gap-1">

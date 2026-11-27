@@ -196,7 +196,7 @@ export function SolveView({
           </Banner>
         )}
         <div className="flex items-center gap-2 text-xs text-muted">
-          <span className="rounded-sm bg-surface-raised px-1.5 py-0.5">
+          <span className="rounded-sm bg-surface px-1.5 py-0.5">
             {multiple ? "すべて選ぶ" : "1つ選ぶ"}
           </span>
           <span>{question.topic}</span>
@@ -215,7 +215,7 @@ export function SolveView({
         </div>
         {view === "explanation" && result ? (
           <>
-            <section className="flex flex-col gap-2 rounded-md border border-border bg-surface p-4">
+            <section className="flex flex-col gap-2 rounded-md border border-border bg-bg p-4">
               <h2 className="text-xs text-muted">解説</h2>
               <div className="font-body text-base leading-loose">
                 <RichText text={result.explanation} />
@@ -403,14 +403,14 @@ export function SolveSkeleton() {
         data-testid="solve-loading"
         className="flex animate-pulse flex-col gap-4"
       >
-        <div className="h-4 w-40 rounded-sm bg-surface-raised" />
-        <div className="h-6 w-2/3 rounded-sm bg-surface-raised" />
-        <div className="h-48 rounded-md border border-border bg-surface-raised" />
+        <div className="h-4 w-40 rounded-sm bg-surface" />
+        <div className="h-6 w-2/3 rounded-sm bg-surface" />
+        <div className="h-48 rounded-md border border-border bg-surface" />
         <div className="flex flex-col gap-2">
           {Array.from({ length: 4 }, (_, i) => (
             <div
               key={i}
-              className="h-12 rounded-md border border-border bg-surface-raised"
+              className="h-12 rounded-md border border-border bg-surface"
             />
           ))}
         </div>

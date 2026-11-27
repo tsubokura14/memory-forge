@@ -2,8 +2,8 @@ import { Icon } from "@/components/icons";
 import type { Mastery } from "@/server/mastery/mastery";
 
 // docs/ui.md の「今の身についている具合」の、名前の下に出す線と数。
-// 線は border の地に、最後に正解した問題（primary）・最後に間違えた問題（border-strong）を全体に対する割合の幅で左から塗り、残りがまだ解いていない問題になる。
-// 下の数は色を付けず muted の文字だけにする（差し色を primary の1色に絞るため。docs/ui.md の「色の使い分け」）
+// 線は border の地に、最後に正解した問題（accent）・最後に間違えた問題（border-strong）を全体に対する割合の幅で左から塗り、残りがまだ解いていない問題になる。
+// 下の数は色を付けず muted の文字だけにする（差し色を accent の1色に絞るため。docs/ui.md の「色の使い分け」）
 export function MasteryBar({
   mastery,
   flagged = 0,
@@ -20,10 +20,7 @@ export function MasteryBar({
         aria-hidden
         className="flex h-1 overflow-hidden rounded-sm bg-border"
       >
-        <span
-          className="bg-primary"
-          style={{ width: width(mastery.correct) }}
-        />
+        <span className="bg-accent" style={{ width: width(mastery.correct) }} />
         <span
           className="bg-border-strong"
           style={{ width: width(mastery.wrong) }}

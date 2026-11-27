@@ -37,7 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="bg-bg font-sans text-text">{children}</body>
+      <body className="bg-bg font-ui text-text">{children}</body>
     </html>
   );
 }

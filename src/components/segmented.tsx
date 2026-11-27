@@ -14,7 +14,7 @@ export function Segmented<T>({
     <div
       role="radiogroup"
       aria-label={label}
-      className="flex gap-1 rounded-md bg-surface-raised p-1"
+      className="flex gap-1 rounded-md bg-surface p-1"
     >
       {options.map((option) => {
         const checked = option.value === value;

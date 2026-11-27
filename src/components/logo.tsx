@@ -12,7 +12,7 @@ export function Logo({ size = "lg" }: { size?: keyof typeof SIZES }) {
     <span
       className={`inline-flex items-center font-bold text-text ${SIZES[size].box}`}
     >
-      <Icon name="hammer" className={`text-primary ${SIZES[size].icon}`} />
+      <Icon name="hammer" className={`text-accent ${SIZES[size].icon}`} />
       memory-forge
     </span>
   );

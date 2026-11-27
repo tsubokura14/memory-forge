@@ -27,7 +27,7 @@ export default function SettingsPage({ searchParams }: PageProps<"/settings">) {
       </section>
       <section className="flex flex-col gap-2">
         <h2 className="text-xs text-muted">見た目</h2>
-        <div className="rounded-md border border-border bg-surface px-4 py-3">
+        <div className="rounded-md border border-border bg-bg px-4 py-3">
           <ThemePicker />
         </div>
       </section>
@@ -54,7 +54,7 @@ async function AccountCard({
   }
 
   return (
-    <div className="divide-y divide-border rounded-md border border-border bg-surface">
+    <div className="divide-y divide-border rounded-md border border-border bg-bg">
       <div className="px-4 py-3">
         {google ? (
           <GoogleAccounts

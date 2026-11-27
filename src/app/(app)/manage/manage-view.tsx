@@ -149,7 +149,7 @@ export function ManageView({
       </ManageHeader>
       <div className="flex flex-col gap-3">
         {/* スマホの幅では、Subject と Topic を縦に並べる */}
-        <div className="flex flex-col gap-3 rounded-md border border-border bg-surface p-3 sm:flex-row">
+        <div className="flex flex-col gap-3 rounded-md border border-border bg-bg p-3 sm:flex-row">
           <Field label="科目">
             <Dropdown
               label="科目"
@@ -287,7 +287,7 @@ export function ManageView({
             </div>
             <ul
               aria-label="問題"
-              className="flex flex-col divide-y divide-border overflow-hidden rounded-md border border-border bg-surface"
+              className="flex flex-col divide-y divide-border overflow-hidden rounded-md border border-border bg-bg"
             >
               {selected.questions.map((q) => (
                 <QuestionRow
@@ -426,7 +426,7 @@ export function QuestionsSkeleton() {
       {Array.from({ length: 6 }, (_, i) => (
         <div
           key={i}
-          className="h-14 rounded-md border border-border bg-surface-raised"
+          className="h-14 rounded-md border border-border bg-surface"
         />
       ))}
     </div>
