@@ -186,6 +186,7 @@
 - 入れ物の種類は、クラスではなく `data-body` の属性（`question`・`choice`・`explanation`）で分ける。`kinari-body` のクラスは ESLint の `no-unknown-classes` の `ignore` に足す（Tailwind のクラスではないため。ほかの名前のクラスを増やさずに済む）
 - kinari-md が読む `--leading-*`・`--font-weight-bold`・`--spacing`・`--default-transition-*` は、Tailwind の既定の値（md-leaf と同じ）がビルドした CSS に出ていることを確かめたので、`tokens.css` には足さない
 - 画面のテストの k3f9a2 の選択肢を文の中のコード（`` `add` `` など）にし、解説に強調と `> [!tip] 覚え方` のコールアウトを足す（`solve-question.png`・`solve-explanation.png` のスクリーンショットに合わせるため。データは `e2e/questions.ts` ではなく `e2e/solve.spec.ts` の `decorators` にある）
+- 取り込む前の確認の入れ物は、`data-body` の `preview`（問題文・解説）と `preview-choice`（選択肢。`preview` の上書きに加えて `--font-body` を `--font-ui` に当てる）の2つに分ける。問題文は Solve と同じ body（明朝）で出す（`import-preview.png` のスクリーンショットに合わせるため）
 
 ## 確かめ方
 
