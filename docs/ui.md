@@ -34,7 +34,7 @@
 - 差し色は江戸紫の1色だけ。ふだんの画面に出る色は、地・文字・muted・accent だけにする。例外は連続日数の flame だけ
   - 炎は暖かい色でないと「灯す」感じが出ないため。flame はほかの場所では使わない
   - success・danger は答え合わせ（Solve・Result）と、帯（誤り・終わったこと）・取り消せない操作・取り込む前の確認だけ、warning は不備の印だけに使う
-  - 解説のコールアウトの中は、kinari-md の色のまま（note・info は info、tip は success など。md-leaf と同じ）。info はコールアウトの中だけで使う
+  - 解説のコールアウトの中は、kinari-md の色のまま（md-leaf と同じ。note は info）。info はコールアウトの中だけで使う
 
 | トークン | 使う場面 |
 | --- | --- |
