@@ -98,10 +98,11 @@ describe("renderExplanation", () => {
     expect(html).toContain('href="https://example.com"');
   });
 
-  test("mermaid のコードブロックは、図の印を付けずコードブロックのまま出す", () => {
+  // pre に data-mermaid の印は付くが、図に描くのはブラウザの drawMermaid なので、呼ばなければコードブロックのまま
+  test("mermaid のコードブロックは、図にせずコードブロックのまま出す", () => {
     const html = renderExplanation(code("mermaid", "graph TD; A-->B"));
-    expect(html).toContain("<pre>");
-    expect(html).not.toContain("data-mermaid");
+    expect(html).toMatch(/<pre[^>]*><code class="language-mermaid">/);
+    expect(html).not.toContain("<svg");
     expect(textOf(html)).toContain("graph TD; A-->B");
   });
 });
