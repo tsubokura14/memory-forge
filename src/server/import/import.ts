@@ -1,6 +1,7 @@
 import { eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/server/db/client";
 import { answers, questions, subjects } from "@/server/db/schema";
+import { renderChoice, renderExplanation } from "@/server/questions/render";
 import { type Change, diffQuestions } from "./diff";
 import {
   type FileError,
@@ -25,9 +26,15 @@ export type ImportPreview =
         id: string;
         text: string;
         flagged: boolean;
-        changes: Change[];
+        changes: PreviewChange[];
       }[];
     };
+
+// 問題文・選択肢・解説の項目は、前と後の HTML（render.ts）も持つ。topic・type・correct は文字だけ
+export type PreviewChange = Change & {
+  beforeHtml?: string;
+  afterHtml?: string;
+};
 
 export type ImportResult =
   | { ok: false; errors: FileError[] }
@@ -56,9 +63,28 @@ export async function previewImport(content: string): Promise<ImportPreview> {
       id: question.id,
       text: question.text,
       flagged: flagged.has(question.id),
-      changes,
+      changes: changes.map(renderChange),
     })),
   };
+}
+
+// 問題文と選択肢は、選択肢と同じ変換（行番号なし）にする。前と後の中は狭く、行番号の要らない比べる場所のため
+function renderChange(change: Change): PreviewChange {
+  if (change.item === "explanation") {
+    return {
+      ...change,
+      beforeHtml: renderExplanation(change.before),
+      afterHtml: renderExplanation(change.after),
+    };
+  }
+  if (change.item === "text" || change.item.startsWith("choice ")) {
+    return {
+      ...change,
+      beforeHtml: renderChoice(change.before).html,
+      afterHtml: renderChoice(change.after).html,
+    };
+  }
+  return change;
 }
 
 // 取り込み。確認のあとに送られた中身を確かめ直し、1つのトランザクションの中で比べて書く。

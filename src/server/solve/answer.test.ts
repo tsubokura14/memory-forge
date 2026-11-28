@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test } from "vitest";
 import { db } from "@/server/db/client";
 import { answers, questions, subjects } from "@/server/db/schema";
+import { renderExplanation } from "@/server/questions/render";
 import { answerQuestion, skipQuestion } from "./answer";
 
 let questionId: number;
@@ -23,7 +24,7 @@ beforeEach(async () => {
       text: "当てはまるものをすべて選べ。",
       choices: ["add", "wrapper", "logger", "None"],
       correct: ["A", "C"],
-      explanation: "デコレータは関数を返す。",
+      explanation: "デコレータは**関数**を返す。",
     })
     .returning({ id: questions.id });
   questionId = question.id;
@@ -41,7 +42,8 @@ describe("answerQuestion", () => {
     expect(await answerQuestion(questionId, ["C", "A"])).toEqual({
       correct: true,
       answer: ["A", "C"],
-      explanation: "デコレータは関数を返す。",
+      explanation: "デコレータは**関数**を返す。",
+      explanationHtml: renderExplanation("デコレータは**関数**を返す。"),
     });
     expect(await recorded()).toEqual([{ correct: true }]);
   });
@@ -64,7 +66,8 @@ describe("skipQuestion", () => {
   test("不正解として記録し、正解の記号と解説を返す", async () => {
     expect(await skipQuestion(questionId)).toEqual({
       answer: ["A", "C"],
-      explanation: "デコレータは関数を返す。",
+      explanation: "デコレータは**関数**を返す。",
+      explanationHtml: renderExplanation("デコレータは**関数**を返す。"),
     });
     expect(await recorded()).toEqual([{ correct: false }]);
   });

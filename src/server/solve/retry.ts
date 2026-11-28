@@ -1,7 +1,7 @@
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/server/db/client";
 import { answers, questions } from "@/server/db/schema";
-import type { SolveQuestion } from "./start";
+import { renderQuestion, type SolveQuestion } from "./start";
 
 // 解き直しの回の問題を、渡した questions.id の順のまま受け取り直す。
 // Result から解き直すまでのあいだに印を付けた・消した問題は除き、取り込み直した問題は今の中身で返す。
@@ -31,6 +31,12 @@ export async function retryQuestions(ids: number[]): Promise<SolveQuestion[]> {
     const row = byId.get(id);
     if (!row) return [];
     const { correctCount, ...question } = row;
-    return [{ ...question, correctBefore: correctCount > 0 }];
+    return [
+      {
+        ...question,
+        ...renderQuestion(question.text, question.choices),
+        correctBefore: correctCount > 0,
+      },
+    ];
   });
 }

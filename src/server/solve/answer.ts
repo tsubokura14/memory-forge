@@ -1,12 +1,15 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/server/db/client";
 import { answers, questions } from "@/server/db/schema";
+import { renderExplanation } from "@/server/questions/render";
 import { gradeAnswer } from "./grade";
 
 export type AnswerResult = {
   correct: boolean;
   answer: string[];
   explanation: string;
+  // 画面に出す解説の HTML（render.ts）
+  explanationHtml: string;
 };
 
 // 答え合わせはサーバーでし、記録と1回の操作にする。記録できなかったら画面は正解・不正解を出さずに retry を出せ、
@@ -30,6 +33,7 @@ export async function answerQuestion(
     correct,
     answer: question.correct,
     explanation: question.explanation,
+    explanationHtml: renderExplanation(question.explanation),
   };
 }
 
@@ -48,5 +52,9 @@ export async function skipQuestion(id: number): Promise<SkipResult> {
   if (!question) throw new Error(`Question ${id} not found.`);
 
   await db.insert(answers).values({ questionId: id, correct: false });
-  return { answer: question.correct, explanation: question.explanation };
+  return {
+    answer: question.correct,
+    explanation: question.explanation,
+    explanationHtml: renderExplanation(question.explanation),
+  };
 }

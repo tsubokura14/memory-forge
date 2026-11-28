@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test } from "vitest";
 import { db } from "@/server/db/client";
 import { answers, questions, subjects } from "@/server/db/schema";
+import { renderChoice, renderQuestionText } from "@/server/questions/render";
 import { retryQuestions } from "./retry";
 
 let ids: number[];
@@ -43,6 +44,8 @@ describe("retryQuestions", () => {
         type: "single",
         text: "問題3",
         choices: ["a", "b"],
+        textHtml: renderQuestionText("問題3"),
+        choicesHtml: [renderChoice("a"), renderChoice("b")],
         correctBefore: false,
       },
       expect.objectContaining({ id: ids[0], questionId: "q1" }),

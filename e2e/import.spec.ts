@@ -158,6 +158,9 @@ test("取り込む前の確認で、数と置き換わる問題の前と後を�
   await expect(
     page.getByRole("button", { name: "すべて取り込む" }),
   ).toBeVisible();
+  // 前と後の問題文は、サーバーで変換した HTML を kinari-md の本文の入れ物で出す
+  const preview = page.locator('.kinari-body[data-body="preview"]');
+  await expect(preview.locator(".hljs-keyword").first()).toBeVisible();
   await expect(page).toHaveScreenshot("import-preview.png", { fullPage: true });
 
   await page.getByRole("button", { name: "やめる" }).click();

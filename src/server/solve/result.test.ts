@@ -130,11 +130,16 @@ describe("missedQuestions", () => {
           type: "single",
           text: "問題",
           choices: ["a", "b"],
+          textHtml: "<p>問題</p>",
+          choicesHtml: [
+            { html: "<p>a</p>", hasCode: false },
+            { html: "<p>b</p>", hasCode: false },
+          ],
           correctBefore: false,
         },
         selected: kind === "skipped" ? [] : ["B"],
         answer: ["A"],
-        explanation: "解説",
+        explanationHtml: "<p>解説</p>",
       },
     };
   }

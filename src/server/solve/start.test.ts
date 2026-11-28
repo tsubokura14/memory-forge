@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test } from "vitest";
 import { db } from "@/server/db/client";
 import { answers, questions, subjects } from "@/server/db/schema";
+import { renderChoice, renderQuestionText } from "@/server/questions/render";
 import { startSession } from "./start";
 
 let python: number;
@@ -55,6 +56,8 @@ describe("startSession", () => {
         type: "single",
         text: "a1 の問題文",
         choices: ["A の選択肢", "B の選択肢"],
+        textHtml: renderQuestionText("a1 の問題文"),
+        choicesHtml: [renderChoice("A の選択肢"), renderChoice("B の選択肢")],
         correctBefore: false,
       },
       expect.objectContaining({ questionId: "c3" }),

@@ -1,0 +1,55 @@
+/*
+  問題文・選択肢・解説の入れ物（src/components/rich-text.tsx の data-body）ごとに、kinari-md の本文の見た目を上書きする。
+  見た目の作りは kinari-md/body.css に任せ、ここには入れ物ごとの文字の大きさ・書体・枠だけを書く。
+  pre や code の中まで変えるので、Tailwind のクラスではなく CSS に書く（[&_pre] のような書き方は ESLint で止まるため）
+*/
+
+.kinari-body[data-body="question"] {
+  --reading-size: var(--text-lg);
+}
+
+/* kinari-md の 0.82em のままだと lg の文の中で大きく、スマホの幅で横にはみ出しやすいので、今と同じ sm にする */
+.kinari-body[data-body="question"] pre {
+  font-size: var(--text-sm);
+}
+
+.kinari-body[data-body="explanation"] {
+  --reading-size: var(--text-base);
+}
+
+/* 選択肢の文は画面の部品の書体（sans）にする。kinari-md は本文に --font-body を使うので、入れ物の中だけ当て直す */
+.kinari-body[data-body="choice"] {
+  --reading-size: var(--text-sm);
+  --font-body: var(--font-ui);
+}
+
+/* 文が sm なので、コードも 0.82em にせず文と同じ大きさにする（小さくなりすぎるため） */
+.kinari-body[data-body="choice"] pre,
+.kinari-body[data-body="choice"] :not(pre) > code {
+  font-size: 1em;
+}
+
+/* 選択肢の中のコードブロックの枠（docs/ui.md の「選択肢の中のコードブロック」） */
+.kinari-body[data-body="choice"] pre {
+  border: thin solid var(--color-border);
+}
+
+/*
+  取り込む前の確認の前と後（src/components/change-row.tsx）。前と後の箱は sm の文字なので、本文もコードも sm にする。
+  選択肢の項目は Solve の選択肢と同じ書体（sans）にする。前と後の地は code-bg と違う色なので、コードブロックに枠は付けない
+*/
+.kinari-body[data-body="preview"],
+.kinari-body[data-body="preview-choice"] {
+  --reading-size: var(--text-sm);
+}
+
+.kinari-body[data-body="preview-choice"] {
+  --font-body: var(--font-ui);
+}
+
+.kinari-body[data-body="preview"] pre,
+.kinari-body[data-body="preview"] :not(pre) > code,
+.kinari-body[data-body="preview-choice"] pre,
+.kinari-body[data-body="preview-choice"] :not(pre) > code {
+  font-size: 1em;
+}

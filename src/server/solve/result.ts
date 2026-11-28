@@ -1,13 +1,13 @@
 // 解き終わりの結果の数え方。データベースは使わない（解く画面がブラウザで数える）
 import type { SolveQuestion } from "./start";
 
-// 見直しの画面に出す、答えたときの中身。selected は選んだ答え（飛ばしたときは空）、answer と explanation は答え合わせ・飛ばすで返ってきたもの。
+// 見直しの画面に出す、答えたときの中身。selected は選んだ答え（飛ばしたときは空）、answer と explanationHtml（解説の HTML）は答え合わせ・飛ばすで返ってきたもの。
 // 見直しは記録を送らずに、これだけで答えたあとの Solve の見た目を出す
 export type Review = {
   question: SolveQuestion;
   selected: string[];
   answer: string[];
-  explanation: string;
+  explanationHtml: string;
 };
 
 // 1問ずつの結果。correctBefore は SolveQuestion のもの。
