@@ -30,10 +30,8 @@ export function ChangeRow({
       <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5 text-sm">
         <span aria-hidden className="flex text-base text-muted">
           <Icon name="chevron-right" className="group-open:hidden" />
-          <Icon
-            name="chevron-down"
-            className="hidden group-open:inline-block"
-          />
+          {/* Icon が inline-block を付け、それが hidden より CSS の後ろに来て勝つので、隠すほうを変化形にする */}
+          <Icon name="chevron-down" className="group-not-open:hidden" />
         </span>
         <span>{id}</span>
         <span className="truncate">{text.split("\n")[0]}</span>
